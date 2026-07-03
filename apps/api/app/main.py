@@ -1,3 +1,4 @@
+import logging
 import os
 from contextlib import asynccontextmanager
 
@@ -6,31 +7,60 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.db import init_db
-from app.routers import health
+from app.middleware import RateLimitMiddleware, RequestLoggingMiddleware
+from app.routers import health, market
 
 load_dotenv()
+
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+logging.basicConfig(
+    level=LOG_LEVEL,
+    format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
+)
+logger = logging.getLogger("pulso.api")
+
+DEFAULT_ALLOWED_ORIGINS = "http://localhost:5173,http://127.0.0.1:5173"
+
+
+def _parse_allowed_origins() -> list[str]:
+    raw = os.getenv("ALLOWED_ORIGINS", "").strip()
+    if not raw:
+        raw = DEFAULT_ALLOWED_ORIGINS
+    return [origin.strip() for origin in raw.split(",") if origin.strip()]
+
+
+RATE_LIMIT_PER_MINUTE = int(os.getenv("RATE_LIMIT_PER_MINUTE", "60"))
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    logger.info("PULSO API starting up (log_level=%s)", LOG_LEVEL)
     await init_db()
     yield
+    logger.info("PULSO API shutting down")
 
 
 app = FastAPI(title="PULSO API", lifespan=lifespan)
 
+allowed_origins = _parse_allowed_origins()
+logger.info("CORS allowed origins: %s", allowed_origins)
+
+# NOTE on order: Starlette makes the LAST-added middleware the OUTERMOST one.
+# CORS must be outermost so that 429 (rate limit) and 5xx responses from the
+# inner middlewares still carry CORS headers -- otherwise the browser reports
+# a CORS failure instead of surfacing the real status code to the frontend.
+app.add_middleware(RequestLoggingMiddleware)
+app.add_middleware(RateLimitMiddleware, max_requests=RATE_LIMIT_PER_MINUTE)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 app.include_router(health.router)
+app.include_router(market.router)
 
 
 @app.get("/")

@@ -1,0 +1,163 @@
+/* Space Grotesk (display/títulos) + Inter (texto). Pesos acotados a los que
+   realmente se usan para no pagar payload de más. Tiene que ir ANTES que
+   @import "tailwindcss" — cualquier @import debe preceder al resto de las
+   reglas, y ese import ya expande a CSS real. */
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap");
+
+@import "tailwindcss";
+@config "../../tailwind.config.ts";
+
+:root {
+  color-scheme: dark;
+
+  /* Tokens espejados como CSS vars — para consumo fuera de Tailwind
+     (framer-motion, lightweight-charts, RainbowKit theme, estilos inline). */
+  --pulso-bg-void: #0a0118;
+  --pulso-bg-deep: #0d0221;
+
+  --pulso-surface-1: #120b27;
+  --pulso-surface-2: #1a1035;
+  --pulso-surface-3: #241748;
+
+  --pulso-border-subtle: rgba(139, 92, 246, 0.12);
+  --pulso-border-default: rgba(139, 92, 246, 0.22);
+  --pulso-border-emphasis: rgba(168, 85, 247, 0.45);
+  --pulso-border-focus: #a855f7;
+
+  --pulso-text-primary: #f5f3ff;
+  --pulso-text-secondary: #c4b5fd;
+  --pulso-text-tertiary: #8b7fae;
+  --pulso-text-muted: #5b5478;
+
+  --pulso-violet: #8b5cf6;
+  --pulso-purple: #a855f7;
+  --pulso-magenta: #ec4899;
+  --pulso-fuchsia: #ff2e9f;
+
+  --pulso-positive: #22d3ee;
+  --pulso-negative: #f43f5e;
+
+  --pulso-font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --pulso-font-text: "Inter", system-ui, sans-serif;
+
+  --pulso-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  border-color: var(--pulso-border-subtle);
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  /* Sin `background-attachment: fixed`: solo pinta hasta la altura del
+     viewport y deja un vacío negro debajo en páginas más largas que una
+     pantalla. El fondo cubre todo el documento y se desplaza con el resto. */
+  background: linear-gradient(160deg, var(--pulso-bg-void) 0%, var(--pulso-bg-deep) 60%, var(--pulso-surface-1) 100%);
+  background-color: var(--pulso-surface-1);
+  color: var(--pulso-text-primary);
+  font-family: var(--pulso-font-text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-display {
+  font-family: var(--pulso-font-display);
+  letter-spacing: -0.01em;
+}
+
+/* Toda cifra de precio/porcentaje va con tabular-nums (clase Tailwind
+   `tabular-nums` disponible), esto es el fallback si se olvida la clase. */
+.pulso-figure {
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: rgba(168, 85, 247, 0.35);
+  color: var(--pulso-text-primary);
+}
+
+/* Grid + starfield sutil de fondo, mencionado en la identidad visual.
+   Aplicar en el contenedor raíz (ver Layout), nunca en cada card. */
+.pulso-ambient {
+  position: relative;
+  isolation: isolate;
+}
+
+.pulso-ambient::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(139, 92, 246, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 90%);
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 90%);
+}
+
+.pulso-ambient::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(245, 243, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 65% 15%, rgba(245, 243, 255, 0.35), transparent),
+    radial-gradient(1.5px 1.5px at 85% 55%, rgba(245, 243, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 40% 75%, rgba(245, 243, 255, 0.3), transparent),
+    radial-gradient(1.5px 1.5px at 10% 85%, rgba(245, 243, 255, 0.35), transparent),
+    radial-gradient(1px 1px at 92% 80%, rgba(245, 243, 255, 0.3), transparent);
+  opacity: 0.6;
+}
+
+/* Scrollbar estilizado */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--pulso-border-emphasis) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(139, 92, 246, 0.3);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(168, 85, 247, 0.5);
+  background-clip: content-box;
+}
+
+/* Respeta prefers-reduced-motion a nivel global, como red de seguridad
+   además de las variantes `motion-reduce:` puntuales de cada componente. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
