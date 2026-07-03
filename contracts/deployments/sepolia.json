@@ -1,0 +1,8 @@
+{
+  "PulsoToken": "0xb432281F4aD976253630792E4931a4D084B33c0A",
+  "PulsoStaking": "0x5C850800beD6E58F52F9F2721705D6675f1A9936",
+  "network": "sepolia",
+  "chainId": 11155111,
+  "blockExplorer": "https://sepolia.etherscan.io",
+  "deployedAt": "2026-07-03"
+}
