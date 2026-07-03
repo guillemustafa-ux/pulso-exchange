@@ -1,0 +1,66 @@
+[
+  {
+    "nombre": "Lemon",
+    "tipo": "fintech",
+    "moneda": "ARS",
+    "apy_aprox": 35.0,
+    "url": "https://www.lemon.me/",
+    "ultima_actualizacion": "2026-07-03"
+  },
+  {
+    "nombre": "Belo",
+    "tipo": "fintech",
+    "moneda": "ARS",
+    "apy_aprox": 32.0,
+    "url": "https://belo.app/",
+    "ultima_actualizacion": "2026-07-03"
+  },
+  {
+    "nombre": "Buenbit",
+    "tipo": "exchange_ar",
+    "moneda": "USDT",
+    "apy_aprox": 6.5,
+    "url": "https://www.buenbit.com/",
+    "ultima_actualizacion": "2026-07-03"
+  },
+  {
+    "nombre": "Ripio",
+    "tipo": "exchange_ar",
+    "moneda": "ARS",
+    "apy_aprox": 30.0,
+    "url": "https://www.ripio.com/",
+    "ultima_actualizacion": "2026-07-03"
+  },
+  {
+    "nombre": "Bitso",
+    "tipo": "exchange_ar",
+    "moneda": "USDC",
+    "apy_aprox": 4.2,
+    "url": "https://bitso.com/ar",
+    "ultima_actualizacion": "2026-07-03"
+  },
+  {
+    "nombre": "Cocos Capital",
+    "tipo": "fintech",
+    "moneda": "ARS",
+    "apy_aprox": 28.0,
+    "url": "https://cocos.capital/",
+    "ultima_actualizacion": "2026-07-03"
+  },
+  {
+    "nombre": "Aave",
+    "tipo": "defi",
+    "moneda": "USDC",
+    "apy_aprox": 3.8,
+    "url": "https://aave.com/",
+    "ultima_actualizacion": "2026-07-03"
+  },
+  {
+    "nombre": "dYdX",
+    "tipo": "defi",
+    "moneda": "USDC",
+    "apy_aprox": 7.0,
+    "url": "https://dydx.exchange/",
+    "ultima_actualizacion": "2026-07-03"
+  }
+]

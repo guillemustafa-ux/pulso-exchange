@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.db import init_db
 from app.middleware import RateLimitMiddleware, RequestLoggingMiddleware
-from app.routers import health, market
+from app.routers import defi, earn, health, market
 
 load_dotenv()
 
@@ -61,6 +61,8 @@ app.add_middleware(
 
 app.include_router(health.router)
 app.include_router(market.router)
+app.include_router(earn.router)
+app.include_router(defi.router)
 
 
 @app.get("/")

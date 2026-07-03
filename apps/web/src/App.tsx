@@ -4,6 +4,9 @@ import { Layout } from './components/layout/Layout'
 import { NAV_ITEMS } from './components/layout/nav-items'
 import { Home } from './pages/Home'
 import { Market } from './pages/Market'
+import { Earn } from './pages/Earn'
+import { DeFi } from './pages/DeFi'
+import { Staking } from './pages/Staking'
 
 /** Nav item cuyo `path` matchea el pathname actual (incluye subrutas, ej. `/market/:id`). */
 function resolveActiveId(pathname: string): string {
@@ -30,6 +33,9 @@ function App(): JSX.Element {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/market/:id?" element={<Market />} />
+        <Route path="/earn" element={<Earn />} />
+        <Route path="/defi" element={<DeFi />} />
+        <Route path="/staking" element={<Staking />} />
       </Routes>
     </Layout>
   )

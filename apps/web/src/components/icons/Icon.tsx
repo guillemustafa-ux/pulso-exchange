@@ -108,6 +108,16 @@ export function IconMore(props: IconProps): JSX.Element {
   )
 }
 
+export function IconWarning(props: IconProps): JSX.Element {
+  return (
+    <svg {...base(props)}>
+      <path d="M12 3L21 19H3L12 3Z" />
+      <path d="M12 9.5V13.5" />
+      <path d="M12 16.25H12.01" />
+    </svg>
+  )
+}
+
 export function IconWallet(props: IconProps): JSX.Element {
   return (
     <svg {...base(props)}>

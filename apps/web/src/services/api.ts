@@ -118,3 +118,58 @@ export function fetchKlines(
   const params = new URLSearchParams({ interval, limit: String(limit) })
   return getJson<KlinesResponse>(`/api/market/klines/${encodeURIComponent(symbol)}?${params.toString()}`)
 }
+
+// ---------------------------------------------------------------------------
+// GET /api/earn/ar
+// ---------------------------------------------------------------------------
+
+export type EarnTipo = 'exchange_ar' | 'fintech' | 'defi'
+export type EarnMoneda = 'ARS' | 'USDT' | 'USDC' | 'BTC'
+
+export interface EarnOption {
+  nombre: string
+  tipo: EarnTipo
+  moneda: EarnMoneda
+  apy_aprox: number
+  url: string
+  ultima_actualizacion: string
+}
+
+/** Pass-through de CriptoYa (`/api/dolar` + `/api/usdt/ars/1`) -- shape ancho y variable, no vale tipar cada subcampo. */
+export interface EarnCotizaciones {
+  dolar: Record<string, unknown>
+  usdt_ars: Record<string, unknown>
+}
+
+export interface EarnArResponse {
+  disclaimer: string
+  updated_at: string
+  opciones: EarnOption[]
+  /** `null` cuando CriptoYa no respondió a tiempo -- la tabla curada llega igual. */
+  cotizaciones: EarnCotizaciones | null
+  cotizaciones_error?: string | null
+}
+
+export function fetchEarnAr(): Promise<EarnArResponse> {
+  return getJson<EarnArResponse>('/api/earn/ar')
+}
+
+// ---------------------------------------------------------------------------
+// GET /api/defi/protocols
+// ---------------------------------------------------------------------------
+
+export interface DefiProtocolItem {
+  id: string
+  name: string
+  logo: string | null
+  category: string | null
+  chains: string[]
+  tvl: number | null
+  change_7d: number | null
+  /** Unix timestamp (segundos) de cuándo DefiLlama empezó a trackear el protocolo. */
+  listed_at: number | null
+}
+
+export function fetchDefiProtocols(): Promise<DefiProtocolItem[]> {
+  return getJson<DefiProtocolItem[]>('/api/defi/protocols')
+}

@@ -28,6 +28,16 @@ export function formatCompactUsd(value: number | null | undefined): string {
   }).format(value)
 }
 
+/** Peso argentino sin decimales — cotizaciones MEP/CCL/USDT-ARS no necesitan centavos. */
+export function formatArs(value: number | null | undefined): string {
+  if (value === null || value === undefined || Number.isNaN(value)) return '—'
+  return new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+    maximumFractionDigits: 0,
+  }).format(value)
+}
+
 /** Porcentaje sin signo (el signo lo da el color/ícono en quien lo consume). */
 export function formatPercent(value: number | null | undefined): string {
   if (value === null || value === undefined || Number.isNaN(value)) return '—'

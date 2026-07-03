@@ -3,9 +3,9 @@ import type { JSX, ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from '../../lib/cn'
 import { Badge } from '../ui/Badge'
-import { Button } from '../ui/Button'
 import { PulseIcon } from '../icons/PulseIcon'
-import { IconMore, IconWallet, IconClose } from '../icons/Icon'
+import { IconMore, IconClose } from '../icons/Icon'
+import { WalletButton } from '../WalletButton'
 import { NAV_ITEMS, MOBILE_PRIMARY_IDS } from './nav-items'
 import type { NavItem } from './nav-items'
 
@@ -106,10 +106,7 @@ function Header({ activeLabel }: { activeLabel: string | undefined }): JSX.Eleme
         <Badge variant="neutral" size="sm" className="hidden sm:inline-flex">
           Sepolia Testnet
         </Badge>
-        <Button variant="secondary" size="sm" className="gap-1.5">
-          <IconWallet className="h-4 w-4" />
-          <span className="hidden sm:inline">Conectar wallet</span>
-        </Button>
+        <WalletButton />
       </div>
     </header>
   )
