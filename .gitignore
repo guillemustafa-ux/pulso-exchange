@@ -1,0 +1,41 @@
+# Environment
+.env
+.env.local
+*.env
+!.env.example
+
+# Node / web
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
+
+# Python / api
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+*.db
+*.sqlite
+*.sqlite3
+
+# Foundry / contracts
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+!contracts/broadcast/**/dry-run/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
