@@ -14,7 +14,8 @@ export type IconType = ComponentType<SVGProps<SVGSVGElement>>
 
 export interface NavItem {
   id: string
-  label: string
+  /** Key de traducción (namespace `nav.*`, ver `src/locales/{es,en}.json`) -- coincide con `id`. */
+  labelKey: string
   icon: IconType
   /** Ruta del router para este módulo. Sin `path` = todavía no tiene página (placeholder en Home). */
   path?: string
@@ -25,14 +26,14 @@ export interface NavItem {
  * widget flotante presente en toda la app, no una sección de nav.
  */
 export const NAV_ITEMS: NavItem[] = [
-  { id: 'mercado', label: 'Mercado', icon: IconMarket, path: '/market' },
-  { id: 'defi', label: 'DeFi', icon: IconDefi, path: '/defi' },
-  { id: 'earn', label: 'Earn AR', icon: IconEarn, path: '/earn' },
-  { id: 'staking', label: 'Staking', icon: IconStaking, path: '/staking' },
-  { id: 'bots', label: 'Bots', icon: IconBots, path: '/bots' },
-  { id: 'tendencias', label: 'Tendencias', icon: IconTrending, path: '/trends' },
-  { id: 'educacion', label: 'Educación', icon: IconEducation },
-  { id: 'seguridad', label: 'Seguridad', icon: IconShield },
+  { id: 'mercado', labelKey: 'nav.mercado', icon: IconMarket, path: '/market' },
+  { id: 'defi', labelKey: 'nav.defi', icon: IconDefi, path: '/defi' },
+  { id: 'earn', labelKey: 'nav.earn', icon: IconEarn, path: '/earn' },
+  { id: 'staking', labelKey: 'nav.staking', icon: IconStaking, path: '/staking' },
+  { id: 'bots', labelKey: 'nav.bots', icon: IconBots, path: '/bots' },
+  { id: 'tendencias', labelKey: 'nav.tendencias', icon: IconTrending, path: '/trends' },
+  { id: 'educacion', labelKey: 'nav.educacion', icon: IconEducation, path: '/education' },
+  { id: 'seguridad', labelKey: 'nav.seguridad', icon: IconShield, path: '/security' },
 ]
 
 /** Slots del bottom nav mobile: los 4 módulos de mayor uso + "Más". */

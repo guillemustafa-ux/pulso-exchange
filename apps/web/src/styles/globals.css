@@ -149,8 +149,11 @@ h4,
   background-clip: content-box;
 }
 
-/* Respeta prefers-reduced-motion a nivel global, como red de seguridad
-   además de las variantes `motion-reduce:` puntuales de cada componente. */
+/* Respeta prefers-reduced-motion a nivel global para animaciones/transiciones
+   CSS (Tailwind `transition-*`, `animate-*`), como red de seguridad además de
+   las variantes `motion-reduce:` puntuales de cada componente. Las animaciones
+   de framer-motion (JS, no CSS) las cubre `<MotionConfig reducedMotion="user">`
+   en `main.tsx` -- esta regla no las alcanza. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -160,4 +163,13 @@ h4,
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Foco visible global: red de seguridad para cualquier botón/link/input que
+   no defina su propio `focus-visible:shadow-focus-ring` (los que sí lo
+   definen -- Button, inputs de búsqueda, etc. -- ganan por especificidad de
+   clase y se ven idénticos, este es solo el piso mínimo garantizado). */
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.55);
 }

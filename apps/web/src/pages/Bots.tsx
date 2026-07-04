@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { JSX, ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   CartesianGrid,
@@ -34,10 +35,11 @@ import { cn } from '../lib/cn'
 /** Spec: polling cada 15s (no WebSocket). */
 const REFRESH_INTERVAL_MS = 15_000
 
-const ESTRATEGIA_LABEL: Record<BotEstrategia, string> = {
-  DCA: 'DCA',
-  GRID: 'Grid',
-  SMA: 'SMA Crossover',
+/** Keys de traducción por estrategia -- ver `bots.estrategiaLabel.*` en `src/locales/{es,en}.json`. */
+const ESTRATEGIA_LABEL_KEY: Record<BotEstrategia, string> = {
+  DCA: 'bots.estrategiaLabel.DCA',
+  GRID: 'bots.estrategiaLabel.GRID',
+  SMA: 'bots.estrategiaLabel.SMA',
 }
 
 const INPUT_CLASS = cn(
@@ -77,11 +79,10 @@ function PnlText({ usd, pct, size = 'lg' }: { usd: number; pct: number; size?: '
 // ---------------------------------------------------------------------------
 
 function MiniEquityChart({ data }: { data: EquityPoint[] }): JSX.Element {
+  const { t } = useTranslation()
   if (data.length < 2) {
     return (
-      <div className="flex h-12 items-center justify-center text-[11px] text-text-muted">
-        Sin historial todavía
-      </div>
+      <div className="flex h-12 items-center justify-center text-[11px] text-text-muted">{t('bots.noHistory')}</div>
     )
   }
   const positive = data[data.length - 1].equity >= data[0].equity
@@ -98,11 +99,12 @@ function MiniEquityChart({ data }: { data: EquityPoint[] }): JSX.Element {
 }
 
 function EquityChart({ data }: { data: EquityPoint[] }): JSX.Element {
+  const { t } = useTranslation()
   if (data.length === 0) {
     return (
       <div className="flex h-64 flex-col items-center justify-center gap-3 text-center">
         <PulseIcon variant="flat" className="h-6 w-16 text-text-muted" />
-        <p className="text-xs text-text-muted">Todavía no hay historial de equity para este bot.</p>
+        <p className="text-xs text-text-muted">{t('bots.noEquityHistory')}</p>
       </div>
     )
   }
@@ -154,13 +156,11 @@ function EquityChart({ data }: { data: EquityPoint[] }): JSX.Element {
 // ---------------------------------------------------------------------------
 
 function PaperTradingBanner(): JSX.Element {
+  const { t } = useTranslation()
   return (
     <div className="flex items-start gap-3 rounded-lg border border-negative/30 bg-negative/10 px-4 py-3">
       <IconWarning className="mt-0.5 h-4 w-4 shrink-0 text-negative" />
-      <p className="text-sm font-medium text-negative">
-        PAPER TRADING — Fondos y operaciones completamente simulados. Ningún bot de PULSO se conecta a un
-        exchange real ni ejecuta órdenes reales.
-      </p>
+      <p className="text-sm font-medium text-negative">{t('bots.banner')}</p>
     </div>
   )
 }
@@ -232,10 +232,10 @@ function ModalShell({
 // Wizard de creación (3 pasos: estrategia -> par + capital -> parámetros)
 // ---------------------------------------------------------------------------
 
-const ESTRATEGIAS: { id: BotEstrategia; label: string; desc: string }[] = [
-  { id: 'DCA', label: 'DCA', desc: 'Compra un monto fijo en USD cada cierto tiempo, sin importar el precio.' },
-  { id: 'GRID', label: 'Grid', desc: 'Niveles de compra/venta fijos por encima y por debajo del precio actual.' },
-  { id: 'SMA', label: 'SMA Crossover', desc: 'Cruce de medias móviles: compra en el cruce alcista, vende en el bajista.' },
+const ESTRATEGIAS: { id: BotEstrategia; labelKey: string; descKey: string }[] = [
+  { id: 'DCA', labelKey: 'bots.wizard.estrategias.DCA.label', descKey: 'bots.wizard.estrategias.DCA.desc' },
+  { id: 'GRID', labelKey: 'bots.wizard.estrategias.GRID.label', descKey: 'bots.wizard.estrategias.GRID.desc' },
+  { id: 'SMA', labelKey: 'bots.wizard.estrategias.SMA.label', descKey: 'bots.wizard.estrategias.SMA.desc' },
 ]
 
 const PARES_SUGERIDOS = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT']
@@ -303,7 +303,8 @@ function buildParams(state: WizardState): Record<string, unknown> {
 }
 
 function StepIndicator({ step }: { step: 1 | 2 | 3 }): JSX.Element {
-  const labels = ['Estrategia', 'Par y capital', 'Parámetros']
+  const { t } = useTranslation()
+  const labels = t('bots.wizard.steps', { returnObjects: true }) as string[]
   return (
     <div className="mb-5 flex items-center gap-2">
       {labels.map((label, i) => {
@@ -342,6 +343,7 @@ function CreateBotWizard({
   onClose: () => void
   onCreated: (bot: Bot) => void
 }): JSX.Element {
+  const { t } = useTranslation()
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [state, setState] = useState<WizardState>(INITIAL_WIZARD_STATE)
   const [submitting, setSubmitting] = useState(false)
@@ -385,7 +387,7 @@ function CreateBotWizard({
       onCreated(bot)
       onClose()
     } catch (err) {
-      setFormError(err instanceof ApiError ? err.message : 'No se pudo crear el bot.')
+      setFormError(err instanceof ApiError ? err.message : t('bots.wizard.genericError'))
     } finally {
       setSubmitting(false)
     }
@@ -395,12 +397,12 @@ function CreateBotWizard({
     <ModalShell onClose={onClose} labelledBy="wizard-title" maxWidth="max-w-xl">
       <div className="mb-1 flex items-start justify-between gap-3 pr-8">
         <h2 id="wizard-title" className="font-display text-lg font-semibold text-text-primary">
-          Crear bot
+          {t('bots.wizard.title')}
         </h2>
         <button
           type="button"
           onClick={onClose}
-          aria-label="Cerrar"
+          aria-label={t('common.close')}
           className="absolute right-4 top-4 rounded-md p-1.5 text-text-tertiary transition-colors duration-150 hover:bg-surface-2/60 hover:text-text-primary"
         >
           <IconClose className="h-5 w-5" />
@@ -423,8 +425,8 @@ function CreateBotWizard({
                   : 'border-border-subtle hover:border-border-default hover:bg-surface-2/40',
               )}
             >
-              <span className="font-display text-sm font-semibold text-text-primary">{e.label}</span>
-              <span className="text-xs text-text-tertiary">{e.desc}</span>
+              <span className="font-display text-sm font-semibold text-text-primary">{t(e.labelKey)}</span>
+              <span className="text-xs text-text-tertiary">{t(e.descKey)}</span>
             </button>
           ))}
         </div>
@@ -433,24 +435,24 @@ function CreateBotWizard({
       {step === 2 && (
         <div className="flex flex-col gap-4">
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium text-text-secondary">Nombre del bot</span>
+            <span className="text-xs font-medium text-text-secondary">{t('bots.wizard.nombreLabel')}</span>
             <input
               type="text"
               value={state.nombre}
               onChange={(e) => setState((s) => ({ ...s, nombre: e.target.value, nombreTocado: true }))}
               className={INPUT_CLASS}
-              placeholder="Ej. DCA BTC semanal"
+              placeholder={t('bots.wizard.nombrePlaceholder')}
             />
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium text-text-secondary">Par</span>
+            <span className="text-xs font-medium text-text-secondary">{t('bots.wizard.parLabel')}</span>
             <input
               type="text"
               value={state.par}
               onChange={(e) => updatePar(e.target.value.toUpperCase())}
               className={INPUT_CLASS}
-              placeholder="BTCUSDT"
+              placeholder={t('bots.wizard.parPlaceholder')}
             />
             <div className="flex flex-wrap gap-1.5">
               {PARES_SUGERIDOS.map((p) => (
@@ -472,7 +474,7 @@ function CreateBotWizard({
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium text-text-secondary">Capital inicial (USD, simulado)</span>
+            <span className="text-xs font-medium text-text-secondary">{t('bots.wizard.capitalLabel')}</span>
             <input
               type="number"
               min="1"
@@ -489,21 +491,21 @@ function CreateBotWizard({
       {step === 3 && state.estrategia === 'DCA' && (
         <div className="flex flex-col gap-4">
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium text-text-secondary">Frecuencia de compra</span>
+            <span className="text-xs font-medium text-text-secondary">{t('bots.wizard.dca.frecuencia')}</span>
             <select
               value={state.intervaloSegundos}
               onChange={(e) => setState((s) => ({ ...s, intervaloSegundos: e.target.value }))}
               className={INPUT_CLASS}
             >
-              <option value="60">Cada 1 minuto</option>
-              <option value="300">Cada 5 minutos</option>
-              <option value="3600">Cada 1 hora</option>
-              <option value="14400">Cada 4 horas</option>
-              <option value="86400">Cada 1 día</option>
+              <option value="60">{t('bots.wizard.dca.opcion1m')}</option>
+              <option value="300">{t('bots.wizard.dca.opcion5m')}</option>
+              <option value="3600">{t('bots.wizard.dca.opcion1h')}</option>
+              <option value="14400">{t('bots.wizard.dca.opcion4h')}</option>
+              <option value="86400">{t('bots.wizard.dca.opcion1d')}</option>
             </select>
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium text-text-secondary">Monto por orden (USD)</span>
+            <span className="text-xs font-medium text-text-secondary">{t('bots.wizard.dca.monto')}</span>
             <input
               type="number"
               min="0"
@@ -521,7 +523,7 @@ function CreateBotWizard({
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-3">
             <label className="flex flex-col gap-1.5">
-              <span className="text-xs font-medium text-text-secondary">Niveles por lado</span>
+              <span className="text-xs font-medium text-text-secondary">{t('bots.wizard.grid.niveles')}</span>
               <input
                 type="number"
                 min="1"
@@ -532,7 +534,7 @@ function CreateBotWizard({
               />
             </label>
             <label className="flex flex-col gap-1.5">
-              <span className="text-xs font-medium text-text-secondary">Spread entre niveles (%)</span>
+              <span className="text-xs font-medium text-text-secondary">{t('bots.wizard.grid.spread')}</span>
               <input
                 type="number"
                 min="0.1"
@@ -544,7 +546,7 @@ function CreateBotWizard({
             </label>
           </div>
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium text-text-secondary">Capital por nivel (USD, opcional)</span>
+            <span className="text-xs font-medium text-text-secondary">{t('bots.wizard.grid.capitalPorNivel')}</span>
             <input
               type="number"
               min="0"
@@ -552,12 +554,10 @@ function CreateBotWizard({
               value={state.capitalPorNivel}
               onChange={(e) => setState((s) => ({ ...s, capitalPorNivel: e.target.value }))}
               className={INPUT_CLASS}
-              placeholder="Auto: capital / (niveles x 2)"
+              placeholder={t('bots.wizard.grid.capitalPorNivelPlaceholder')}
             />
           </label>
-          <p className="text-xs text-text-tertiary">
-            Los niveles se calculan sobre el precio actual del par en el momento de crear el bot.
-          </p>
+          <p className="text-xs text-text-tertiary">{t('bots.wizard.grid.note')}</p>
         </div>
       )}
 
@@ -565,7 +565,7 @@ function CreateBotWizard({
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-3">
             <label className="flex flex-col gap-1.5">
-              <span className="text-xs font-medium text-text-secondary">SMA corta (velas)</span>
+              <span className="text-xs font-medium text-text-secondary">{t('bots.wizard.sma.corta')}</span>
               <input
                 type="number"
                 min="1"
@@ -575,7 +575,7 @@ function CreateBotWizard({
               />
             </label>
             <label className="flex flex-col gap-1.5">
-              <span className="text-xs font-medium text-text-secondary">SMA larga (velas)</span>
+              <span className="text-xs font-medium text-text-secondary">{t('bots.wizard.sma.larga')}</span>
               <input
                 type="number"
                 min="2"
@@ -585,21 +585,21 @@ function CreateBotWizard({
               />
             </label>
           </div>
-          {smaInvalid && <p className="text-xs text-negative">La SMA corta debe ser menor que la SMA larga.</p>}
+          {smaInvalid && <p className="text-xs text-negative">{t('bots.wizard.sma.invalid')}</p>}
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium text-text-secondary">Timeframe de las velas</span>
+            <span className="text-xs font-medium text-text-secondary">{t('bots.wizard.sma.timeframe')}</span>
             <select
               value={state.interval}
               onChange={(e) => setState((s) => ({ ...s, interval: e.target.value }))}
               className={INPUT_CLASS}
             >
-              <option value="1h">1 hora</option>
-              <option value="4h">4 horas</option>
-              <option value="1d">1 día</option>
+              <option value="1h">{t('bots.wizard.sma.tf1h')}</option>
+              <option value="4h">{t('bots.wizard.sma.tf4h')}</option>
+              <option value="1d">{t('bots.wizard.sma.tf1d')}</option>
             </select>
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium text-text-secondary">Monto por orden (USD)</span>
+            <span className="text-xs font-medium text-text-secondary">{t('bots.wizard.sma.monto')}</span>
             <input
               type="number"
               min="0"
@@ -622,7 +622,7 @@ function CreateBotWizard({
           onClick={() => (step === 1 ? onClose() : setStep((s) => (s - 1) as 1 | 2))}
           disabled={submitting}
         >
-          {step === 1 ? 'Cancelar' : 'Atrás'}
+          {step === 1 ? t('bots.wizard.cancel') : t('bots.wizard.back')}
         </Button>
         {step < 3 ? (
           <Button
@@ -631,11 +631,11 @@ function CreateBotWizard({
             onClick={() => setStep((s) => (s + 1) as 2 | 3)}
             disabled={step === 1 ? !state.estrategia : !step2Valid}
           >
-            Continuar
+            {t('bots.wizard.continue')}
           </Button>
         ) : (
           <Button variant="primary" size="sm" onClick={handleSubmit} loading={submitting} disabled={smaInvalid}>
-            Crear bot
+            {t('bots.wizard.submit')}
           </Button>
         )}
       </div>
@@ -658,6 +658,7 @@ function BotDetailModal({
   onChanged: (bot: Bot) => void
   onDeleted: (id: number) => void
 }): JSX.Element {
+  const { t } = useTranslation()
   const [trades, setTrades] = useState<Trade[] | null>(null)
   const [equity, setEquity] = useState<EquityPoint[] | null>(null)
   const [loading, setLoading] = useState(true)
@@ -672,14 +673,14 @@ function BotDetailModal({
     setLoading(true)
     setLoadError(null)
     Promise.all([fetchBotTrades(bot.id), fetchBotEquity(bot.id)])
-      .then(([t, e]) => {
+      .then(([tradesData, equityData]) => {
         if (cancelled) return
-        setTrades(t)
-        setEquity(e)
+        setTrades(tradesData)
+        setEquity(equityData)
       })
       .catch((err: unknown) => {
         if (cancelled) return
-        setLoadError(err instanceof ApiError ? err.message : 'No se pudo cargar el detalle del bot.')
+        setLoadError(err instanceof ApiError ? err.message : t('bots.detail.loadError'))
       })
       .finally(() => {
         if (!cancelled) setLoading(false)
@@ -687,6 +688,7 @@ function BotDetailModal({
     return () => {
       cancelled = true
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bot.id])
 
   async function handleToggleEstado(): Promise<void> {
@@ -696,7 +698,7 @@ function BotDetailModal({
       const updated = await setBotEstado(bot.id, bot.estado === 'activo' ? 'pausado' : 'activo')
       onChanged(updated)
     } catch (err) {
-      setActionError(err instanceof ApiError ? err.message : 'No se pudo cambiar el estado del bot.')
+      setActionError(err instanceof ApiError ? err.message : t('bots.detail.toggleError'))
     } finally {
       setToggling(false)
     }
@@ -710,7 +712,7 @@ function BotDetailModal({
       onDeleted(bot.id)
       onClose()
     } catch (err) {
-      setActionError(err instanceof ApiError ? err.message : 'No se pudo eliminar el bot.')
+      setActionError(err instanceof ApiError ? err.message : t('bots.detail.deleteError'))
       setDeleting(false)
     }
   }
@@ -719,22 +721,27 @@ function BotDetailModal({
     () => [
       {
         key: 'timestamp',
-        header: 'Fecha',
+        header: t('bots.detail.columns.fecha'),
         cell: (row) => <span className="text-text-tertiary">{new Date(row.timestamp).toLocaleString('es-AR')}</span>,
       },
       {
         key: 'tipo',
-        header: 'Tipo',
+        header: t('bots.detail.columns.tipo'),
         cell: (row) => (
           <Badge variant={row.tipo === 'compra' ? 'success' : 'danger'} size="sm">
-            {row.tipo === 'compra' ? 'Compra' : 'Venta'}
+            {row.tipo === 'compra' ? t('bots.detail.tipo.compra') : t('bots.detail.tipo.venta')}
           </Badge>
         ),
       },
-      { key: 'precio', header: 'Precio', align: 'right', cell: (row) => formatUsd(row.precio) },
-      { key: 'cantidad', header: 'Cantidad', align: 'right', cell: (row) => formatCantidad(row.cantidad) },
+      { key: 'precio', header: t('bots.detail.columns.precio'), align: 'right', cell: (row) => formatUsd(row.precio) },
+      {
+        key: 'cantidad',
+        header: t('bots.detail.columns.cantidad'),
+        align: 'right',
+        cell: (row) => formatCantidad(row.cantidad),
+      },
     ],
-    [],
+    [t],
   )
 
   return (
@@ -746,21 +753,21 @@ function BotDetailModal({
               {bot.nombre}
             </h2>
             <Badge variant="info" size="sm">
-              {ESTRATEGIA_LABEL[bot.estrategia]}
+              {t(ESTRATEGIA_LABEL_KEY[bot.estrategia])}
             </Badge>
           </div>
           <p className="mt-1 text-xs text-text-tertiary">
-            {bot.par} · creado {new Date(bot.creado_at).toLocaleString('es-AR')}
+            {bot.par} · {t('bots.detail.createdAt', { date: new Date(bot.creado_at).toLocaleString('es-AR') })}
           </p>
         </div>
         <Badge variant={bot.estado === 'activo' ? 'success' : 'neutral'} size="sm" live={bot.estado === 'activo'}>
-          {bot.estado === 'activo' ? 'Activo' : 'Pausado'}
+          {bot.estado === 'activo' ? t('bots.estado.activo') : t('bots.estado.pausado')}
         </Badge>
       </div>
       <button
         type="button"
         onClick={onClose}
-        aria-label="Cerrar"
+        aria-label={t('common.close')}
         className="absolute right-4 top-4 rounded-md p-1.5 text-text-tertiary transition-colors duration-150 hover:bg-surface-2/60 hover:text-text-primary"
       >
         <IconClose className="h-5 w-5" />
@@ -768,38 +775,42 @@ function BotDetailModal({
 
       <div className="mt-5 grid gap-3 sm:grid-cols-4">
         <Card glow="none" className="flex flex-col gap-1">
-          <span className="text-xs text-text-tertiary">PnL</span>
+          <span className="text-xs text-text-tertiary">{t('bots.pnl')}</span>
           <PnlText usd={bot.pnl_usd} pct={bot.pnl_pct} />
         </Card>
         <Card glow="none" className="flex flex-col gap-1">
-          <span className="text-xs text-text-tertiary">Capital inicial</span>
+          <span className="text-xs text-text-tertiary">{t('bots.detail.capitalInicial')}</span>
           <span className="text-sm font-medium tabular-nums text-text-primary">{formatUsd(bot.capital_inicial)}</span>
         </Card>
         <Card glow="none" className="flex flex-col gap-1">
-          <span className="text-xs text-text-tertiary">Cash disponible</span>
+          <span className="text-xs text-text-tertiary">{t('bots.detail.cashDisponible')}</span>
           <span className="text-sm font-medium tabular-nums text-text-primary">{formatUsd(bot.capital_actual)}</span>
         </Card>
         <Card glow="none" className="flex flex-col gap-1">
-          <span className="text-xs text-text-tertiary">Holding</span>
+          <span className="text-xs text-text-tertiary">{t('bots.detail.holding')}</span>
           <span className="text-sm font-medium tabular-nums text-text-primary">{formatCantidad(bot.cantidad_total)}</span>
         </Card>
       </div>
 
       <div className="mt-5">
-        <p className="mb-2 text-xs font-medium uppercase tracking-wide text-text-tertiary">Equity curve</p>
+        <p className="mb-2 text-xs font-medium uppercase tracking-wide text-text-tertiary">
+          {t('bots.detail.equityCurve')}
+        </p>
         {loading ? <Skeleton variant="block" className="h-64 w-full" /> : <EquityChart data={equity ?? []} />}
       </div>
 
       <div className="mt-5">
-        <p className="mb-2 text-xs font-medium uppercase tracking-wide text-text-tertiary">Historial de trades</p>
+        <p className="mb-2 text-xs font-medium uppercase tracking-wide text-text-tertiary">
+          {t('bots.detail.tradesHistory')}
+        </p>
         <Table
           data={trades ?? []}
           columns={tradeColumns}
           rowKey={(row) => row.id}
           loading={loading}
           pageSize={8}
-          emptyTitle="Sin trades todavía"
-          emptyDescription="El motor todavía no ejecutó ninguna orden simulada para este bot."
+          emptyTitle={t('bots.detail.noTrades')}
+          emptyDescription={t('bots.detail.noTradesDesc')}
         />
       </div>
 
@@ -808,21 +819,21 @@ function BotDetailModal({
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-border-subtle pt-4">
         <Button variant="secondary" size="sm" onClick={handleToggleEstado} loading={toggling}>
-          {bot.estado === 'activo' ? 'Pausar' : 'Reanudar'}
+          {bot.estado === 'activo' ? t('bots.detail.pausar') : t('bots.detail.reanudar')}
         </Button>
         {confirmingDelete ? (
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs text-text-tertiary">¿Eliminar este bot y su historial?</span>
+            <span className="text-xs text-text-tertiary">{t('bots.detail.confirmDelete')}</span>
             <Button variant="secondary" size="sm" onClick={() => setConfirmingDelete(false)} disabled={deleting}>
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button variant="danger" size="sm" onClick={handleDelete} loading={deleting}>
-              Confirmar
+              {t('common.confirm')}
             </Button>
           </div>
         ) : (
           <Button variant="danger" size="sm" onClick={() => setConfirmingDelete(true)}>
-            Eliminar
+            {t('bots.detail.eliminar')}
           </Button>
         )}
       </div>
@@ -835,6 +846,7 @@ function BotDetailModal({
 // ---------------------------------------------------------------------------
 
 function BotCard({ bot, onOpen }: { bot: Bot; onOpen: () => void }): JSX.Element {
+  const { t } = useTranslation()
   const valorTotal = bot.capital_actual + bot.cantidad_total * (bot.precio_actual ?? 0)
   return (
     <Card glow="violet" className="flex cursor-pointer flex-col gap-4" onClick={onOpen}>
@@ -843,23 +855,23 @@ function BotCard({ bot, onOpen }: { bot: Bot; onOpen: () => void }): JSX.Element
           <p className="truncate font-display text-sm font-medium text-text-primary">{bot.nombre}</p>
           <div className="mt-1 flex items-center gap-1.5">
             <Badge variant="info" size="sm">
-              {ESTRATEGIA_LABEL[bot.estrategia]}
+              {t(ESTRATEGIA_LABEL_KEY[bot.estrategia])}
             </Badge>
             <span className="text-xs text-text-tertiary">{bot.par}</span>
           </div>
         </div>
         <Badge variant={bot.estado === 'activo' ? 'success' : 'neutral'} size="sm" live={bot.estado === 'activo'}>
-          {bot.estado === 'activo' ? 'Activo' : 'Pausado'}
+          {bot.estado === 'activo' ? t('bots.estado.activo') : t('bots.estado.pausado')}
         </Badge>
       </div>
 
       <div className="flex items-end justify-between gap-3">
         <div>
-          <p className="text-xs text-text-tertiary">PnL</p>
+          <p className="text-xs text-text-tertiary">{t('bots.pnl')}</p>
           <PnlText usd={bot.pnl_usd} pct={bot.pnl_pct} />
         </div>
         <div className="text-right">
-          <p className="text-xs text-text-tertiary">Valor total</p>
+          <p className="text-xs text-text-tertiary">{t('bots.valorTotal')}</p>
           <p className="text-sm tabular-nums text-text-secondary">{formatUsd(valorTotal)}</p>
         </div>
       </div>
@@ -886,6 +898,7 @@ function BotCardSkeleton(): JSX.Element {
 }
 
 export function Bots(): JSX.Element {
+  const { t } = useTranslation()
   const [bots, setBots] = useState<Bot[] | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -899,11 +912,11 @@ export function Bots(): JSX.Element {
       const data = await fetchBots()
       setBots(data)
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'No se pudo conectar con la API de PULSO.')
+      setError(err instanceof ApiError ? err.message : t('common.connectionError'))
     } finally {
       if (!opts.silent) setLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     load()
@@ -935,11 +948,11 @@ export function Bots(): JSX.Element {
       <div className="mx-auto flex max-w-lg flex-col items-center gap-4 py-24 text-center">
         <PulseIcon variant="flat" className="h-6 w-16 text-text-muted" />
         <div>
-          <h2 className="font-display text-lg font-medium text-text-primary">No se pudo cargar Bots</h2>
+          <h2 className="font-display text-lg font-medium text-text-primary">{t('bots.loadErrorTitle')}</h2>
           <p className="mt-1 text-sm text-text-tertiary">{error}</p>
         </div>
         <Button variant="primary" onClick={() => load()}>
-          Reintentar
+          {t('common.retry')}
         </Button>
       </div>
     )
@@ -953,22 +966,20 @@ export function Bots(): JSX.Element {
         <div>
           <h1 className="font-display flex items-center gap-2 text-2xl font-semibold text-text-primary">
             <IconBots className="h-6 w-6 text-violet" />
-            Bots
+            {t('bots.title')}
           </h1>
-          <p className="mt-1 text-sm text-text-tertiary">
-            Motor de paper trading: DCA, Grid y SMA Crossover sobre precios reales de Binance.
-          </p>
+          <p className="mt-1 text-sm text-text-tertiary">{t('bots.subtitle')}</p>
         </div>
         <Button variant="primary" onClick={() => setWizardOpen(true)}>
-          + Crear bot
+          {t('bots.createBot')}
         </Button>
       </div>
 
       {error && bots && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-negative/25 bg-negative/5 px-4 py-3">
-          <p className="text-sm text-negative">No se pudo actualizar: {error}</p>
+          <p className="text-sm text-negative">{t('common.updateError', { error })}</p>
           <Button variant="secondary" size="sm" onClick={() => load()}>
-            Reintentar
+            {t('common.retry')}
           </Button>
         </div>
       )}
@@ -989,13 +1000,11 @@ export function Bots(): JSX.Element {
         <div className="flex flex-col items-center gap-3 rounded-lg border border-border-subtle py-16 text-center">
           <PulseIcon variant="flat" className="h-6 w-16 text-text-muted" />
           <div>
-            <p className="font-display text-sm font-medium text-text-secondary">Todavía no creaste ningún bot</p>
-            <p className="mt-1 text-xs text-text-muted">
-              Arrancá con DCA, Grid o SMA — todo con fondos simulados.
-            </p>
+            <p className="font-display text-sm font-medium text-text-secondary">{t('bots.emptyTitle')}</p>
+            <p className="mt-1 text-xs text-text-muted">{t('bots.emptyDescription')}</p>
           </div>
           <Button variant="primary" size="sm" onClick={() => setWizardOpen(true)}>
-            Crear el primero
+            {t('bots.createFirst')}
           </Button>
         </div>
       )}

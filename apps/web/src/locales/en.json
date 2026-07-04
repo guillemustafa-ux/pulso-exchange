@@ -1,0 +1,440 @@
+{
+  "common": {
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close",
+    "loading": "Loading",
+    "updated": "Updated {{time}}",
+    "liveData": "Live data",
+    "updateError": "Couldn't refresh: {{error}}",
+    "connectionError": "Couldn't connect to the PULSO API. Is it running on :8000?",
+    "visit": "Visit ↗",
+    "viewOnEtherscan": "View on Etherscan ↗"
+  },
+  "nav": {
+    "mercado": "Market",
+    "defi": "DeFi",
+    "earn": "Earn AR",
+    "staking": "Staking",
+    "bots": "Bots",
+    "tendencias": "Trends",
+    "educacion": "Education",
+    "seguridad": "Security"
+  },
+  "langSwitch": {
+    "es": "ES",
+    "en": "EN",
+    "switchToEs": "Cambiar a español",
+    "switchToEn": "Switch to English"
+  },
+  "layout": {
+    "sepoliaTestnet": "Sepolia Testnet",
+    "nonCustodialNote": "Non-custodial · you hold your keys. PULSO never asks for them.",
+    "more": "More",
+    "moreModules": "More modules",
+    "close": "Close"
+  },
+  "home": {
+    "title": "The pulse of the crypto market, in your wallet.",
+    "subtitle": "A non-custodial demo exchange: live prices, on-chain staking on Sepolia, and paper-trading bots. We never hold your funds or ask for your seed.",
+    "badgeLiveData": "Live data",
+    "badgeSepolia": "Sepolia Testnet",
+    "badgePaperTrading": "Paper trading",
+    "ctaExplore": "Explore the market",
+    "ctaHowItWorks": "How it works",
+    "modules": {
+      "mercado": "Market — Top 100",
+      "defi": "DeFi — best protocols",
+      "staking": "On-chain staking"
+    },
+    "syncingLabel": "Syncing {{label}}",
+    "syncing": "syncing",
+    "comingSoon": "Coming soon",
+    "footerTag": "Design system — Day 1"
+  },
+  "market": {
+    "title": "Market",
+    "subtitle": "Top 100 by market capitalization.",
+    "columns": {
+      "rank": "#",
+      "name": "Name",
+      "price": "Price",
+      "change24h": "24h %",
+      "change7d": "7d %",
+      "sparkline": "7d",
+      "marketCap": "Market Cap",
+      "volume": "Volume (24h)"
+    },
+    "searchPlaceholder": "Search by name or symbol...",
+    "emptyTitle": "No results",
+    "emptyDescription": "Try another name or symbol.",
+    "loadErrorTitle": "Couldn't load the market"
+  },
+  "earn": {
+    "title": "Earn AR",
+    "subtitle": "Yield comparator: Argentine exchanges, fintechs and DeFi.",
+    "tipoLabel": {
+      "exchange_ar": "AR Exchange",
+      "fintech": "Fintech",
+      "defi": "DeFi"
+    },
+    "cotizaciones": {
+      "mep": "MEP Dollar",
+      "ccl": "CCL Dollar",
+      "usdtArs": "USDT/ARS (avg.)"
+    },
+    "disclaimerLoading": "Loading disclaimer...",
+    "columns": {
+      "nombre": "Name",
+      "moneda": "Currency",
+      "apy": "Approx. APY",
+      "actualizado": "Updated",
+      "sitio": "Site"
+    },
+    "emptyTitle": "No data",
+    "emptyDescription": "No yields to show yet.",
+    "loadErrorTitle": "Couldn't load Earn AR"
+  },
+  "defi": {
+    "title": "DeFi",
+    "subtitle": "Top 50 protocols by TVL, via DefiLlama.",
+    "searchPlaceholder": "Search by name...",
+    "allCategories": "All categories",
+    "allChains": "All chains",
+    "risk": {
+      "established": "Established",
+      "high": "High risk",
+      "medium": "Medium risk"
+    },
+    "tvl": "TVL",
+    "change7d": "7d",
+    "emptyTitle": "No results",
+    "emptyDescription": "Try another filter or category.",
+    "loadErrorTitle": "Couldn't load DeFi"
+  },
+  "staking": {
+    "title": "Staking",
+    "subtitle": "Stake test PULSO on Sepolia and earn rewards in the same token. Non-custodial: every action is a transaction you sign, PULSO never touches your funds.",
+    "sepoliaBadge": "Sepolia",
+    "connect": {
+      "title": "Connect your wallet",
+      "desc": "You need a wallet connected to Sepolia Testnet to claim PULSO from the faucet and stake."
+    },
+    "faucet": {
+      "title": "Faucet",
+      "desc": "Test PULSO, {{hours}}h cooldown per wallet.",
+      "claim": "Claim 100 PULSO",
+      "nextClaim": "Next claim in"
+    },
+    "stake": {
+      "title": "Stake",
+      "desc": "Lock PULSO to start earning rewards.",
+      "available": "Available:",
+      "staked": "Staked:",
+      "max": "MAX",
+      "insufficientBalance": "You don't have enough PULSO available.",
+      "approve": "Approve PULSO",
+      "approveNote": "You approve PULSO spending once (unlimited allowance) — you won't have to sign an approve for every stake.",
+      "stakeBtn": "Stake"
+    },
+    "rewards": {
+      "title": "Rewards",
+      "claim": "Claim rewards",
+      "exit": "Exit (unstake + claim)",
+      "pending": "PULSO pending",
+      "noActive": "no active rewards",
+      "aprEst": "{{apr}}% est. APR"
+    },
+    "tx": {
+      "signInWallet": "Confirm in your wallet…",
+      "waitingConfirmation": "Waiting for confirmation on Sepolia…",
+      "confirmed": "Confirmed —",
+      "viewOnEtherscan": "view on Etherscan",
+      "reverted": "The transaction was reverted on-chain. Check the conditions (cooldown, balance) and try again.",
+      "unexpectedError": "An unexpected error occurred. Please try again.",
+      "processing": "Processing transaction"
+    },
+    "wrongNetwork": {
+      "message": "Your wallet is on {{network}} — PULSO runs on Sepolia Testnet.",
+      "detail": "Switch networks to claim from the faucet, stake and collect rewards. No action is enabled on the wrong network.",
+      "switch": "Switch to Sepolia",
+      "otherNetwork": "another network"
+    }
+  },
+  "trends": {
+    "title": "Trends",
+    "subtitle": "Market sentiment, trending coins, 24h gainers/losers and BTC dominance.",
+    "bands": {
+      "extremeFear": "Extreme fear",
+      "fear": "Fear",
+      "greed": "Greed",
+      "extremeGreed": "Extreme greed",
+      "noData": "No data"
+    },
+    "gaugeAria": "Fear and greed index: {{value}} of 100, {{label}}",
+    "gaugeAriaEmpty": "Fear and greed index with no data",
+    "historyEmpty": "No history available.",
+    "tooltipIndex": "Index",
+    "fearGreedTitle": "Fear & Greed Index",
+    "fearGreedDesc": "Aggregate crypto market sentiment, via alternative.me.",
+    "last30days": "Last 30 days",
+    "dominanceTitle": "BTC Dominance",
+    "dominanceDesc": "Bitcoin's share of total market cap.",
+    "marketCapTotal": "Total market cap",
+    "change24h": "24h change",
+    "trendingTitle": "Trending",
+    "trendingSubtitle": "Top 7 most searched on CoinGecko",
+    "trendingRank": "#{{rank}} trending",
+    "rank": "Rank #{{rank}}",
+    "trendingEmpty": "No trending data for now.",
+    "gainersTitle": "24h Gainers",
+    "losersTitle": "24h Losers",
+    "columns": {
+      "name": "Name",
+      "price": "Price",
+      "change": "24h %"
+    },
+    "gainersEmptyDesc": "No gainers to show yet.",
+    "losersEmptyDesc": "No losers to show yet.",
+    "emptyTitle": "No data",
+    "loadErrorTitle": "Couldn't load trends"
+  },
+  "bots": {
+    "title": "Bots",
+    "subtitle": "Paper trading engine: DCA, Grid and SMA Crossover on real Binance prices.",
+    "estrategiaLabel": {
+      "DCA": "DCA",
+      "GRID": "Grid",
+      "SMA": "SMA Crossover"
+    },
+    "estado": {
+      "activo": "Active",
+      "pausado": "Paused"
+    },
+    "banner": "PAPER TRADING — Funds and operations are fully simulated. No PULSO bot connects to a real exchange or executes real orders.",
+    "createBot": "+ Create bot",
+    "loadErrorTitle": "Couldn't load Bots",
+    "emptyTitle": "You haven't created any bots yet",
+    "emptyDescription": "Get started with DCA, Grid or SMA — all with simulated funds.",
+    "createFirst": "Create the first one",
+    "pnl": "PnL",
+    "valorTotal": "Total value",
+    "noHistory": "No history yet",
+    "noEquityHistory": "There's no equity history for this bot yet.",
+    "wizard": {
+      "title": "Create bot",
+      "steps": ["Strategy", "Pair and capital", "Parameters"],
+      "estrategias": {
+        "DCA": { "label": "DCA", "desc": "Buys a fixed USD amount at a set interval, regardless of price." },
+        "GRID": { "label": "Grid", "desc": "Fixed buy/sell levels above and below the current price." },
+        "SMA": { "label": "SMA Crossover", "desc": "Moving average crossover: buys on the bullish cross, sells on the bearish one." }
+      },
+      "nombreLabel": "Bot name",
+      "nombrePlaceholder": "E.g. Weekly BTC DCA",
+      "parLabel": "Pair",
+      "parPlaceholder": "BTCUSDT",
+      "capitalLabel": "Initial capital (USD, simulated)",
+      "dca": {
+        "frecuencia": "Buy frequency",
+        "opcion1m": "Every 1 minute",
+        "opcion5m": "Every 5 minutes",
+        "opcion1h": "Every 1 hour",
+        "opcion4h": "Every 4 hours",
+        "opcion1d": "Every 1 day",
+        "monto": "Amount per order (USD)"
+      },
+      "grid": {
+        "niveles": "Levels per side",
+        "spread": "Spread between levels (%)",
+        "capitalPorNivel": "Capital per level (USD, optional)",
+        "capitalPorNivelPlaceholder": "Auto: capital / (levels x 2)",
+        "note": "Levels are calculated from the pair's current price at the moment the bot is created."
+      },
+      "sma": {
+        "corta": "Short SMA (candles)",
+        "larga": "Long SMA (candles)",
+        "invalid": "The short SMA must be less than the long SMA.",
+        "timeframe": "Candle timeframe",
+        "tf1h": "1 hour",
+        "tf4h": "4 hours",
+        "tf1d": "1 day",
+        "monto": "Amount per order (USD)"
+      },
+      "cancel": "Cancel",
+      "back": "Back",
+      "continue": "Continue",
+      "submit": "Create bot",
+      "genericError": "Couldn't create the bot."
+    },
+    "detail": {
+      "createdAt": "created {{date}}",
+      "capitalInicial": "Initial capital",
+      "cashDisponible": "Available cash",
+      "holding": "Holding",
+      "equityCurve": "Equity curve",
+      "tradesHistory": "Trade history",
+      "noTrades": "No trades yet",
+      "noTradesDesc": "The engine hasn't executed any simulated order for this bot yet.",
+      "pausar": "Pause",
+      "reanudar": "Resume",
+      "eliminar": "Delete",
+      "confirmDelete": "Delete this bot and its history?",
+      "deleteError": "Couldn't delete the bot.",
+      "toggleError": "Couldn't change the bot's status.",
+      "loadError": "Couldn't load the bot's details.",
+      "columns": {
+        "fecha": "Date",
+        "tipo": "Type",
+        "precio": "Price",
+        "cantidad": "Amount"
+      },
+      "tipo": {
+        "compra": "Buy",
+        "venta": "Sell"
+      }
+    }
+  },
+  "security": {
+    "title": "Security",
+    "intro": "PULSO is <strong>non-custodial</strong>: we never have access to your funds or your keys. You sign every on-chain action yourself, from your own wallet. This page explains in detail what that means in practice.",
+    "badgeSepolia": "Sepolia Testnet",
+    "badgeNonCustodial": "Non-custodial",
+    "badgePaperTrading": "Paper trading",
+    "custodialModel": {
+      "heading": "How the non-custodial model works",
+      "desc": "Your wallet (MetaMask, Rainbow, etc.) always keeps your keys on your own device. PULSO never sees them, never asks for them, and could never move them even if it wanted to.",
+      "p1": "When you connect your wallet, the app only reads your public address and balances — information anyone can see on a block explorer. No operation (faucet, stake, claim, etc.) runs on its own: each one opens a popup in your wallet where you see exactly which contract, which function and which amount you're about to sign, and you decide whether to confirm or reject.",
+      "p2": "If PULSO disappeared tomorrow, your staked PULSO and your rewards would still be yours: they live in the contracts on Sepolia, not on one of our servers. PULSO's backend never holds a private key or the ability to move a single token."
+    },
+    "signedActions": {
+      "heading": "What you sign, action by action",
+      "desc": "Everything that happens in the Staking module boils down to these five transactions. Nothing else moves your funds.",
+      "faucet": { "action": "Faucet", "what": "You request 100 test PULSO. It only moves testnet tokens to your wallet — never the other way around." },
+      "approve": { "action": "Approve", "what": "You authorize the Staking contract to move a certain amount of PULSO on your behalf. Nothing moves yet: it only grants permission." },
+      "stake": { "action": "Stake", "what": "You transfer PULSO from your wallet to the Staking contract. It's recorded under your name and you can withdraw it any time with Unstake." },
+      "claim": { "action": "Claim", "what": "You withdraw to your wallet the rewards you've already earned. It doesn't touch your staked principal." },
+      "unstake": { "action": "Unstake / Exit", "what": "Returns your staked PULSO (and pending rewards, in the case of Exit) to your wallet. Never blocked by a contract pause." }
+    },
+    "neverAsks": {
+      "heading": "PULSO will never ask you for:",
+      "item1": "Your seed phrase or recovery words.",
+      "item2": "Your private key, in any format or through any channel.",
+      "item3": "To \"connect your wallet here\" outside the official PULSO app.",
+      "item4": "To transfer funds to a \"support\" or \"verification\" address.",
+      "item5": "Passwords, 2FA codes or access to your centralized exchange.",
+      "footer": "If someone asks you for any of this claiming to be \"from PULSO\" (via Telegram, Discord, DM or any other channel), it's a scam attempt — ignore it and don't reply."
+    },
+    "verifyContracts": {
+      "heading": "How to verify the contracts yourself",
+      "desc": "Don't trust, verify: both PULSO contracts are publicly verified on Etherscan. Anyone can read the exact source code running on-chain, without relying on what this page says.",
+      "cardTitle": "Contracts on Sepolia",
+      "cardDesc": "Verified addresses — the source code matches byte-for-byte with what's deployed.",
+      "stepsTitle": "Steps to check it yourself:",
+      "step1": "Open the \"View on Etherscan\" link for either contract above.",
+      "step2a": "Look for the green checkmark icon next to \"Contract\" — it means the source code is verified (tab",
+      "step2b": "Contract → Code",
+      "step2c": ").",
+      "step3": "Read the code directly there, or compare it with the project's public repository (contracts/src folder).",
+      "step4a": "On the",
+      "step4b": "Read Contract",
+      "step4c": "tab you can query your staked balance, pending rewards, etc. directly from Etherscan, without going through the PULSO app.",
+      "explorerUsed": "Explorer used:"
+    },
+    "disclaimers": {
+      "heading": "Disclaimers",
+      "desc": "PULSO is a demonstration project. Nothing below is negotiable, and it applies no matter what part of the app you're in.",
+      "testnetTitle": "Testnet — no real value.",
+      "testnetBody": "Everything runs on Sepolia. The PULSO you receive from the faucet and the one you stake have no economic value, and the faucet is intentionally abusable (details in DESIGN.md): it's an educational demo, not a financial product.",
+      "paperTitle": "Paper trading — simulated funds.",
+      "paperBody": "The trading bots (Bots module) don't execute any real order against any exchange. All PnL, positions and history are simulated on real prices for illustrative purposes only.",
+      "aiTitle": "AI assistant — educational only.",
+      "aiBody": "The assistant (Groq) only responds with the data it sees on screen, never makes up prices or figures, and is forbidden from giving financial advice. None of its answers is an investment recommendation.",
+      "footer": "Nothing in PULSO —not this page, not the rest of the app, not the AI assistant— constitutes financial, legal or tax advice. Use it to learn and to try out the full flow of a non-custodial exchange, not to make real investment decisions."
+    }
+  },
+  "education": {
+    "moduleLabel": "Module",
+    "title": "Education",
+    "subtitle": "8 short lessons to navigate crypto with your own judgment: wallets and seeds, staking, DeFi risks, stablecoins and the dollar in Argentina, how to read charts, smart contracts, custodial vs. non-custodial, and how to spot scams.",
+    "progressLabel": "Course progress",
+    "lessonsApproved": "{{done}}/{{total}} lessons passed",
+    "lessonN": "Lesson {{order}}",
+    "review": "Review",
+    "start": "Start",
+    "status": {
+      "completed": "Completed",
+      "inProgress": "In progress",
+      "notStarted": "Not started"
+    },
+    "quiz": {
+      "title": "Quiz",
+      "answered": "{{answered}}/{{total}} answered",
+      "correct": "Correct. ",
+      "incorrect": "Not quite. ",
+      "result": "Result: {{score}}/{{total}}",
+      "passed": "Passed -- you can move on to the next lesson.",
+      "failed": "You didn't reach 75% -- review the lesson and try again.",
+      "retry": "Retry quiz"
+    },
+    "backLink": "Education",
+    "lessonCounter": "Lesson {{order}}/{{total}}",
+    "notFoundTitle": "Lesson not found",
+    "notFoundDesc": "The link might be broken or incomplete.",
+    "backToIndex": "Back to index",
+    "prev": "Previous",
+    "next": "Next"
+  },
+  "coinDetail": {
+    "detailAria": "Detail for {{name}}",
+    "close": "Close",
+    "sourceBinance": "Binance · candles",
+    "sourceCoingecko": "CoinGecko · line",
+    "loadingChart": "Loading chart",
+    "errorNoData": "No chart data for this pair, neither on Binance nor CoinGecko.",
+    "errorGeneric": "Couldn't load the chart."
+  },
+  "walletButton": {
+    "connect": "Connect wallet",
+    "connectShort": "Connect",
+    "wrongNetwork": "Wrong network"
+  },
+  "aiAssistant": {
+    "sectionLabel": {
+      "market": "Market",
+      "staking": "Staking",
+      "defi": "DeFi",
+      "bots": "Bots",
+      "trends": "Trends",
+      "earn": "Earn AR",
+      "general": "PULSO"
+    },
+    "quickQuestions": {
+      "market": ["What does market cap mean?", "How do I read the candlestick chart?"],
+      "staking": ["What is APR?", "What risk does staking carry?"],
+      "defi": ["What is TVL?", "What is a rug pull?"],
+      "bots": ["What risk does this config have?", "What is DCA?"],
+      "trends": ["What does Fear & Greed mean?"]
+    },
+    "openAria": "Open AI assistant",
+    "panelAria": "PULSO AI assistant",
+    "closeAria": "Close assistant",
+    "headerTitle": "PULSO Assistant",
+    "headerSubtitle": "Educational · {{section}} section",
+    "emptyMessage": "Ask me anything about this section. I only use the data you see on screen, I never make up prices or figures.",
+    "thinking": "Thinking",
+    "thinkingDots": "Thinking…",
+    "inputPlaceholder": "Type your question...",
+    "submit": "Ask",
+    "footerDisclaimer": "Educational AI. Not financial advice.",
+    "connectionError": "Couldn't connect to the AI assistant."
+  },
+  "table": {
+    "searchPlaceholder": "Search...",
+    "emptyTitle": "No data",
+    "emptyDescription": "There's nothing to show here yet.",
+    "pageInfo": "Page {{page}} of {{total}} · {{count}} results",
+    "prevPage": "Previous page",
+    "nextPage": "Next page"
+  }
+}

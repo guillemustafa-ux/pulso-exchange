@@ -5,14 +5,13 @@
 
 from __future__ import annotations
 
-import asyncio
 import logging
-import time
-from typing import Any, Awaitable, Callable, TypeVar
+from typing import Any
 
 import httpx
 from fastapi import APIRouter, HTTPException
 
+from app.cache import TTLCache
 from app.schemas.defi import DefiProtocolItem
 
 logger = logging.getLogger("pulso.defi")
@@ -24,53 +23,6 @@ DEFILLAMA_BASE = "https://api.llama.fi"
 _HTTP_TIMEOUT = httpx.Timeout(15.0, connect=5.0)
 
 TOP_N = 50
-
-T = TypeVar("T")
-
-
-class TTLCache:
-    """Single-flight in-memory TTL cache (asyncio, no Redis).
-
-    Same pattern as `app.routers.market.TTLCache`: concurrent callers racing
-    on an expired key await the same in-flight fetch instead of each firing
-    their own upstream request. Duplicated here (rather than imported from
-    `market.py`) to keep each router module self-contained.
-    """
-
-    def __init__(self, ttl_seconds: float):
-        self.ttl = ttl_seconds
-        self._data: dict[str, Any] = {}
-        self._timestamp: dict[str, float] = {}
-        self._locks: dict[str, asyncio.Lock] = {}
-
-    def _lock_for(self, key: str) -> asyncio.Lock:
-        lock = self._locks.get(key)
-        if lock is None:
-            lock = asyncio.Lock()
-            self._locks[key] = lock
-        return lock
-
-    def _fresh(self, key: str) -> Any | None:
-        ts = self._timestamp.get(key)
-        if ts is None or (time.monotonic() - ts) > self.ttl:
-            return None
-        return self._data.get(key)
-
-    def set(self, key: str, value: Any) -> None:
-        self._data[key] = value
-        self._timestamp[key] = time.monotonic()
-
-    async def get_or_fetch(self, key: str, fetch_fn: Callable[[], Awaitable[T]]) -> T:
-        cached = self._fresh(key)
-        if cached is not None:
-            return cached
-        async with self._lock_for(key):
-            cached = self._fresh(key)  # re-check: another request may have refreshed it
-            if cached is not None:
-                return cached
-            value = await fetch_fn()
-            self.set(key, value)
-            return value
 
 
 _protocols_cache = TTLCache(ttl_seconds=300)

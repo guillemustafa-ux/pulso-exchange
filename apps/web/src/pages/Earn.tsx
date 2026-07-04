@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { JSX } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Table } from '../components/ui/Table'
 import type { Column } from '../components/ui/Table'
 import { Badge } from '../components/ui/Badge'
@@ -16,10 +17,11 @@ import { useSetPageContext } from '../context/AIContext'
 /** Coincide con el TTL del cache del backend (10 min) — no tiene sentido pollear más seguido. */
 const REFRESH_INTERVAL_MS = 10 * 60_000
 
-const TIPO_LABEL: Record<EarnTipo, string> = {
-  exchange_ar: 'Exchange AR',
-  fintech: 'Fintech',
-  defi: 'DeFi',
+/** Keys de traducción por tipo -- ver `earn.tipoLabel.*` en `src/locales/{es,en}.json`. */
+const TIPO_LABEL_KEY: Record<EarnTipo, string> = {
+  exchange_ar: 'earn.tipoLabel.exchange_ar',
+  fintech: 'earn.tipoLabel.fintech',
+  defi: 'earn.tipoLabel.defi',
 }
 
 const MONEDA_BADGE_VARIANT: Record<EarnMoneda, 'success' | 'info' | 'neutral'> = {
@@ -47,14 +49,15 @@ function averageUsdtArsAsk(usdtArs: Record<string, unknown> | undefined): number
 }
 
 function CotizacionesStrip({ cotizaciones }: { cotizaciones: EarnCotizaciones | null }): JSX.Element {
+  const { t } = useTranslation()
   const mep = extractDolarPrice(cotizaciones?.dolar, 'mep')
   const ccl = extractDolarPrice(cotizaciones?.dolar, 'ccl')
   const usdtArs = averageUsdtArsAsk(cotizaciones?.usdt_ars)
 
   const items = [
-    { label: 'Dólar MEP', value: formatArs(mep) },
-    { label: 'Dólar CCL', value: formatArs(ccl) },
-    { label: 'USDT/ARS (prom.)', value: formatArs(usdtArs) },
+    { label: t('earn.cotizaciones.mep'), value: formatArs(mep) },
+    { label: t('earn.cotizaciones.ccl'), value: formatArs(ccl) },
+    { label: t('earn.cotizaciones.usdtArs'), value: formatArs(usdtArs) },
   ]
 
   return (
@@ -70,15 +73,17 @@ function CotizacionesStrip({ cotizaciones }: { cotizaciones: EarnCotizaciones | 
 }
 
 function NombreCell({ option }: { option: EarnOption }): JSX.Element {
+  const { t } = useTranslation()
   return (
     <div className="min-w-0">
       <p className="truncate text-sm font-medium text-text-primary">{option.nombre}</p>
-      <p className="text-xs text-text-tertiary">{TIPO_LABEL[option.tipo]}</p>
+      <p className="text-xs text-text-tertiary">{t(TIPO_LABEL_KEY[option.tipo])}</p>
     </div>
   )
 }
 
 export function Earn(): JSX.Element {
+  const { t } = useTranslation()
   const [data, setData] = useState<{ opciones: EarnOption[]; cotizaciones: EarnCotizaciones | null; disclaimer: string } | null>(
     null,
   )
@@ -94,11 +99,11 @@ export function Earn(): JSX.Element {
       setData({ opciones: res.opciones, cotizaciones: res.cotizaciones, disclaimer: res.disclaimer })
       setLastUpdated(Date.now())
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'No se pudo conectar con la API de PULSO.')
+      setError(err instanceof ApiError ? err.message : t('common.connectionError'))
     } finally {
       if (!opts.silent) setLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     load()
@@ -132,13 +137,13 @@ export function Earn(): JSX.Element {
     () => [
       {
         key: 'nombre',
-        header: 'Nombre',
+        header: t('earn.columns.nombre'),
         sortValue: (row) => row.nombre.toLowerCase(),
         cell: (row) => <NombreCell option={row} />,
       },
       {
         key: 'moneda',
-        header: 'Moneda',
+        header: t('earn.columns.moneda'),
         sortValue: (row) => row.moneda,
         cell: (row) => (
           <Badge variant={MONEDA_BADGE_VARIANT[row.moneda]} size="sm">
@@ -148,21 +153,21 @@ export function Earn(): JSX.Element {
       },
       {
         key: 'apy',
-        header: 'APY aprox.',
+        header: t('earn.columns.apy'),
         align: 'right',
         sortValue: (row) => row.apy_aprox,
         cell: (row) => <span className="font-medium text-positive">{formatPercent(row.apy_aprox)}</span>,
       },
       {
         key: 'actualizado',
-        header: 'Actualizado',
+        header: t('earn.columns.actualizado'),
         align: 'right',
         sortValue: (row) => row.ultima_actualizacion,
         cell: (row) => <span className="text-text-tertiary">{row.ultima_actualizacion}</span>,
       },
       {
         key: 'sitio',
-        header: 'Sitio',
+        header: t('earn.columns.sitio'),
         align: 'right',
         cell: (row) => (
           <a
@@ -172,12 +177,12 @@ export function Earn(): JSX.Element {
             onClick={(e) => e.stopPropagation()}
             className="text-sm font-medium text-violet underline-offset-2 hover:underline"
           >
-            Visitar ↗
+            {t('common.visit')}
           </a>
         ),
       },
     ],
-    [],
+    [t],
   )
 
   if (error && !data) {
@@ -185,11 +190,11 @@ export function Earn(): JSX.Element {
       <div className="mx-auto flex max-w-lg flex-col items-center gap-4 py-24 text-center">
         <PulseIcon variant="flat" className="h-6 w-16 text-text-muted" />
         <div>
-          <h2 className="font-display text-lg font-medium text-text-primary">No se pudo cargar Earn AR</h2>
+          <h2 className="font-display text-lg font-medium text-text-primary">{t('earn.loadErrorTitle')}</h2>
           <p className="mt-1 text-sm text-text-tertiary">{error}</p>
         </div>
         <Button variant="primary" onClick={() => load()}>
-          Reintentar
+          {t('common.retry')}
         </Button>
       </div>
     )
@@ -199,14 +204,12 @@ export function Earn(): JSX.Element {
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-text-primary">Earn AR</h1>
-          <p className="mt-1 text-sm text-text-tertiary">
-            Comparador de rendimientos: exchanges argentinos, fintechs y DeFi.
-          </p>
+          <h1 className="font-display text-2xl font-semibold text-text-primary">{t('earn.title')}</h1>
+          <p className="mt-1 text-sm text-text-tertiary">{t('earn.subtitle')}</p>
         </div>
         {lastUpdated && (
           <span className="text-xs text-text-muted">
-            Actualizado {new Date(lastUpdated).toLocaleTimeString('es-AR')}
+            {t('common.updated', { time: new Date(lastUpdated).toLocaleTimeString('es-AR') })}
           </span>
         )}
       </div>
@@ -217,16 +220,16 @@ export function Earn(): JSX.Element {
         )}
       >
         <IconWarning className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
-        <p className="text-sm text-amber-200">{data?.disclaimer ?? 'Cargando disclaimer...'}</p>
+        <p className="text-sm text-amber-200">{data?.disclaimer ?? t('earn.disclaimerLoading')}</p>
       </div>
 
       <CotizacionesStrip cotizaciones={data?.cotizaciones ?? null} />
 
       {error && data && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-negative/25 bg-negative/5 px-4 py-3">
-          <p className="text-sm text-negative">No se pudo actualizar: {error}</p>
+          <p className="text-sm text-negative">{t('common.updateError', { error })}</p>
           <Button variant="secondary" size="sm" onClick={() => load()}>
-            Reintentar
+            {t('common.retry')}
           </Button>
         </div>
       )}
@@ -237,8 +240,8 @@ export function Earn(): JSX.Element {
         rowKey={(row) => row.nombre}
         loading={loading && !data}
         pageSize={10}
-        emptyTitle="Sin datos"
-        emptyDescription="No hay rendimientos para mostrar todavía."
+        emptyTitle={t('earn.emptyTitle')}
+        emptyDescription={t('earn.emptyDescription')}
       />
     </div>
   )

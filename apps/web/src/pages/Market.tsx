@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { JSX } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import { Table } from '../components/ui/Table'
 import type { Column } from '../components/ui/Table'
 import { Button } from '../components/ui/Button'
@@ -91,6 +92,7 @@ function CoinNameCell({ coin }: { coin: CoinMarketItem }): JSX.Element {
 }
 
 export function Market(): JSX.Element {
+  const { t } = useTranslation()
   const [coins, setCoins] = useState<CoinMarketItem[] | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -107,11 +109,11 @@ export function Market(): JSX.Element {
       setCoins(data)
       setLastUpdated(Date.now())
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'No se pudo conectar con la API de PULSO.')
+      setError(err instanceof ApiError ? err.message : t('common.connectionError'))
     } finally {
       if (!opts.silent) setLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     load()
@@ -127,27 +129,27 @@ export function Market(): JSX.Element {
     () => [
       {
         key: 'rank',
-        header: '#',
+        header: t('market.columns.rank'),
         width: '48px',
         sortValue: (row) => row.market_cap_rank ?? Number.MAX_SAFE_INTEGER,
         cell: (row) => <span className="text-text-tertiary">{row.market_cap_rank ?? '—'}</span>,
       },
       {
         key: 'name',
-        header: 'Nombre',
+        header: t('market.columns.name'),
         sortValue: (row) => row.name.toLowerCase(),
         cell: (row) => <CoinNameCell coin={row} />,
       },
       {
         key: 'price',
-        header: 'Precio',
+        header: t('market.columns.price'),
         align: 'right',
         sortValue: (row) => row.current_price ?? 0,
         cell: (row) => <span>{formatUsd(row.current_price)}</span>,
       },
       {
         key: 'change24h',
-        header: '24h %',
+        header: t('market.columns.change24h'),
         align: 'right',
         sortValue: (row) => row.price_change_percentage_24h_in_currency ?? row.price_change_percentage_24h ?? 0,
         cell: (row) => (
@@ -156,14 +158,14 @@ export function Market(): JSX.Element {
       },
       {
         key: 'change7d',
-        header: '7d %',
+        header: t('market.columns.change7d'),
         align: 'right',
         sortValue: (row) => row.price_change_percentage_7d_in_currency ?? 0,
         cell: (row) => <PercentCell value={row.price_change_percentage_7d_in_currency} />,
       },
       {
         key: 'sparkline',
-        header: '7d',
+        header: t('market.columns.sparkline'),
         align: 'right',
         width: '76px',
         cell: (row) => {
@@ -176,20 +178,20 @@ export function Market(): JSX.Element {
       },
       {
         key: 'marketCap',
-        header: 'Market Cap',
+        header: t('market.columns.marketCap'),
         align: 'right',
         sortValue: (row) => row.market_cap ?? 0,
         cell: (row) => <span>{formatCompactUsd(row.market_cap)}</span>,
       },
       {
         key: 'volume',
-        header: 'Volumen (24h)',
+        header: t('market.columns.volume'),
         align: 'right',
         sortValue: (row) => row.total_volume ?? 0,
         cell: (row) => <span>{formatCompactUsd(row.total_volume)}</span>,
       },
     ],
-    [],
+    [t],
   )
 
   const selectedCoin = id ? (coins?.find((c) => c.id === id) ?? null) : null
@@ -230,11 +232,11 @@ export function Market(): JSX.Element {
       <div className="mx-auto flex max-w-lg flex-col items-center gap-4 py-24 text-center">
         <PulseIcon variant="flat" className="h-6 w-16 text-text-muted" />
         <div>
-          <h2 className="font-display text-lg font-medium text-text-primary">No se pudo cargar el mercado</h2>
+          <h2 className="font-display text-lg font-medium text-text-primary">{t('market.loadErrorTitle')}</h2>
           <p className="mt-1 text-sm text-text-tertiary">{error}</p>
         </div>
         <Button variant="primary" onClick={() => load()}>
-          Reintentar
+          {t('common.retry')}
         </Button>
       </div>
     )
@@ -244,16 +246,16 @@ export function Market(): JSX.Element {
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-text-primary">Mercado</h1>
-          <p className="mt-1 text-sm text-text-tertiary">Top 100 por capitalización de mercado.</p>
+          <h1 className="font-display text-2xl font-semibold text-text-primary">{t('market.title')}</h1>
+          <p className="mt-1 text-sm text-text-tertiary">{t('market.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="info" size="md" live>
-            Datos en vivo
+            {t('common.liveData')}
           </Badge>
           {lastUpdated && (
             <span className="hidden text-xs text-text-muted sm:inline">
-              Actualizado {new Date(lastUpdated).toLocaleTimeString('es-AR')}
+              {t('common.updated', { time: new Date(lastUpdated).toLocaleTimeString('es-AR') })}
             </span>
           )}
         </div>
@@ -261,9 +263,9 @@ export function Market(): JSX.Element {
 
       {error && coins && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-negative/25 bg-negative/5 px-4 py-3">
-          <p className="text-sm text-negative">No se pudo actualizar: {error}</p>
+          <p className="text-sm text-negative">{t('common.updateError', { error })}</p>
           <Button variant="secondary" size="sm" onClick={() => load()}>
-            Reintentar
+            {t('common.retry')}
           </Button>
         </div>
       )}
@@ -277,9 +279,9 @@ export function Market(): JSX.Element {
         pageSize={20}
         searchable
         getSearchText={(row) => `${row.name} ${row.symbol}`}
-        searchPlaceholder="Buscar por nombre o símbolo..."
-        emptyTitle="Sin resultados"
-        emptyDescription="Probá con otro nombre o símbolo."
+        searchPlaceholder={t('market.searchPlaceholder')}
+        emptyTitle={t('market.emptyTitle')}
+        emptyDescription={t('market.emptyDescription')}
       />
 
       <AnimatePresence>

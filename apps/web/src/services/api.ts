@@ -3,6 +3,7 @@
  * `VITE_API_URL` sobreescribe el origin (ej. en deploy); en local usamos el
  * default de abajo para no depender de un `.env` presente.
  */
+import i18n from '../i18n'
 
 const DEFAULT_API_URL = 'http://localhost:8000'
 
@@ -26,7 +27,7 @@ async function getJson<T>(path: string): Promise<T> {
   try {
     res = await fetch(`${API_URL}${path}`)
   } catch {
-    throw new ApiError('No se pudo conectar con la API de PULSO. ¿Está corriendo en :8000?', 0)
+    throw new ApiError(i18n.t('common.connectionError'), 0)
   }
 
   if (!res.ok) {
@@ -52,7 +53,7 @@ async function postJson<T>(path: string, body: unknown): Promise<T> {
       body: JSON.stringify(body),
     })
   } catch {
-    throw new ApiError('No se pudo conectar con la API de PULSO. ¿Está corriendo en :8000?', 0)
+    throw new ApiError(i18n.t('common.connectionError'), 0)
   }
 
   if (!res.ok) {
@@ -79,7 +80,7 @@ async function sendJson<T>(path: string, method: 'PATCH' | 'DELETE', body?: unkn
       body: body !== undefined ? JSON.stringify(body) : undefined,
     })
   } catch {
-    throw new ApiError('No se pudo conectar con la API de PULSO. ¿Está corriendo en :8000?', 0)
+    throw new ApiError(i18n.t('common.connectionError'), 0)
   }
 
   if (!res.ok) {

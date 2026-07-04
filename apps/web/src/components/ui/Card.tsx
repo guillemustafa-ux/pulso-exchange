@@ -1,5 +1,5 @@
 import { forwardRef } from 'react'
-import type { HTMLAttributes, JSX, ReactNode } from 'react'
+import type { HTMLAttributes, JSX, KeyboardEvent, ReactNode } from 'react'
 import { cn } from '../../lib/cn'
 
 type GlowColor = 'violet' | 'magenta' | 'cyan' | 'none'
@@ -26,19 +26,48 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
  * Superficie base de PULSO: glassmorphism (blur + borde translúcito 1px)
  * sobre el fondo violeta-negro, con un glow de marca que aparece al pasar
  * el mouse — nunca decorativo por defecto, solo responde a interacción.
+ *
+ * Si se pasa `onClick`, la card se vuelve operable por teclado (Home,
+ * Education, Bots la usan como card clickeable): `role="button"`,
+ * `tabIndex=0` y Enter/Espacio disparan el mismo handler que el click de
+ * mouse. Sin esto, una card con `onClick` era invisible para teclado/lector
+ * de pantalla -- un div no es focuseable ni anuncia que es interactivo.
+ *
+ * `min-w-0` es obligatorio acá: como grid item (ej. la grilla de protocolos
+ * de DeFi en mobile, 1 columna), el `min-width: auto` por defecto hace que
+ * el track del grid crezca al ancho mínimo del contenido no-shrinkable más
+ * ancho de CUALQUIER card de la lista (ej. una fila de badges de cadena),
+ * desbordando la página entera de costado en vez de solo esa card. Sin
+ * costo en contextos no-grid: `min-width: 0` ya es el default de un bloque.
  */
 export const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
-  { className, glow = 'violet', bare = false, children, ...rest },
+  { className, glow = 'violet', bare = false, children, onClick, onKeyDown, tabIndex, role, ...rest },
   ref,
 ): JSX.Element {
+  const interactive = typeof onClick === 'function'
+
+  function handleKeyDown(event: KeyboardEvent<HTMLDivElement>): void {
+    onKeyDown?.(event)
+    if (!interactive || event.defaultPrevented) return
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      ;(onClick as unknown as (e: KeyboardEvent<HTMLDivElement>) => void)(event)
+    }
+  }
+
   return (
     <div
       ref={ref}
+      onClick={onClick}
+      onKeyDown={interactive ? handleKeyDown : onKeyDown}
+      role={interactive ? (role ?? 'button') : role}
+      tabIndex={interactive ? (tabIndex ?? 0) : tabIndex}
       className={cn(
-        'relative rounded-lg border border-border-subtle bg-surface-1/70 backdrop-blur-xl',
+        'relative min-w-0 rounded-lg border border-border-subtle bg-surface-1/70 backdrop-blur-xl',
         'shadow-card transition-[box-shadow,border-color] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]',
         !bare && 'p-5',
         GLOW_CLASS[glow],
+        interactive && 'focus-visible:outline-none focus-visible:shadow-focus-ring',
         className,
       )}
       {...rest}

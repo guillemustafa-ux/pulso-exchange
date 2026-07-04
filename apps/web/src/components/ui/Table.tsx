@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import type { JSX, ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 import { PulseIcon } from '../icons/PulseIcon'
 import { IconSearch, IconSort, IconChevronLeft, IconChevronRight } from '../icons/Icon'
@@ -58,14 +59,18 @@ export function Table<T>({
   pageSize = 10,
   searchable,
   getSearchText,
-  searchPlaceholder = 'Buscar...',
-  emptyTitle = 'Sin datos',
-  emptyDescription = 'Todavía no hay nada para mostrar acá.',
+  searchPlaceholder,
+  emptyTitle,
+  emptyDescription,
   className,
 }: TableProps<T>): JSX.Element {
+  const { t } = useTranslation()
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState<SortState>(null)
   const [page, setPage] = useState(1)
+  const resolvedSearchPlaceholder = searchPlaceholder ?? t('table.searchPlaceholder')
+  const resolvedEmptyTitle = emptyTitle ?? t('table.emptyTitle')
+  const resolvedEmptyDescription = emptyDescription ?? t('table.emptyDescription')
 
   const filtered = useMemo(() => {
     if (!searchable || !getSearchText || query.trim() === '') return data
@@ -114,7 +119,7 @@ export function Table<T>({
             type="text"
             value={query}
             onChange={(e) => handleSearch(e.target.value)}
-            placeholder={searchPlaceholder}
+            placeholder={resolvedSearchPlaceholder}
             className={cn(
               'h-9 w-full rounded-md border border-border-subtle bg-surface-2/70 pl-9 pr-3 text-sm text-text-primary',
               'placeholder:text-text-muted outline-none transition-colors duration-200',
@@ -179,8 +184,8 @@ export function Table<T>({
                   <div className="flex flex-col items-center gap-3 text-center">
                     <PulseIcon variant="flat" className="h-6 w-16 text-text-muted" />
                     <div>
-                      <p className="font-display text-sm font-medium text-text-secondary">{emptyTitle}</p>
-                      <p className="mt-1 text-xs text-text-muted">{emptyDescription}</p>
+                      <p className="font-display text-sm font-medium text-text-secondary">{resolvedEmptyTitle}</p>
+                      <p className="mt-1 text-xs text-text-muted">{resolvedEmptyDescription}</p>
                     </div>
                   </div>
                 </td>
@@ -190,9 +195,21 @@ export function Table<T>({
                 <tr
                   key={rowKey(row)}
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  tabIndex={onRowClick ? 0 : undefined}
+                  onKeyDown={
+                    onRowClick
+                      ? (e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault()
+                            onRowClick(row)
+                          }
+                        }
+                      : undefined
+                  }
                   className={cn(
                     'border-b border-border-subtle last:border-0 transition-colors duration-150',
-                    onRowClick && 'cursor-pointer hover:bg-surface-2/50',
+                    onRowClick &&
+                      'cursor-pointer hover:bg-surface-2/50 focus-visible:outline-none focus-visible:bg-surface-2/60 focus-visible:shadow-[inset_0_0_0_2px_rgba(168,85,247,0.55)]',
                   )}
                 >
                   {columns.map((column) => (
@@ -213,7 +230,7 @@ export function Table<T>({
       {!loading && sorted.length > 0 && totalPages > 1 && (
         <div className="flex items-center justify-between gap-3 text-xs text-text-tertiary">
           <span className="tabular-nums">
-            Página {safePage} de {totalPages} · {sorted.length} resultados
+            {t('table.pageInfo', { page: safePage, total: totalPages, count: sorted.length })}
           </span>
           <div className="flex items-center gap-1.5">
             <button
@@ -221,7 +238,7 @@ export function Table<T>({
               disabled={safePage === 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border-subtle text-text-secondary transition-colors duration-150 hover:border-border-emphasis hover:text-text-primary disabled:pointer-events-none disabled:opacity-40"
-              aria-label="Página anterior"
+              aria-label={t('table.prevPage')}
             >
               <IconChevronLeft className="h-4 w-4" />
             </button>
@@ -230,7 +247,7 @@ export function Table<T>({
               disabled={safePage === totalPages}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border-subtle text-text-secondary transition-colors duration-150 hover:border-border-emphasis hover:text-text-primary disabled:pointer-events-none disabled:opacity-40"
-              aria-label="Página siguiente"
+              aria-label={t('table.nextPage')}
             >
               <IconChevronRight className="h-4 w-4" />
             </button>

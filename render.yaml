@@ -1,0 +1,40 @@
+# Blueprint de Render para el backend de PULSO (apps/api).
+#
+# Uso: Render → New → Blueprint → apuntar a este repo. Render lee este archivo
+# solo y crea el servicio. Las env vars marcadas `sync: false` NO viven acá
+# (son secretas o dependen del dominio final) — Render pide completarlas a
+# mano en el dashboard del servicio antes/después del primer deploy.
+#
+# Ver README raíz (sección "Deploy") y apps/api/.env.example para el detalle
+# de cada variable.
+services:
+  - type: web
+    name: pulso-api
+    runtime: python
+    plan: free
+    region: oregon
+    rootDir: apps/api
+    buildCommand: pip install -r requirements.txt
+    # --proxy-headers: Render corre detrás de su propio proxy: sin esto uvicorn
+    # no confía en X-Forwarded-* y algunos headers/scheme llegan mal a la app.
+    # Complementa (no reemplaza) a TRUST_PROXY=1 más abajo, que es el que hace
+    # que el rate limiter lea la IP real desde X-Forwarded-For.
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      # --- A completar en el dashboard de Render (no van en git) ---
+      - key: GROQ_API_KEY
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false # ej: https://pulso-exchange.vercel.app
+      # --- Con valor por defecto razonable, ajustables si hace falta ---
+      - key: TRUST_PROXY
+        value: "1"
+      - key: RATE_LIMIT_PER_MINUTE
+        value: "60"
+      - key: AI_RATE_LIMIT_PER_HOUR
+        value: "20"
+      - key: LOG_LEVEL
+        value: INFO

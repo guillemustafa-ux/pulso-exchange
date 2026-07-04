@@ -8,15 +8,14 @@
 
 from __future__ import annotations
 
-import asyncio
 import logging
 import os
-import time
-from typing import Any, Awaitable, Callable, TypeVar
+from typing import Any
 
 import httpx
 from fastapi import APIRouter, HTTPException, Query
 
+from app.cache import TTLCache
 from app.schemas.market import (
     CoinMarketItem,
     GlobalMarketResponse,
@@ -35,8 +34,6 @@ COINGECKO_API_KEY = os.getenv("COINGECKO_API_KEY", "").strip()
 
 _HTTP_TIMEOUT = httpx.Timeout(10.0, connect=5.0)
 
-T = TypeVar("T")
-
 
 def _coingecko_headers() -> dict[str, str]:
     headers = {"Accept": "application/json"}
@@ -44,49 +41,6 @@ def _coingecko_headers() -> dict[str, str]:
         # Demo-tier key header; CoinGecko also accepts x-cg-pro-api-key for paid plans.
         headers["x-cg-demo-api-key"] = COINGECKO_API_KEY
     return headers
-
-
-class TTLCache:
-    """Single-flight in-memory TTL cache (asyncio, no Redis).
-
-    Concurrent callers racing on an expired key await the same in-flight
-    fetch instead of each firing their own upstream request.
-    """
-
-    def __init__(self, ttl_seconds: float):
-        self.ttl = ttl_seconds
-        self._data: dict[str, Any] = {}
-        self._timestamp: dict[str, float] = {}
-        self._locks: dict[str, asyncio.Lock] = {}
-
-    def _lock_for(self, key: str) -> asyncio.Lock:
-        lock = self._locks.get(key)
-        if lock is None:
-            lock = asyncio.Lock()
-            self._locks[key] = lock
-        return lock
-
-    def _fresh(self, key: str) -> Any | None:
-        ts = self._timestamp.get(key)
-        if ts is None or (time.monotonic() - ts) > self.ttl:
-            return None
-        return self._data.get(key)
-
-    def set(self, key: str, value: Any) -> None:
-        self._data[key] = value
-        self._timestamp[key] = time.monotonic()
-
-    async def get_or_fetch(self, key: str, fetch_fn: Callable[[], Awaitable[T]]) -> T:
-        cached = self._fresh(key)
-        if cached is not None:
-            return cached
-        async with self._lock_for(key):
-            cached = self._fresh(key)  # re-check: another request may have refreshed it
-            if cached is not None:
-                return cached
-            value = await fetch_fn()
-            self.set(key, value)
-            return value
 
 
 _top100_cache = TTLCache(ttl_seconds=60)

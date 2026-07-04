@@ -14,14 +14,14 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-import time
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Awaitable, Callable, TypeVar
+from typing import Any
 
 import httpx
 from fastapi import APIRouter, HTTPException
 
+from app.cache import TTLCache
 from app.schemas.earn import EarnArResponse
 
 logger = logging.getLogger("pulso.earn")
@@ -36,8 +36,6 @@ DISCLAIMER = "Tasas aproximadas. Verificá siempre antes de invertir. Esto no es
 
 _HTTP_TIMEOUT = httpx.Timeout(10.0, connect=5.0)
 
-T = TypeVar("T")
-
 
 # ---------------------------------------------------------------------------
 # Tabla curada (estática, se lee de disco -- barata, no hace falta cachear)
@@ -50,51 +48,8 @@ def _load_opciones() -> list[dict[str, Any]]:
 
 
 # ---------------------------------------------------------------------------
-# Cotizaciones CriptoYa (cache 10 min, mismo TTLCache single-flight de market.py)
+# Cotizaciones CriptoYa (cache 10 min, TTLCache single-flight compartido de app.cache)
 # ---------------------------------------------------------------------------
-
-
-class TTLCache:
-    """Single-flight in-memory TTL cache (asyncio, no Redis).
-
-    Copia deliberada de la clase homónima en `market.py`: cada router queda
-    autocontenido en vez de compartir un util cruzado para este alcance.
-    """
-
-    def __init__(self, ttl_seconds: float):
-        self.ttl = ttl_seconds
-        self._data: dict[str, Any] = {}
-        self._timestamp: dict[str, float] = {}
-        self._locks: dict[str, asyncio.Lock] = {}
-
-    def _lock_for(self, key: str) -> asyncio.Lock:
-        lock = self._locks.get(key)
-        if lock is None:
-            lock = asyncio.Lock()
-            self._locks[key] = lock
-        return lock
-
-    def _fresh(self, key: str) -> Any | None:
-        ts = self._timestamp.get(key)
-        if ts is None or (time.monotonic() - ts) > self.ttl:
-            return None
-        return self._data.get(key)
-
-    def set(self, key: str, value: Any) -> None:
-        self._data[key] = value
-        self._timestamp[key] = time.monotonic()
-
-    async def get_or_fetch(self, key: str, fetch_fn: Callable[[], Awaitable[T]]) -> T:
-        cached = self._fresh(key)
-        if cached is not None:
-            return cached
-        async with self._lock_for(key):
-            cached = self._fresh(key)  # re-check: otro request pudo haber refrescado
-            if cached is not None:
-                return cached
-            value = await fetch_fn()
-            self.set(key, value)
-            return value
 
 
 _cotizaciones_cache = TTLCache(ttl_seconds=600)  # 10 min

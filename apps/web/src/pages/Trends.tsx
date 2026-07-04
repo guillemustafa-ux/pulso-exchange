@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { JSX } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion, useReducedMotion } from 'framer-motion'
 import {
   Area,
@@ -43,14 +44,14 @@ interface GaugeBand {
   min: number
   max: number
   hex: string
-  label: string
+  labelKey: string
 }
 
 const GAUGE_BANDS: GaugeBand[] = [
-  { min: 0, max: 25, hex: color.semantic.negative, label: 'Miedo extremo' },
-  { min: 25, max: 50, hex: '#F97316', label: 'Miedo' },
-  { min: 50, max: 75, hex: '#4ADE80', label: 'Codicia' },
-  { min: 75, max: 100, hex: color.semantic.positive, label: 'Codicia extrema' },
+  { min: 0, max: 25, hex: color.semantic.negative, labelKey: 'trends.bands.extremeFear' },
+  { min: 25, max: 50, hex: '#F97316', labelKey: 'trends.bands.fear' },
+  { min: 50, max: 75, hex: '#4ADE80', labelKey: 'trends.bands.greed' },
+  { min: 75, max: 100, hex: color.semantic.positive, labelKey: 'trends.bands.extremeGreed' },
 ]
 
 function getBand(value: number): GaugeBand {
@@ -81,11 +82,13 @@ function describeArc(cx: number, cy: number, r: number, startAngle: number, endA
 // ---------------------------------------------------------------------------
 
 function FearGreedGauge({ value }: { value: number | null }): JSX.Element {
+  const { t } = useTranslation()
   const prefersReducedMotion = useReducedMotion()
   const hasValue = value !== null && !Number.isNaN(value)
   const clamped = hasValue ? Math.min(100, Math.max(0, value as number)) : 0
   const needleRotation = (clamped / 100) * 180 - 90
   const band = hasValue ? getBand(clamped) : null
+  const bandLabel = band ? t(band.labelKey) : null
 
   return (
     <div className="flex flex-col items-center gap-1">
@@ -93,16 +96,14 @@ function FearGreedGauge({ value }: { value: number | null }): JSX.Element {
         viewBox="0 0 200 112"
         className="w-full max-w-[280px]"
         role="img"
-        aria-label={
-          hasValue ? `Índice de miedo y codicia: ${clamped} de 100, ${band?.label}` : 'Índice de miedo y codicia sin datos'
-        }
+        aria-label={hasValue ? t('trends.gaugeAria', { value: clamped, label: bandLabel }) : t('trends.gaugeAriaEmpty')}
       >
         {GAUGE_BANDS.map((b, i) => {
           const startAngle = (b.min / 100) * 180 + (i === 0 ? 0 : GAUGE_GAP_DEG / 2)
           const endAngle = (b.max / 100) * 180 - (i === GAUGE_BANDS.length - 1 ? 0 : GAUGE_GAP_DEG / 2)
           return (
             <path
-              key={b.label}
+              key={b.labelKey}
               d={describeArc(GAUGE_CX, GAUGE_CY, GAUGE_RADIUS, startAngle, endAngle)}
               fill="none"
               stroke={b.hex}
@@ -139,7 +140,7 @@ function FearGreedGauge({ value }: { value: number | null }): JSX.Element {
           {hasValue ? clamped : '—'}
         </span>
         <span className="text-sm font-medium" style={{ color: band?.hex ?? color.text.tertiary }}>
-          {band?.label ?? 'Sin datos'}
+          {bandLabel ?? t('trends.bands.noData')}
         </span>
       </div>
     </div>
@@ -151,6 +152,7 @@ function FearGreedGauge({ value }: { value: number | null }): JSX.Element {
 // ---------------------------------------------------------------------------
 
 function FearGreedHistoryChart({ data }: { data: FearGreedItem[] }): JSX.Element {
+  const { t } = useTranslation()
   const chartData = useMemo(
     () =>
       [...data]
@@ -164,9 +166,7 @@ function FearGreedHistoryChart({ data }: { data: FearGreedItem[] }): JSX.Element
 
   if (chartData.length === 0) {
     return (
-      <div className="flex h-40 items-center justify-center text-xs text-text-muted">
-        Sin histórico disponible.
-      </div>
+      <div className="flex h-40 items-center justify-center text-xs text-text-muted">{t('trends.historyEmpty')}</div>
     )
   }
 
@@ -205,7 +205,7 @@ function FearGreedHistoryChart({ data }: { data: FearGreedItem[] }): JSX.Element
             }}
             labelStyle={{ color: color.text.secondary }}
             itemStyle={{ color: color.text.primary }}
-            formatter={(value) => [`${value}`, 'Índice']}
+            formatter={(value) => [`${value}`, t('trends.tooltipIndex')]}
           />
           <Area
             type="monotone"
@@ -227,6 +227,7 @@ function FearGreedHistoryChart({ data }: { data: FearGreedItem[] }): JSX.Element
 const BTC_ORANGE = '#F7931A'
 
 function BtcDominanceDonut({ btcDominance }: { btcDominance: number | null }): JSX.Element {
+  const { t } = useTranslation()
   const hasValue = btcDominance !== null && !Number.isNaN(btcDominance)
   const value = hasValue ? Math.min(100, Math.max(0, btcDominance as number)) : 0
   const data = [
@@ -258,7 +259,7 @@ function BtcDominanceDonut({ btcDominance }: { btcDominance: number | null }): J
         <span className="font-display text-xl font-semibold tabular-nums text-text-primary">
           {hasValue ? `${value.toFixed(1)}%` : '—'}
         </span>
-        <span className="text-[11px] text-text-tertiary">Dominancia BTC</span>
+        <span className="text-[11px] text-text-tertiary">{t('trends.dominanceTitle')}</span>
       </div>
     </div>
   )
@@ -279,14 +280,17 @@ function trendingPrice(coin: TrendingCoinSummary): number | null {
 }
 
 function TrendingCard({ coin, rank }: { coin: TrendingCoinSummary; rank: number }): JSX.Element {
+  const { t } = useTranslation()
   const price = trendingPrice(coin)
   return (
     <Card glow="violet" className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <Badge variant="info" size="sm">
-          #{rank} trending
+          {t('trends.trendingRank', { rank })}
         </Badge>
-        {coin.market_cap_rank && <span className="text-[11px] text-text-muted">Rank #{coin.market_cap_rank}</span>}
+        {coin.market_cap_rank && (
+          <span className="text-[11px] text-text-muted">{t('trends.rank', { rank: coin.market_cap_rank })}</span>
+        )}
       </div>
       <div className="flex items-center gap-3">
         {coin.thumb ? (
@@ -369,23 +373,24 @@ function MoverNameCell({ coin }: { coin: MoverItem }): JSX.Element {
 }
 
 function useMoverColumns(): Column<MoverItem>[] {
+  const { t } = useTranslation()
   return useMemo<Column<MoverItem>[]>(
     () => [
-      { key: 'name', header: 'Nombre', cell: (row) => <MoverNameCell coin={row} /> },
+      { key: 'name', header: t('trends.columns.name'), cell: (row) => <MoverNameCell coin={row} /> },
       {
         key: 'price',
-        header: 'Precio',
+        header: t('trends.columns.price'),
         align: 'right',
         cell: (row) => <span>{formatUsd(row.current_price)}</span>,
       },
       {
         key: 'change',
-        header: '24h %',
+        header: t('trends.columns.change'),
         align: 'right',
         cell: (row) => <PercentCell value={row.price_change_percentage_24h} />,
       },
     ],
-    [],
+    [t],
   )
 }
 
@@ -394,6 +399,7 @@ function useMoverColumns(): Column<MoverItem>[] {
 // ---------------------------------------------------------------------------
 
 export function Trends(): JSX.Element {
+  const { t } = useTranslation()
   const [summary, setSummary] = useState<TrendsSummaryResponse | null>(null)
   const [history, setHistory] = useState<FearGreedItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -411,11 +417,11 @@ export function Trends(): JSX.Element {
       setHistory(fngData.data)
       setLastUpdated(Date.now())
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'No se pudo conectar con la API de PULSO.')
+      setError(err instanceof ApiError ? err.message : t('common.connectionError'))
     } finally {
       if (!opts.silent) setLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     load()
@@ -433,11 +439,11 @@ export function Trends(): JSX.Element {
       <div className="mx-auto flex max-w-lg flex-col items-center gap-4 py-24 text-center">
         <PulseIcon variant="flat" className="h-6 w-16 text-text-muted" />
         <div>
-          <h2 className="font-display text-lg font-medium text-text-primary">No se pudieron cargar las tendencias</h2>
+          <h2 className="font-display text-lg font-medium text-text-primary">{t('trends.loadErrorTitle')}</h2>
           <p className="mt-1 text-sm text-text-tertiary">{error}</p>
         </div>
         <Button variant="primary" onClick={() => load()}>
-          Reintentar
+          {t('common.retry')}
         </Button>
       </div>
     )
@@ -456,19 +462,17 @@ export function Trends(): JSX.Element {
             <IconTrending className="h-5 w-5" />
           </span>
           <div>
-            <h1 className="font-display text-2xl font-semibold text-text-primary">Tendencias</h1>
-            <p className="mt-1 text-sm text-text-tertiary">
-              Sentimiento de mercado, trending coins, ganadores/perdedores 24h y dominancia BTC.
-            </p>
+            <h1 className="font-display text-2xl font-semibold text-text-primary">{t('trends.title')}</h1>
+            <p className="mt-1 text-sm text-text-tertiary">{t('trends.subtitle')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="info" size="md" live>
-            Datos en vivo
+            {t('common.liveData')}
           </Badge>
           {lastUpdated && (
             <span className="hidden text-xs text-text-muted sm:inline">
-              Actualizado {new Date(lastUpdated).toLocaleTimeString('es-AR')}
+              {t('common.updated', { time: new Date(lastUpdated).toLocaleTimeString('es-AR') })}
             </span>
           )}
         </div>
@@ -476,9 +480,9 @@ export function Trends(): JSX.Element {
 
       {error && summary && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-negative/25 bg-negative/5 px-4 py-3">
-          <p className="text-sm text-negative">No se pudo actualizar: {error}</p>
+          <p className="text-sm text-negative">{t('common.updateError', { error })}</p>
           <Button variant="secondary" size="sm" onClick={() => load()}>
-            Reintentar
+            {t('common.retry')}
           </Button>
         </div>
       )}
@@ -487,8 +491,8 @@ export function Trends(): JSX.Element {
         <Card glow="violet" className="flex flex-col gap-4 lg:col-span-2">
           <CardHeader>
             <div>
-              <CardTitle>Fear &amp; Greed Index</CardTitle>
-              <CardDescription>Sentimiento agregado del mercado cripto, vía alternative.me.</CardDescription>
+              <CardTitle>{t('trends.fearGreedTitle')}</CardTitle>
+              <CardDescription>{t('trends.fearGreedDesc')}</CardDescription>
             </div>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
@@ -498,7 +502,9 @@ export function Trends(): JSX.Element {
               <FearGreedGauge value={fearGreedValue} />
             )}
             <div>
-              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-text-tertiary">Últimos 30 días</p>
+              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-text-tertiary">
+                {t('trends.last30days')}
+              </p>
               {loading && history.length === 0 ? (
                 <Skeleton variant="block" className="h-40 w-full" />
               ) : (
@@ -511,8 +517,8 @@ export function Trends(): JSX.Element {
         <Card glow="magenta" className="flex flex-col gap-4">
           <CardHeader>
             <div>
-              <CardTitle>Dominancia BTC</CardTitle>
-              <CardDescription>Participación de Bitcoin sobre el market cap total.</CardDescription>
+              <CardTitle>{t('trends.dominanceTitle')}</CardTitle>
+              <CardDescription>{t('trends.dominanceDesc')}</CardDescription>
             </div>
           </CardHeader>
           <CardContent className="flex flex-1 flex-col items-center justify-center gap-4">
@@ -522,13 +528,13 @@ export function Trends(): JSX.Element {
               <BtcDominanceDonut btcDominance={summary?.btc_dominance ?? null} />
             )}
             <div className="flex w-full items-center justify-between border-t border-border-subtle pt-3 text-sm">
-              <span className="text-text-tertiary">Market cap total</span>
+              <span className="text-text-tertiary">{t('trends.marketCapTotal')}</span>
               <span className="font-medium tabular-nums text-text-primary">
                 {formatCompactUsd(summary?.market_cap_usd)}
               </span>
             </div>
             <div className="-mt-2 flex w-full items-center justify-between text-xs">
-              <span className="text-text-tertiary">Variación 24h</span>
+              <span className="text-text-tertiary">{t('trends.change24h')}</span>
               <PercentCell value={summary?.market_cap_change_percentage_24h} />
             </div>
           </CardContent>
@@ -537,8 +543,8 @@ export function Trends(): JSX.Element {
 
       <section className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-lg font-medium text-text-primary">Trending</h2>
-          <span className="text-xs text-text-muted">Top 7 más buscadas en CoinGecko</span>
+          <h2 className="font-display text-lg font-medium text-text-primary">{t('trends.trendingTitle')}</h2>
+          <span className="text-xs text-text-muted">{t('trends.trendingSubtitle')}</span>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {loading && !summary
@@ -546,14 +552,14 @@ export function Trends(): JSX.Element {
             : trending.map((coin, i) => <TrendingCard key={coin.id} coin={coin} rank={i + 1} />)}
         </div>
         {!loading && summary && trending.length === 0 && (
-          <p className="py-6 text-center text-sm text-text-muted">Sin datos de trending por ahora.</p>
+          <p className="py-6 text-center text-sm text-text-muted">{t('trends.trendingEmpty')}</p>
         )}
       </section>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card glow="cyan" bare className="p-5">
           <CardHeader>
-            <CardTitle>Ganadores 24h</CardTitle>
+            <CardTitle>{t('trends.gainersTitle')}</CardTitle>
           </CardHeader>
           <Table
             data={gainers}
@@ -561,14 +567,14 @@ export function Trends(): JSX.Element {
             rowKey={(row) => row.id}
             loading={loading && !summary}
             pageSize={5}
-            emptyTitle="Sin datos"
-            emptyDescription="Todavía no hay ganadores para mostrar."
+            emptyTitle={t('trends.emptyTitle')}
+            emptyDescription={t('trends.gainersEmptyDesc')}
           />
         </Card>
 
         <Card glow="none" bare className="p-5">
           <CardHeader>
-            <CardTitle>Perdedores 24h</CardTitle>
+            <CardTitle>{t('trends.losersTitle')}</CardTitle>
           </CardHeader>
           <Table
             data={losers}
@@ -576,8 +582,8 @@ export function Trends(): JSX.Element {
             rowKey={(row) => row.id}
             loading={loading && !summary}
             pageSize={5}
-            emptyTitle="Sin datos"
-            emptyDescription="Todavía no hay perdedores para mostrar."
+            emptyTitle={t('trends.emptyTitle')}
+            emptyDescription={t('trends.losersEmptyDesc')}
           />
         </Card>
       </div>

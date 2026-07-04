@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { JSX } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { CandlestickSeries, ColorType, LineSeries, createChart } from 'lightweight-charts'
 import type { IChartApi, ISeriesApi, UTCTimestamp } from 'lightweight-charts'
@@ -45,6 +46,7 @@ export interface CoinDetailProps {
  * `Market.tsx`, así que también es enlazable/compartible.
  */
 export function CoinDetail({ coin, onClose }: CoinDetailProps): JSX.Element {
+  const { t } = useTranslation()
   const [interval, setInterval_] = useState<KlineInterval>('1h')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -179,15 +181,16 @@ export function CoinDetail({ coin, onClose }: CoinDetailProps): JSX.Element {
         setError(
           err instanceof ApiError
             ? err.status === 404
-              ? 'No hay datos de gráfico para este par, ni en Binance ni en CoinGecko.'
+              ? t('coinDetail.errorNoData')
               : err.message
-            : 'No se pudo cargar el gráfico.',
+            : t('coinDetail.errorGeneric'),
         )
       })
 
     return () => {
       cancelled = true
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coin.symbol, interval, retryToken])
 
   const changePct = coin.price_change_percentage_24h_in_currency ?? coin.price_change_percentage_24h
@@ -207,7 +210,7 @@ export function CoinDetail({ coin, onClose }: CoinDetailProps): JSX.Element {
         <motion.div
           role="dialog"
           aria-modal="true"
-          aria-label={`Detalle de ${coin.name}`}
+          aria-label={t('coinDetail.detailAria', { name: coin.name })}
           initial={{ opacity: 0, y: 16, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 12, scale: 0.98 }}
@@ -218,7 +221,7 @@ export function CoinDetail({ coin, onClose }: CoinDetailProps): JSX.Element {
           <button
             type="button"
             onClick={onClose}
-            aria-label="Cerrar"
+            aria-label={t('coinDetail.close')}
             className="absolute right-4 top-4 rounded-md p-1.5 text-text-tertiary transition-colors duration-150 hover:bg-surface-2/60 hover:text-text-primary"
           >
             <IconClose className="h-5 w-5" />
@@ -276,7 +279,7 @@ export function CoinDetail({ coin, onClose }: CoinDetailProps): JSX.Element {
             ))}
             {source && (
               <span className="ml-auto text-[11px] text-text-muted">
-                {source === 'binance' ? 'Binance · velas' : 'CoinGecko · línea'}
+                {source === 'binance' ? t('coinDetail.sourceBinance') : t('coinDetail.sourceCoingecko')}
               </span>
             )}
           </div>
@@ -285,14 +288,14 @@ export function CoinDetail({ coin, onClose }: CoinDetailProps): JSX.Element {
             <div ref={containerRef} className="h-full w-full" />
             {loading && (
               <div className="absolute inset-0 flex items-center justify-center">
-                <Spinner size="lg" color="violet" label="Cargando gráfico" />
+                <Spinner size="lg" color="violet" label={t('coinDetail.loadingChart')} />
               </div>
             )}
             {!loading && error && (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-surface-1/80 text-center">
                 <p className="max-w-xs text-sm text-text-tertiary">{error}</p>
-                <Button variant="secondary" size="sm" onClick={() => setRetryToken((t) => t + 1)}>
-                  Reintentar
+                <Button variant="secondary" size="sm" onClick={() => setRetryToken((prev) => prev + 1)}>
+                  {t('common.retry')}
                 </Button>
               </div>
             )}

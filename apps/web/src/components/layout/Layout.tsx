@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import type { JSX, ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 import { Badge } from '../ui/Badge'
 import { PulseIcon } from '../icons/PulseIcon'
 import { IconMore, IconClose } from '../icons/Icon'
 import { WalletButton } from '../WalletButton'
 import { AIAssistant } from '../AIAssistant'
+import { LanguageSwitch } from '../LanguageSwitch'
 import { NAV_ITEMS, MOBILE_PRIMARY_IDS } from './nav-items'
 import type { NavItem } from './nav-items'
 
@@ -45,6 +47,7 @@ function NavButton({
   onClick: () => void
   compact?: boolean
 }): JSX.Element {
+  const { t } = useTranslation()
   const Icon = item.icon
   return (
     <button
@@ -71,12 +74,13 @@ function NavButton({
         />
       )}
       <Icon className={cn(compact ? 'h-5 w-5' : 'h-[18px] w-[18px]', active && 'text-violet')} />
-      <span className={compact ? '' : undefined}>{item.label}</span>
+      <span className={compact ? '' : undefined}>{t(item.labelKey)}</span>
     </button>
   )
 }
 
 function Sidebar({ activeId, onNavigate }: { activeId: string; onNavigate: (id: string) => void }): JSX.Element {
+  const { t } = useTranslation()
   return (
     <aside className="sticky top-0 hidden h-dvh w-[220px] shrink-0 flex-col border-r border-border-subtle bg-bg-void/40 backdrop-blur-xl md:flex">
       <div className="px-5 py-6">
@@ -88,15 +92,14 @@ function Sidebar({ activeId, onNavigate }: { activeId: string; onNavigate: (id: 
         ))}
       </nav>
       <div className="border-t border-border-subtle p-4">
-        <p className="px-1 text-[11px] leading-snug text-text-muted">
-          Non-custodial · vos guardás tus claves. PULSO nunca las pide.
-        </p>
+        <p className="px-1 text-[11px] leading-snug text-text-muted">{t('layout.nonCustodialNote')}</p>
       </div>
     </aside>
   )
 }
 
 function Header({ activeLabel }: { activeLabel: string | undefined }): JSX.Element {
+  const { t } = useTranslation()
   return (
     <header className="sticky top-0 z-sticky flex h-16 items-center justify-between gap-3 border-b border-border-subtle bg-bg-void/60 px-4 backdrop-blur-xl md:px-8">
       <div className="flex items-center gap-3 md:hidden">
@@ -104,9 +107,17 @@ function Header({ activeLabel }: { activeLabel: string | undefined }): JSX.Eleme
       </div>
       <h1 className="font-display hidden text-sm font-medium text-text-secondary md:block">{activeLabel}</h1>
       <div className="flex items-center gap-2">
-        <Badge variant="neutral" size="sm" className="hidden sm:inline-flex">
-          Sepolia Testnet
-        </Badge>
+        {/* Envuelto en un div en vez de pasarle `hidden` a la Badge: Badge ya
+            trae `inline-flex` incondicional en sus clases base, y `cn()` no
+            resuelve conflictos de utilities (no es tailwind-merge) -- las dos
+            clases de display competían por el mismo elemento y `inline-flex`
+            ganaba en todos los anchos, desbordando el header en mobile. */}
+        <div className="hidden sm:block">
+          <Badge variant="neutral" size="sm">
+            {t('layout.sepoliaTestnet')}
+          </Badge>
+        </div>
+        <LanguageSwitch />
         <WalletButton />
       </div>
     </header>
@@ -114,6 +125,7 @@ function Header({ activeLabel }: { activeLabel: string | undefined }): JSX.Eleme
 }
 
 function BottomNav({ activeId, onNavigate }: { activeId: string; onNavigate: (id: string) => void }): JSX.Element {
+  const { t } = useTranslation()
   const [moreOpen, setMoreOpen] = useState(false)
   const primary = NAV_ITEMS.filter((item) => MOBILE_PRIMARY_IDS.includes(item.id))
   const rest = NAV_ITEMS.filter((item) => !MOBILE_PRIMARY_IDS.includes(item.id))
@@ -145,7 +157,7 @@ function BottomNav({ activeId, onNavigate }: { activeId: string; onNavigate: (id
           )}
         >
           <IconMore className="h-5 w-5" />
-          <span>Más</span>
+          <span>{t('layout.more')}</span>
         </button>
       </nav>
 
@@ -170,12 +182,12 @@ function BottomNav({ activeId, onNavigate }: { activeId: string; onNavigate: (id
               className="fixed inset-x-0 bottom-0 z-modal rounded-t-xl border-t border-border-default bg-surface-1 p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] md:hidden"
             >
               <div className="mb-3 flex items-center justify-between">
-                <span className="font-display text-sm font-medium text-text-primary">Más módulos</span>
+                <span className="font-display text-sm font-medium text-text-primary">{t('layout.moreModules')}</span>
                 <button
                   type="button"
                   onClick={() => setMoreOpen(false)}
                   className="rounded-md p-1 text-text-tertiary hover:text-text-primary"
-                  aria-label="Cerrar"
+                  aria-label={t('layout.close')}
                 >
                   <IconClose className="h-5 w-5" />
                 </button>
@@ -198,7 +210,7 @@ function BottomNav({ activeId, onNavigate }: { activeId: string; onNavigate: (id
                       )}
                     >
                       <Icon className="h-5 w-5" />
-                      {item.label}
+                      {t(item.labelKey)}
                     </button>
                   )
                 })}
@@ -216,10 +228,12 @@ function BottomNav({ activeId, onNavigate }: { activeId: string; onNavigate: (id
  * y fondo ambient (grid + starfield) compartido por todas las secciones.
  */
 export function Layout({ children, activeId = 'mercado', onNavigate, className }: LayoutProps): JSX.Element {
+  const { t } = useTranslation()
   const [internalActive, setInternalActive] = useState(activeId)
   const currentActive = onNavigate ? activeId : internalActive
   const handleNavigate = onNavigate ?? setInternalActive
-  const activeLabel = NAV_ITEMS.find((item) => item.id === currentActive)?.label
+  const activeLabelKey = NAV_ITEMS.find((item) => item.id === currentActive)?.labelKey
+  const activeLabel = activeLabelKey ? t(activeLabelKey) : undefined
 
   return (
     <div className={cn('pulso-ambient flex min-h-dvh bg-transparent', className)}>

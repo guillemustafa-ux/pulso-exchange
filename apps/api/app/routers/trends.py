@@ -21,12 +21,12 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
-import time
-from typing import Any, Awaitable, Callable, TypeVar
+from typing import Any
 
 import httpx
 from fastapi import APIRouter, HTTPException
 
+from app.cache import TTLCache
 from app.routers.market import _fetch_top100, _top100_cache
 from app.schemas.trends import FearGreedResponse, TrendsSummaryResponse
 
@@ -40,8 +40,6 @@ COINGECKO_API_KEY = os.getenv("COINGECKO_API_KEY", "").strip()
 
 _HTTP_TIMEOUT = httpx.Timeout(10.0, connect=5.0)
 
-T = TypeVar("T")
-
 
 def _coingecko_headers() -> dict[str, str]:
     headers = {"Accept": "application/json"}
@@ -50,50 +48,9 @@ def _coingecko_headers() -> dict[str, str]:
     return headers
 
 
-class TTLCache:
-    """Single-flight in-memory TTL cache (asyncio, no Redis).
-
-    Same pattern as `app.routers.market.TTLCache` (duplicated here, same
-    convention as `defi.py`/`earn.py`, to keep this router self-contained)
-    -- EXCEPT for the top100 data used by gainers/losers below, which is
-    deliberately imported and reused from `market.py` per spec, instead of
-    being refetched.
-    """
-
-    def __init__(self, ttl_seconds: float):
-        self.ttl = ttl_seconds
-        self._data: dict[str, Any] = {}
-        self._timestamp: dict[str, float] = {}
-        self._locks: dict[str, asyncio.Lock] = {}
-
-    def _lock_for(self, key: str) -> asyncio.Lock:
-        lock = self._locks.get(key)
-        if lock is None:
-            lock = asyncio.Lock()
-            self._locks[key] = lock
-        return lock
-
-    def _fresh(self, key: str) -> Any | None:
-        ts = self._timestamp.get(key)
-        if ts is None or (time.monotonic() - ts) > self.ttl:
-            return None
-        return self._data.get(key)
-
-    def set(self, key: str, value: Any) -> None:
-        self._data[key] = value
-        self._timestamp[key] = time.monotonic()
-
-    async def get_or_fetch(self, key: str, fetch_fn: Callable[[], Awaitable[T]]) -> T:
-        cached = self._fresh(key)
-        if cached is not None:
-            return cached
-        async with self._lock_for(key):
-            cached = self._fresh(key)  # re-check: another request may have refreshed it
-            if cached is not None:
-                return cached
-            value = await fetch_fn()
-            self.set(key, value)
-            return value
+# NOTA: el TTLCache single-flight ahora vive en `app.cache` (usado por los
+# 4 routers). La única excepción sigue siendo el top100 de gainers/losers
+# de abajo, que se importa y reusa de `market.py` en vez de refetchearse.
 
 
 _fng_cache = TTLCache(ttl_seconds=3600)  # 1h, per spec

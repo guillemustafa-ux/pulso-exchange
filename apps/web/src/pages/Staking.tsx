@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { JSX } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAccount, useReadContract, useSwitchChain } from 'wagmi'
 import { formatUnits, maxUint256, parseUnits } from 'viem'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '../components/ui/Card'
@@ -49,13 +50,14 @@ function useNowTick(): number {
 
 /** Spinner mientras la tx está pending/confirmando, link a Etherscan al confirmar, error legible. */
 function TxStatusLine({ tx }: { tx: ReturnType<typeof useTxAction> }): JSX.Element | null {
+  const { t } = useTranslation()
   if (tx.status === 'idle') return null
 
   if (tx.status === 'pending' || tx.status === 'confirming') {
     return (
       <p className="flex items-center gap-2 text-xs text-text-tertiary">
-        <Spinner size="sm" color="violet" label="Procesando transacción" />
-        {tx.status === 'pending' ? 'Confirmá en tu wallet…' : 'Esperando confirmación en Sepolia…'}
+        <Spinner size="sm" color="violet" label={t('staking.tx.processing')} />
+        {tx.status === 'pending' ? t('staking.tx.signInWallet') : t('staking.tx.waitingConfirmation')}
       </p>
     )
   }
@@ -63,14 +65,14 @@ function TxStatusLine({ tx }: { tx: ReturnType<typeof useTxAction> }): JSX.Eleme
   if (tx.status === 'confirmed' && tx.hash) {
     return (
       <p className="text-xs text-positive">
-        Confirmado —{' '}
+        {t('staking.tx.confirmed')}{' '}
         <a
           href={etherscanTxUrl(tx.hash)}
           target="_blank"
           rel="noreferrer"
           className="underline underline-offset-2 hover:text-text-primary"
         >
-          ver en Etherscan
+          {t('staking.tx.viewOnEtherscan')}
         </a>
       </p>
     )
@@ -88,16 +90,15 @@ function TxStatusLine({ tx }: { tx: ReturnType<typeof useTxAction> }): JSX.Eleme
 // ---------------------------------------------------------------------------
 
 function ConnectPanel(): JSX.Element {
+  const { t } = useTranslation()
   return (
     <Card glow="violet" className="mx-auto flex max-w-md flex-col items-center gap-4 py-10 text-center">
       <div className="rounded-full bg-violet/10 p-3 text-violet">
         <IconWallet className="h-6 w-6" />
       </div>
       <div>
-        <h2 className="font-display text-lg font-medium text-text-primary">Conectá tu wallet</h2>
-        <p className="mt-1 max-w-xs text-sm text-text-tertiary">
-          Necesitás una wallet conectada a Sepolia Testnet para reclamar PULSO del faucet y stakear.
-        </p>
+        <h2 className="font-display text-lg font-medium text-text-primary">{t('staking.connect.title')}</h2>
+        <p className="mt-1 max-w-xs text-sm text-text-tertiary">{t('staking.connect.desc')}</p>
       </div>
       <WalletButton />
     </Card>
@@ -109,6 +110,7 @@ function ConnectPanel(): JSX.Element {
 // ---------------------------------------------------------------------------
 
 function FaucetSection(): JSX.Element {
+  const { t } = useTranslation()
   const { address } = useAccount()
   const now = useNowTick()
   const tx = useTxAction()
@@ -155,11 +157,11 @@ function FaucetSection(): JSX.Element {
     <Card glow="violet">
       <CardHeader>
         <div>
-          <CardTitle>Faucet</CardTitle>
-          <CardDescription>PULSO de prueba, cooldown de {cooldownHours}h por wallet.</CardDescription>
+          <CardTitle>{t('staking.faucet.title')}</CardTitle>
+          <CardDescription>{t('staking.faucet.desc', { hours: cooldownHours })}</CardDescription>
         </div>
         <Badge variant="info" size="sm">
-          Sepolia
+          {t('staking.sepoliaBadge')}
         </Badge>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
@@ -168,7 +170,8 @@ function FaucetSection(): JSX.Element {
         </p>
         {address && onCooldown && (
           <p className="text-sm text-text-tertiary">
-            Próximo claim en <span className="tabular-nums text-text-secondary">{formatCountdown(remaining)}</span>
+            {t('staking.faucet.nextClaim')}{' '}
+            <span className="tabular-nums text-text-secondary">{formatCountdown(remaining)}</span>
           </p>
         )}
         <TxStatusLine tx={tx} />
@@ -181,7 +184,7 @@ function FaucetSection(): JSX.Element {
           disabled={!address || onCooldown}
           onClick={handleClaim}
         >
-          Reclamar 100 PULSO
+          {t('staking.faucet.claim')}
         </Button>
       </CardFooter>
     </Card>
@@ -193,6 +196,7 @@ function FaucetSection(): JSX.Element {
 // ---------------------------------------------------------------------------
 
 function StakeSection(): JSX.Element {
+  const { t } = useTranslation()
   const { address } = useAccount()
   const [amountInput, setAmountInput] = useState('')
   const approveTx = useTxAction()
@@ -276,17 +280,19 @@ function StakeSection(): JSX.Element {
     <Card glow="magenta">
       <CardHeader>
         <div>
-          <CardTitle>Stake</CardTitle>
-          <CardDescription>Bloqueá PULSO para empezar a ganar recompensas.</CardDescription>
+          <CardTitle>{t('staking.stake.title')}</CardTitle>
+          <CardDescription>{t('staking.stake.desc')}</CardDescription>
         </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <div className="flex items-center justify-between text-xs text-text-tertiary">
           <span>
-            Disponible: <span className="tabular-nums text-text-secondary">{formatToken(walletBalance)} PULSO</span>
+            {t('staking.stake.available')}{' '}
+            <span className="tabular-nums text-text-secondary">{formatToken(walletBalance)} PULSO</span>
           </span>
           <span>
-            Stakeado: <span className="tabular-nums text-text-secondary">{formatToken(stakedBalance)} PULSO</span>
+            {t('staking.stake.staked')}{' '}
+            <span className="tabular-nums text-text-secondary">{formatToken(stakedBalance)} PULSO</span>
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -300,10 +306,10 @@ function StakeSection(): JSX.Element {
             className="h-10 w-full rounded-md border border-border-default bg-surface-2/60 px-3 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none disabled:opacity-40"
           />
           <Button variant="secondary" size="sm" onClick={handleMax} disabled={!address}>
-            MAX
+            {t('staking.stake.max')}
           </Button>
         </div>
-        {exceedsBalance && <p className="text-xs text-negative">No tenés suficiente PULSO disponible.</p>}
+        {exceedsBalance && <p className="text-xs text-negative">{t('staking.stake.insufficientBalance')}</p>}
         <TxStatusLine tx={activeTx} />
       </CardContent>
       <CardFooter className="flex-col gap-2">
@@ -316,12 +322,9 @@ function StakeSection(): JSX.Element {
               disabled={!address || !parsedAmount || exceedsBalance}
               onClick={handleApprove}
             >
-              Aprobar PULSO
+              {t('staking.stake.approve')}
             </Button>
-            <p className="text-center text-[11px] leading-snug text-text-muted">
-              Aprobás el gasto de PULSO una sola vez (allowance ilimitado) — no vas a
-              tener que firmar un approve por cada stake.
-            </p>
+            <p className="text-center text-[11px] leading-snug text-text-muted">{t('staking.stake.approveNote')}</p>
           </>
         ) : (
           <Button
@@ -331,7 +334,7 @@ function StakeSection(): JSX.Element {
             disabled={!address || !parsedAmount || exceedsBalance || allowanceLoading}
             onClick={handleStake}
           >
-            Stakear
+            {t('staking.stake.stakeBtn')}
           </Button>
         )}
       </CardFooter>
@@ -344,6 +347,7 @@ function StakeSection(): JSX.Element {
 // ---------------------------------------------------------------------------
 
 function ClaimSection(): JSX.Element {
+  const { t } = useTranslation()
   const { address } = useAccount()
   const now = useNowTick()
   const claimTx = useTxAction()
@@ -407,13 +411,14 @@ function ClaimSection(): JSX.Element {
   const claimBusy = claimTx.status === 'pending' || claimTx.status === 'confirming'
   const exitBusy = exitTx.status === 'pending' || exitTx.status === 'confirming'
 
-  const aprLabel = apr === null ? '—' : apr === 0 ? 'sin recompensas activas' : `${apr.toFixed(2)}% APR est.`
+  const aprLabel =
+    apr === null ? '—' : apr === 0 ? t('staking.rewards.noActive') : t('staking.rewards.aprEst', { apr: apr.toFixed(2) })
 
   return (
     <Card glow="cyan">
       <CardHeader>
         <div>
-          <CardTitle>Recompensas</CardTitle>
+          <CardTitle>{t('staking.rewards.title')}</CardTitle>
           <CardDescription>{aprLabel}</CardDescription>
         </div>
         <Badge variant="success" size="sm" live={hasEarned}>
@@ -422,7 +427,8 @@ function ClaimSection(): JSX.Element {
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         <p className="font-display text-2xl font-semibold tabular-nums text-text-primary">
-          {formatToken(earned, 6)} <span className="text-sm font-normal text-text-tertiary">PULSO pendientes</span>
+          {formatToken(earned, 6)}{' '}
+          <span className="text-sm font-normal text-text-tertiary">{t('staking.rewards.pending')}</span>
         </p>
         <TxStatusLine tx={claimTx} />
         <TxStatusLine tx={exitTx} />
@@ -435,7 +441,7 @@ function ClaimSection(): JSX.Element {
           disabled={!address || !hasEarned}
           onClick={handleClaim}
         >
-          Reclamar recompensas
+          {t('staking.rewards.claim')}
         </Button>
         <Button
           variant="danger"
@@ -444,7 +450,7 @@ function ClaimSection(): JSX.Element {
           disabled={!address || !hasStake}
           onClick={handleExit}
         >
-          Exit (unstake + claim)
+          {t('staking.rewards.exit')}
         </Button>
       </CardFooter>
     </Card>
@@ -456,6 +462,7 @@ function ClaimSection(): JSX.Element {
 // ---------------------------------------------------------------------------
 
 export function Staking(): JSX.Element {
+  const { t } = useTranslation()
   const { isConnected, address, chain } = useAccount()
   const { switchChain, isPending: switchPending } = useSwitchChain()
 
@@ -501,12 +508,9 @@ export function Staking(): JSX.Element {
           <span className="rounded-md bg-violet/10 p-2 text-violet">
             <IconStaking className="h-5 w-5" />
           </span>
-          <h1 className="font-display text-2xl font-semibold text-text-primary">Staking</h1>
+          <h1 className="font-display text-2xl font-semibold text-text-primary">{t('staking.title')}</h1>
         </div>
-        <p className="max-w-2xl text-sm text-text-secondary">
-          Stakeá PULSO de prueba en Sepolia y ganá recompensas del mismo token. Non-custodial: cada acción es una
-          transacción que firmás vos, PULSO nunca toca tus fondos.
-        </p>
+        <p className="max-w-2xl text-sm text-text-secondary">{t('staking.subtitle')}</p>
       </header>
 
       {!isConnected ? (
@@ -515,18 +519,15 @@ export function Staking(): JSX.Element {
         <Card glow="magenta">
           <CardContent className="flex flex-col items-center gap-4 py-10 text-center">
             <p className="text-sm font-medium text-text-primary">
-              Tu wallet está en {chain?.name ?? 'otra red'} — PULSO opera en Sepolia Testnet.
+              {t('staking.wrongNetwork.message', { network: chain?.name ?? t('staking.wrongNetwork.otherNetwork') })}
             </p>
-            <p className="max-w-md text-xs text-text-tertiary">
-              Cambiá de red para reclamar del faucet, stakear y cobrar recompensas. Ninguna
-              acción se habilita en la red equivocada.
-            </p>
+            <p className="max-w-md text-xs text-text-tertiary">{t('staking.wrongNetwork.detail')}</p>
             <Button
               variant="primary"
               loading={switchPending}
               onClick={() => switchChain({ chainId: CHAIN_ID })}
             >
-              Cambiar a Sepolia
+              {t('staking.wrongNetwork.switch')}
             </Button>
           </CardContent>
         </Card>

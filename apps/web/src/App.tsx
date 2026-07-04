@@ -1,15 +1,35 @@
+import { Suspense, lazy } from 'react'
 import type { JSX } from 'react'
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Layout } from './components/layout/Layout'
 import { NAV_ITEMS } from './components/layout/nav-items'
 import { AIContextProvider } from './context/AIContext'
+import { Spinner } from './components/ui/Spinner'
 import { Home } from './pages/Home'
-import { Market } from './pages/Market'
-import { Earn } from './pages/Earn'
-import { DeFi } from './pages/DeFi'
-import { Staking } from './pages/Staking'
-import { Trends } from './pages/Trends'
-import { Bots } from './pages/Bots'
+
+// Code-splitting por página: Home (landing) va en el bundle principal, el
+// resto se carga on-demand -- evita que RainbowKit/wagmi/lightweight-charts/
+// recharts de páginas que el usuario nunca visita infle el chunk inicial.
+const Market = lazy(() => import('./pages/Market'))
+const Earn = lazy(() => import('./pages/Earn'))
+const DeFi = lazy(() => import('./pages/DeFi'))
+const Staking = lazy(() => import('./pages/Staking'))
+const Trends = lazy(() => import('./pages/Trends'))
+const Bots = lazy(() => import('./pages/Bots'))
+const Security = lazy(() => import('./pages/Security'))
+const Education = lazy(() => import('./pages/Education'))
+
+/** Fallback de `<Suspense>` mientras baja el chunk de la página -- mismo
+ * Spinner de marca que el resto de la app, nunca un blank screen. */
+function PageFallback(): JSX.Element {
+  const { t } = useTranslation()
+  return (
+    <div className="flex min-h-[50vh] items-center justify-center">
+      <Spinner size="lg" color="violet" label={t('common.loading')} />
+    </div>
+  )
+}
 
 /** Nav item cuyo `path` matchea el pathname actual (incluye subrutas, ej. `/market/:id`). */
 function resolveActiveId(pathname: string): string {
@@ -34,15 +54,19 @@ function App(): JSX.Element {
   return (
     <AIContextProvider>
       <Layout activeId={activeId} onNavigate={handleNavigate}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/market/:id?" element={<Market />} />
-          <Route path="/earn" element={<Earn />} />
-          <Route path="/defi" element={<DeFi />} />
-          <Route path="/staking" element={<Staking />} />
-          <Route path="/trends" element={<Trends />} />
-          <Route path="/bots" element={<Bots />} />
-        </Routes>
+        <Suspense fallback={<PageFallback />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/market/:id?" element={<Market />} />
+            <Route path="/earn" element={<Earn />} />
+            <Route path="/defi" element={<DeFi />} />
+            <Route path="/staking" element={<Staking />} />
+            <Route path="/trends" element={<Trends />} />
+            <Route path="/bots" element={<Bots />} />
+            <Route path="/security" element={<Security />} />
+            <Route path="/education/:lessonId?" element={<Education />} />
+          </Routes>
+        </Suspense>
       </Layout>
     </AIContextProvider>
   )

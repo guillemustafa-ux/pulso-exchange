@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { JSX } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Card } from '../components/ui/Card'
 import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
@@ -28,7 +29,7 @@ const MAX_CHAIN_FILTERS = 20
 type RiskVariant = 'success' | 'danger' | 'neutral'
 
 interface Risk {
-  label: string
+  labelKey: string
   variant: RiskVariant
 }
 
@@ -44,12 +45,12 @@ function getRisk(protocol: DefiProtocolItem): Risk {
   const ageSeconds = protocol.listed_at ? Date.now() / 1000 - protocol.listed_at : null
 
   if (tvl > ONE_BILLION && ageSeconds !== null && ageSeconds > TWO_YEARS_SECONDS) {
-    return { label: 'Establecido', variant: 'success' }
+    return { labelKey: 'defi.risk.established', variant: 'success' }
   }
   if (tvl < ONE_HUNDRED_MILLION) {
-    return { label: 'Alto riesgo', variant: 'danger' }
+    return { labelKey: 'defi.risk.high', variant: 'danger' }
   }
-  return { label: 'Riesgo medio', variant: 'neutral' }
+  return { labelKey: 'defi.risk.medium', variant: 'neutral' }
 }
 
 function PercentCell({ value }: { value: number | null | undefined }): JSX.Element {
@@ -115,6 +116,7 @@ function ProtocolLogo({ src }: { src: string | null }): JSX.Element {
 }
 
 function ProtocolCard({ protocol }: { protocol: DefiProtocolItem }): JSX.Element {
+  const { t } = useTranslation()
   const risk = getRisk(protocol)
   const visibleChains = protocol.chains.slice(0, 3)
   const extraChains = protocol.chains.length - visibleChains.length
@@ -132,19 +134,19 @@ function ProtocolCard({ protocol }: { protocol: DefiProtocolItem }): JSX.Element
           </div>
         </div>
         <Badge variant={risk.variant} size="sm" className="shrink-0">
-          {risk.label}
+          {t(risk.labelKey)}
         </Badge>
       </div>
 
       <div className="flex items-end justify-between gap-3">
         <div>
-          <p className="text-xs text-text-tertiary">TVL</p>
+          <p className="text-xs text-text-tertiary">{t('defi.tvl')}</p>
           <p className="font-display text-lg font-semibold tabular-nums text-text-primary">
             {formatCompactUsd(protocol.tvl)}
           </p>
         </div>
         <div className="text-right">
-          <p className="text-xs text-text-tertiary">7d</p>
+          <p className="text-xs text-text-tertiary">{t('defi.change7d')}</p>
           <PercentCell value={protocol.change_7d} />
         </div>
       </div>
@@ -186,6 +188,7 @@ function ProtocolCardSkeleton(): JSX.Element {
 }
 
 export function DeFi(): JSX.Element {
+  const { t } = useTranslation()
   const [protocols, setProtocols] = useState<DefiProtocolItem[] | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -202,11 +205,11 @@ export function DeFi(): JSX.Element {
       setProtocols(data)
       setLastUpdated(Date.now())
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'No se pudo conectar con la API de PULSO.')
+      setError(err instanceof ApiError ? err.message : t('common.connectionError'))
     } finally {
       if (!opts.silent) setLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     load()
@@ -272,11 +275,11 @@ export function DeFi(): JSX.Element {
       <div className="mx-auto flex max-w-lg flex-col items-center gap-4 py-24 text-center">
         <PulseIcon variant="flat" className="h-6 w-16 text-text-muted" />
         <div>
-          <h2 className="font-display text-lg font-medium text-text-primary">No se pudo cargar DeFi</h2>
+          <h2 className="font-display text-lg font-medium text-text-primary">{t('defi.loadErrorTitle')}</h2>
           <p className="mt-1 text-sm text-text-tertiary">{error}</p>
         </div>
         <Button variant="primary" onClick={() => load()}>
-          Reintentar
+          {t('common.retry')}
         </Button>
       </div>
     )
@@ -286,16 +289,16 @@ export function DeFi(): JSX.Element {
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-text-primary">DeFi</h1>
-          <p className="mt-1 text-sm text-text-tertiary">Top 50 protocolos por TVL, vía DefiLlama.</p>
+          <h1 className="font-display text-2xl font-semibold text-text-primary">{t('defi.title')}</h1>
+          <p className="mt-1 text-sm text-text-tertiary">{t('defi.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="info" size="md" live>
-            Datos en vivo
+            {t('common.liveData')}
           </Badge>
           {lastUpdated && (
             <span className="hidden text-xs text-text-muted sm:inline">
-              Actualizado {new Date(lastUpdated).toLocaleTimeString('es-AR')}
+              {t('common.updated', { time: new Date(lastUpdated).toLocaleTimeString('es-AR') })}
             </span>
           )}
         </div>
@@ -303,9 +306,9 @@ export function DeFi(): JSX.Element {
 
       {error && protocols && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-negative/25 bg-negative/5 px-4 py-3">
-          <p className="text-sm text-negative">No se pudo actualizar: {error}</p>
+          <p className="text-sm text-negative">{t('common.updateError', { error })}</p>
           <Button variant="secondary" size="sm" onClick={() => load()}>
-            Reintentar
+            {t('common.retry')}
           </Button>
         </div>
       )}
@@ -318,7 +321,7 @@ export function DeFi(): JSX.Element {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar por nombre..."
+              placeholder={t('defi.searchPlaceholder')}
               className={cn(
                 'h-9 w-full rounded-md border border-border-subtle bg-surface-2/70 pl-9 pr-3 text-sm text-text-primary',
                 'placeholder:text-text-muted outline-none transition-colors duration-200',
@@ -328,14 +331,14 @@ export function DeFi(): JSX.Element {
           </div>
 
           <div className="flex flex-wrap gap-1.5">
-            <FilterChip label="Todas las categorías" active={category === ALL} onClick={() => setCategory(ALL)} />
+            <FilterChip label={t('defi.allCategories')} active={category === ALL} onClick={() => setCategory(ALL)} />
             {categories.map((c) => (
               <FilterChip key={c} label={c} active={category === c} onClick={() => setCategory(c)} />
             ))}
           </div>
 
           <div className="flex flex-wrap gap-1.5">
-            <FilterChip label="Todas las cadenas" active={chain === ALL} onClick={() => setChain(ALL)} />
+            <FilterChip label={t('defi.allChains')} active={chain === ALL} onClick={() => setChain(ALL)} />
             {chains.map((c) => (
               <FilterChip key={c} label={c} active={chain === c} onClick={() => setChain(c)} />
             ))}
@@ -353,8 +356,8 @@ export function DeFi(): JSX.Element {
         <div className="flex flex-col items-center gap-3 py-16 text-center">
           <PulseIcon variant="flat" className="h-6 w-16 text-text-muted" />
           <div>
-            <p className="font-display text-sm font-medium text-text-secondary">Sin resultados</p>
-            <p className="mt-1 text-xs text-text-muted">Probá con otro filtro o categoría.</p>
+            <p className="font-display text-sm font-medium text-text-secondary">{t('defi.emptyTitle')}</p>
+            <p className="mt-1 text-xs text-text-muted">{t('defi.emptyDescription')}</p>
           </div>
         </div>
       )}

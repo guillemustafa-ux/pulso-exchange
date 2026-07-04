@@ -1,5 +1,6 @@
 import type { JSX } from 'react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { useTranslation } from 'react-i18next'
 import { cn } from '../lib/cn'
 import { Button } from './ui/Button'
 import { IconWallet } from './icons/Icon'
@@ -15,6 +16,7 @@ import { IconWallet } from './icons/Icon'
  * la address truncada (`0x1234…abcd`) si no.
  */
 export function WalletButton({ className }: { className?: string }): JSX.Element {
+  const { t } = useTranslation()
   return (
     <ConnectButton.Custom>
       {({ account, chain, openAccountModal, openChainModal, openConnectModal, authenticationStatus, mounted }) => {
@@ -35,8 +37,8 @@ export function WalletButton({ className }: { className?: string }): JSX.Element
                 return (
                   <Button variant="secondary" size="sm" className="gap-1.5" onClick={openConnectModal}>
                     <IconWallet className="h-4 w-4" />
-                    <span className="hidden sm:inline">Conectar wallet</span>
-                    <span className="sm:hidden">Conectar</span>
+                    <span className="hidden sm:inline">{t('walletButton.connect')}</span>
+                    <span className="sm:hidden">{t('walletButton.connectShort')}</span>
                   </Button>
                 )
               }
@@ -44,7 +46,7 @@ export function WalletButton({ className }: { className?: string }): JSX.Element
               if (chain?.unsupported) {
                 return (
                   <Button variant="danger" size="sm" onClick={openChainModal}>
-                    Red incorrecta
+                    {t('walletButton.wrongNetwork')}
                   </Button>
                 )
               }

@@ -1,16 +1,21 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 
 export type TxStatus = 'idle' | 'pending' | 'confirming' | 'confirmed' | 'error'
 
-/** Extrae un mensaje legible de un error de viem/wagmi (revert, rechazo del usuario, RPC, etc.). */
-function toErrorMessage(err: unknown): string {
+/**
+ * Extrae un mensaje legible de un error de viem/wagmi (revert, rechazo del usuario, RPC,
+ * etc.). Los errores del propio proveedor (`shortMessage`/`message`) llegan tal cual del
+ * SDK -- no están traducidos, PULSO no controla ese texto.
+ */
+function toErrorMessage(err: unknown, fallback: string): string {
   if (err && typeof err === 'object') {
     const anyErr = err as { shortMessage?: unknown; message?: unknown }
     if (typeof anyErr.shortMessage === 'string' && anyErr.shortMessage.length > 0) return anyErr.shortMessage
     if (typeof anyErr.message === 'string' && anyErr.message.length > 0) return anyErr.message
   }
-  return 'Ocurrió un error inesperado. Probá de nuevo.'
+  return fallback
 }
 
 /**
@@ -21,6 +26,7 @@ function toErrorMessage(err: unknown): string {
  * independiente en vez de compartir uno global.
  */
 export function useTxAction() {
+  const { t } = useTranslation()
   const { writeContractAsync, reset: resetWrite } = useWriteContract()
   const [hash, setHash] = useState<`0x${string}` | undefined>(undefined)
   const [status, setStatus] = useState<TxStatus>('idle')
@@ -36,16 +42,17 @@ export function useTxAction() {
       // status 'reverted'. Sin este chequeo, un revert se mostraría en verde.
       if (receipt.data.status === 'reverted') {
         setStatus('error')
-        setErrorMessage('La transacción fue revertida on-chain. Revisá las condiciones (cooldown, balance) y probá de nuevo.')
+        setErrorMessage(t('staking.tx.reverted'))
       } else {
         setStatus('confirmed')
       }
     } else if (receipt.isError) {
       setStatus('error')
-      setErrorMessage(toErrorMessage(receipt.error))
+      setErrorMessage(toErrorMessage(receipt.error, t('staking.tx.unexpectedError')))
     } else if (receipt.isLoading) {
       setStatus('confirming')
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hash, receipt.isSuccess, receipt.isError, receipt.isLoading, receipt.error, receipt.data])
 
   async function execute(params: Parameters<typeof writeContractAsync>[0]): Promise<void> {
@@ -56,7 +63,7 @@ export function useTxAction() {
       setHash(txHash)
     } catch (err) {
       setStatus('error')
-      setErrorMessage(toErrorMessage(err))
+      setErrorMessage(toErrorMessage(err, t('staking.tx.unexpectedError')))
     }
   }
 
