@@ -8,6 +8,11 @@ import {PulsoStaking} from "../src/PulsoStaking.sol";
 /// @notice Deploy de PulsoToken + PulsoStaking en Sepolia, fondeo y arranque de recompensas.
 contract Deploy is Script {
     uint256 constant REWARD_FUNDING = 100_000 ether;
+    /// @dev Stake ancla del deployer ANTES de notifyRewardAmount: con totalSupply == 0
+    ///      el reloj gotearía recompensas que no se acreditan a nadie y quedan
+    ///      bloqueadas (el contrato ahora lo revierte con NoStakers — v1 en Sepolia
+    ///      orfanó ~917 PULSO por esto).
+    uint256 constant ANCHOR_STAKE = 1 ether;
 
     function run() external {
         vm.startBroadcast();
@@ -18,7 +23,8 @@ contract Deploy is Script {
         PulsoStaking staking = new PulsoStaking(address(token), deployer);
 
         // notifyRewardAmount hace pull (transferFrom) de las recompensas — requiere approve previo.
-        token.approve(address(staking), REWARD_FUNDING);
+        token.approve(address(staking), REWARD_FUNDING + ANCHOR_STAKE);
+        staking.stake(ANCHOR_STAKE);
         staking.notifyRewardAmount(REWARD_FUNDING);
 
         vm.stopBroadcast();

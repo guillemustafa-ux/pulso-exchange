@@ -578,6 +578,11 @@ export const PulsoStakingAbi = [
   },
   {
     "type": "error",
+    "name": "NoStakers",
+    "inputs": []
+  },
+  {
+    "type": "error",
     "name": "OwnableInvalidOwner",
     "inputs": [
       {

@@ -8,21 +8,25 @@
  *
  * Fuente: contracts/deployments/sepolia.json
  * {
- *   "PulsoToken": "0xb432281F4aD976253630792E4931a4D084B33c0A",
- *   "PulsoStaking": "0x5C850800beD6E58F52F9F2721705D6675f1A9936",
+ *   "PulsoToken": "0xe8D2f470b0f2F79D025658f825dF1F2aBA3ADB75",
+ *   "PulsoStaking": "0x6006EA579603439e22fb090bD5233f1f6fba06df",
  *   "network": "sepolia",
  *   "chainId": 11155111,
  *   "blockExplorer": "https://sepolia.etherscan.io",
- *   "deployedAt": "2026-07-03"
+ *   "deployedAt": "2026-07-04"
  * }
+ *
+ * v2 (2026-07-04): redeploy tras auditoría interna — notifyRewardAmount ahora exige
+ * stakers (fix del goteo huérfano de v1) y el deploy ancla 1 PULSO antes de fondear.
+ * v1 deprecada: 0xb432...3c0A / 0x5C85...9936 (quedó con ~917 PULSO huérfanos, documentado).
  */
 export const CHAIN_ID = 11155111
 
 export const BLOCK_EXPLORER_URL = 'https://sepolia.etherscan.io'
 
 export const CONTRACT_ADDRESSES = {
-  PulsoToken: '0xb432281F4aD976253630792E4931a4D084B33c0A',
-  PulsoStaking: '0x5C850800beD6E58F52F9F2721705D6675f1A9936',
+  PulsoToken: '0xe8D2f470b0f2F79D025658f825dF1F2aBA3ADB75',
+  PulsoStaking: '0x6006EA579603439e22fb090bD5233f1f6fba06df',
 } as const satisfies Record<string, `0x${string}`>
 
 /** Link a Etherscan (Sepolia) para una tx confirmada. */

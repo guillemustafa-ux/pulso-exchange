@@ -21,10 +21,13 @@ contract PulsoStakingTest is Test {
         token = new PulsoToken();
         staking = new PulsoStaking(address(token), owner);
 
-        // Fondea el pool de recompensas (30 días default) antes de que nadie stakee,
-        // así el balance del contrato de staking == reward pool + lo que se stakee después.
-        token.approve(address(staking), REWARD_AMOUNT);
+        // notifyRewardAmount exige totalSupply > 0 (fix NoStakers): el owner ancla el
+        // reloj con 1 PULSO, fondea el pool (30 días default) y retira el ancla en el
+        // mismo timestamp — no gotea nada y los tests conservan totalSupply limpio.
+        token.approve(address(staking), REWARD_AMOUNT + 1e18);
+        staking.stake(1e18);
         staking.notifyRewardAmount(REWARD_AMOUNT);
+        staking.unstake(1e18);
 
         // Fondos para el usuario de test.
         token.transfer(user, 10_000 * 10 ** 18);

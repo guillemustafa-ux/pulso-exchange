@@ -575,10 +575,5 @@ export const PulsoTokenAbi = [
         "internalType": "address"
       }
     ]
-  },
-  {
-    "type": "error",
-    "name": "ReentrancyGuardReentrantCall",
-    "inputs": []
   }
 ] as const

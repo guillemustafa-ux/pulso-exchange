@@ -27,6 +27,7 @@ contract PulsoStaking is Ownable2Step, Pausable, ReentrancyGuard {
     error RewardTooHigh();
     error RewardPeriodNotFinished();
     error RewardsDurationIsZero();
+    error NoStakers();
 
     // ---------------------------------------------------------------------
     // State
@@ -186,8 +187,18 @@ contract PulsoStaking is Ownable2Step, Pausable, ReentrancyGuard {
     /// @notice Inicia o extiende el período de distribución de recompensas.
     /// @dev Hace pull de `reward` unidades de `stakingToken` desde el owner (msg.sender)
     ///      hacia el contrato para financiar la distribución.
+    ///
+    ///      Requiere `totalSupply > 0`: si el reloj arranca sin stakers, todo lo goteado
+    ///      hasta el primer `stake()` no se acredita a nadie y queda bloqueado para
+    ///      siempre (rewardPerToken() no avanza con supply 0, pero lastUpdateTime sí, y
+    ///      recoverERC20 no puede tocar stakingToken). La alternativa Synthetix-fork de
+    ///      congelar lastUpdateTime con supply 0 le regala el tramo entero al primer
+    ///      staker y es front-runneable; preferimos exigir un stake ancla previo
+    ///      (ver Deploy.s.sol). Bug encontrado en revisión propia: el deploy v1 en
+    ///      Sepolia orfanó ~917 PULSO por este exacto escenario.
     function notifyRewardAmount(uint256 reward) external onlyOwner nonReentrant updateReward(address(0)) {
         if (reward == 0) revert ZeroAmount();
+        if (totalSupply == 0) revert NoStakers();
 
         if (block.timestamp >= periodFinish) {
             rewardRate = reward / rewardsDuration;

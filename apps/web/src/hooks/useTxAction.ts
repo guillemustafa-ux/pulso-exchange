@@ -31,14 +31,22 @@ export function useTxAction() {
   useEffect(() => {
     if (!hash) return
     if (receipt.isSuccess) {
-      setStatus('confirmed')
+      // Gotcha de wagmi v2: isSuccess significa "la receipt se obtuvo", NO que la
+      // tx haya tenido éxito — una tx revertida on-chain también llega acá, con
+      // status 'reverted'. Sin este chequeo, un revert se mostraría en verde.
+      if (receipt.data.status === 'reverted') {
+        setStatus('error')
+        setErrorMessage('La transacción fue revertida on-chain. Revisá las condiciones (cooldown, balance) y probá de nuevo.')
+      } else {
+        setStatus('confirmed')
+      }
     } else if (receipt.isError) {
       setStatus('error')
       setErrorMessage(toErrorMessage(receipt.error))
     } else if (receipt.isLoading) {
       setStatus('confirming')
     }
-  }, [hash, receipt.isSuccess, receipt.isError, receipt.isLoading, receipt.error])
+  }, [hash, receipt.isSuccess, receipt.isError, receipt.isLoading, receipt.error, receipt.data])
 
   async function execute(params: Parameters<typeof writeContractAsync>[0]): Promise<void> {
     setStatus('pending')

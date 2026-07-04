@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  contracts:
+    name: Contratos (Foundry)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contracts
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Instalar Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Build (solc pinneado en foundry.toml)
+        run: forge build
+
+      - name: Tests (unit + fuzz + invariantes)
+        run: forge test -vv
+
+  web:
+    name: Frontend (Vite + TS estricto)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Lint (oxlint, incluye no-explicit-any)
+        run: npx oxlint src
+
+      - name: Build (tsc -b + vite build)
+        run: npm run build
+
+  api:
+    name: Backend (FastAPI)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: La app importa y arranca (smoke)
+        run: python -c "from app.main import app; print('OK:', app.title)"

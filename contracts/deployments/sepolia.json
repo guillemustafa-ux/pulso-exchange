@@ -1,8 +1,17 @@
 {
-  "PulsoToken": "0xb432281F4aD976253630792E4931a4D084B33c0A",
-  "PulsoStaking": "0x5C850800beD6E58F52F9F2721705D6675f1A9936",
+  "PulsoToken": "0xe8D2f470b0f2F79D025658f825dF1F2aBA3ADB75",
+  "PulsoStaking": "0x6006EA579603439e22fb090bD5233f1f6fba06df",
   "network": "sepolia",
   "chainId": 11155111,
   "blockExplorer": "https://sepolia.etherscan.io",
-  "deployedAt": "2026-07-03"
+  "deployedAt": "2026-07-04",
+  "version": "v2 — fix NoStakers (notifyRewardAmount exige stakers) + stake ancla en deploy",
+  "deprecated": {
+    "v1": {
+      "PulsoToken": "0xb432281F4aD976253630792E4931a4D084B33c0A",
+      "PulsoStaking": "0x5C850800beD6E58F52F9F2721705D6675f1A9936",
+      "deployedAt": "2026-07-03",
+      "motivo": "notifyRewardAmount corrió con totalSupply=0: ~917 PULSO goteados sin acreditar a nadie, irrecuperables por diseño (recoverERC20 excluye stakingToken). Detectado en auditoría interna; ver test_OrphanedRewards_WhenEveryoneExitsMidPeriod."
+    }
+  }
 }

@@ -1,14 +1,18 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.24;
 
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {Ownable2Step, Ownable} from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
 
 /// @title PulsoToken
 /// @notice ERC20 básico de prueba con faucet público para Pulso Exchange.
-contract PulsoToken is ERC20, ReentrancyGuard, Ownable2Step, Pausable {
+/// @dev Limitación conocida y aceptada para testnet: el faucet es sybileable
+///      (N wallets → 100·N PULSO/día, sin costo real en Sepolia) y el mismo token
+///      se stakea en PulsoStaking, así que un sybil puede diluir las recompensas
+///      de stakers honestos. En mainnet esto sería crítico; acá es una demo
+///      educativa y el trade-off está declarado a propósito.
+contract PulsoToken is ERC20, Ownable2Step, Pausable {
     /// @notice Cantidad inicial minteada al deployer (1,000,000 PULSO).
     uint256 private constant INITIAL_SUPPLY = 1_000_000 * 10 ** 18;
 
@@ -33,7 +37,9 @@ contract PulsoToken is ERC20, ReentrancyGuard, Ownable2Step, Pausable {
     }
 
     /// @notice Reclama FAUCET_AMOUNT de PULSO. Máximo una vez cada FAUCET_COOLDOWN por address.
-    function faucet() external nonReentrant whenNotPaused {
+    /// @dev Sin ReentrancyGuard a propósito: `_mint` de OZ no tiene hooks ni llamadas
+    ///      externas, el guard sería peso muerto en gas.
+    function faucet() external whenNotPaused {
         uint256 nextClaimAt = lastClaim[msg.sender] + FAUCET_COOLDOWN;
         if (block.timestamp < nextClaimAt) {
             revert FaucetCooldown(nextClaimAt);
@@ -48,7 +54,7 @@ contract PulsoToken is ERC20, ReentrancyGuard, Ownable2Step, Pausable {
         emit FaucetClaimed(msg.sender, FAUCET_AMOUNT);
     }
 
-    /// @notice Pausa stake/claim (faucet) de emergencia. Solo owner.
+    /// @notice Pausa el faucet de emergencia (las transferencias ERC20 siguen operando). Solo owner.
     function pause() external onlyOwner {
         _pause();
     }

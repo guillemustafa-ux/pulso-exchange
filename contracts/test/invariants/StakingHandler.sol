@@ -76,4 +76,47 @@ contract StakingHandler is Test {
         vm.prank(actor);
         staking.unstake(amount);
     }
+
+    // -----------------------------------------------------------------------
+    // Acciones de rewards — hacen que la corrida ejercite la matemática de
+    // distribución completa (warp + notify + claim), no solo la contabilidad
+    // de stake/unstake.
+    // -----------------------------------------------------------------------
+
+    /// @notice Suma de rewards pendientes (earned) de todos los actores.
+    function sumOfActorEarned() public view returns (uint256 sum) {
+        for (uint256 i = 0; i < actors.length; i++) {
+            sum += staking.earned(actors[i]);
+        }
+    }
+
+    /// @notice El test transfiere la ownership del staking al handler (Ownable2Step);
+    ///         este helper la acepta para poder llamar notifyRewardAmount fuzzeado.
+    function acceptStakingOwnership() external {
+        staking.acceptOwnership();
+    }
+
+    /// @notice Avanza el reloj entre 1 hora y 15 días — sin esto la corrida nunca
+    ///         acumularía recompensas y earned() sería siempre 0.
+    function warp(uint256 secondsSeed) external {
+        vm.warp(block.timestamp + bound(secondsSeed, 1 hours, 15 days));
+    }
+
+    function claim(uint256 actorSeed) external {
+        address actor = actors[actorSeed % actors.length];
+        vm.prank(actor);
+        staking.claim();
+    }
+
+    /// @notice Fondea y arranca/extiende un período de recompensas con monto fuzzeado.
+    ///         try/catch: NoStakers (supply 0) y RewardTooHigh (montos chicos con
+    ///         leftover) son reverts legítimos del contrato, no fallas del invariante.
+    function notifyRewards(uint256 amountSeed) external {
+        uint256 balance = token.balanceOf(address(this));
+        if (balance < 1e18) return;
+
+        uint256 amount = bound(amountSeed, 1e18, balance > 20_000e18 ? 20_000e18 : balance);
+        token.approve(address(staking), amount);
+        try staking.notifyRewardAmount(amount) {} catch {}
+    }
 }
