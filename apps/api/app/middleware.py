@@ -7,6 +7,7 @@ counter per client IP is enough for Día 1 scope (single process, no Redis).
 from __future__ import annotations
 
 import logging
+import os
 import time
 from collections import defaultdict, deque
 
@@ -17,6 +18,26 @@ from starlette.responses import JSONResponse, Response
 logger = logging.getLogger("pulso.api")
 
 WINDOW_SECONDS = 60.0
+
+# Detrás de un proxy (Render/Railway/nginx) TODOS los requests llegan con la IP
+# del proxy: sin esto, el rate limit se vuelve un único bucket global y ~5
+# usuarios navegando alcanzan para 429 general. TRUST_PROXY=1 SOLO cuando la app
+# corre detrás de un proxy propio que setea X-Forwarded-For (nunca expuesta
+# directa a internet con el flag activo: el header sería spoofeable).
+TRUST_PROXY = os.getenv("TRUST_PROXY", "").lower() in {"1", "true", "yes"}
+
+
+def client_ip(request: Request) -> str:
+    """IP real del cliente — única fuente para rate limiting y logs.
+
+    Con TRUST_PROXY activo toma el primer hop de X-Forwarded-For (el cliente
+    original, agregado por nuestro proxy); si no, la IP de la conexión directa.
+    """
+    if TRUST_PROXY:
+        forwarded = request.headers.get("x-forwarded-for", "")
+        if forwarded:
+            return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
@@ -43,16 +64,16 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         if request.url.path in self.exempt_paths:
             return await call_next(request)
 
-        client_ip = request.client.host if request.client else "unknown"
+        ip = client_ip(request)
         now = time.monotonic()
-        bucket = self._hits[client_ip]
+        bucket = self._hits[ip]
 
         while bucket and (now - bucket[0]) > WINDOW_SECONDS:
             bucket.popleft()
 
         if len(bucket) >= self.max_requests:
             retry_after = max(1, int(WINDOW_SECONDS - (now - bucket[0])))
-            logger.warning("rate limit exceeded ip=%s path=%s", client_ip, request.url.path)
+            logger.warning("rate limit exceeded ip=%s path=%s", ip, request.url.path)
             return JSONResponse(
                 status_code=429,
                 content={"detail": "Rate limit exceeded. Max 60 requests per minute."},

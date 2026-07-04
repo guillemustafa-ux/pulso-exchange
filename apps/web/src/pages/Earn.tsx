@@ -11,6 +11,7 @@ import { ApiError, fetchEarnAr } from '../services/api'
 import type { EarnCotizaciones, EarnMoneda, EarnOption, EarnTipo } from '../services/api'
 import { formatArs, formatPercent } from '../lib/format'
 import { cn } from '../lib/cn'
+import { useSetPageContext } from '../context/AIContext'
 
 /** Coincide con el TTL del cache del backend (10 min) — no tiene sentido pollear más seguido. */
 const REFRESH_INTERVAL_MS = 10 * 60_000
@@ -115,6 +116,17 @@ export function Earn(): JSX.Element {
     () => (data ? [...data.opciones].sort((a, b) => b.apy_aprox - a.apy_aprox) : []),
     [data],
   )
+
+  // Snapshot para el AIAssistant: top opciones visibles por APY.
+  useSetPageContext({
+    seccion: 'earn',
+    opciones_visibles: opcionesOrdenadas.slice(0, 8).map((o) => ({
+      nombre: o.nombre,
+      tipo: o.tipo,
+      moneda: o.moneda,
+      apy_aprox_pct: o.apy_aprox,
+    })),
+  })
 
   const columns = useMemo<Column<EarnOption>[]>(
     () => [

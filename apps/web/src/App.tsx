@@ -2,11 +2,14 @@ import type { JSX } from 'react'
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { Layout } from './components/layout/Layout'
 import { NAV_ITEMS } from './components/layout/nav-items'
+import { AIContextProvider } from './context/AIContext'
 import { Home } from './pages/Home'
 import { Market } from './pages/Market'
 import { Earn } from './pages/Earn'
 import { DeFi } from './pages/DeFi'
 import { Staking } from './pages/Staking'
+import { Trends } from './pages/Trends'
+import { Bots } from './pages/Bots'
 
 /** Nav item cuyo `path` matchea el pathname actual (incluye subrutas, ej. `/market/:id`). */
 function resolveActiveId(pathname: string): string {
@@ -29,15 +32,19 @@ function App(): JSX.Element {
   }
 
   return (
-    <Layout activeId={activeId} onNavigate={handleNavigate}>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/market/:id?" element={<Market />} />
-        <Route path="/earn" element={<Earn />} />
-        <Route path="/defi" element={<DeFi />} />
-        <Route path="/staking" element={<Staking />} />
-      </Routes>
-    </Layout>
+    <AIContextProvider>
+      <Layout activeId={activeId} onNavigate={handleNavigate}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/market/:id?" element={<Market />} />
+          <Route path="/earn" element={<Earn />} />
+          <Route path="/defi" element={<DeFi />} />
+          <Route path="/staking" element={<Staking />} />
+          <Route path="/trends" element={<Trends />} />
+          <Route path="/bots" element={<Bots />} />
+        </Routes>
+      </Layout>
+    </AIContextProvider>
   )
 }
 

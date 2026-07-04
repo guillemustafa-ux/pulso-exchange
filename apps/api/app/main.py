@@ -3,14 +3,20 @@ import os
 from contextlib import asynccontextmanager
 
 from dotenv import load_dotenv
+
+# Debe cargarse ANTES de importar app.routers.*: algunos routers (ej. ai.py)
+# leen sus env vars (GROQ_API_KEY) a nivel de módulo, en el momento del
+# import -- si load_dotenv() corriera después, esas lecturas verían el
+# proceso todavía sin el .env cargado.
+load_dotenv()
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.db import init_db
 from app.middleware import RateLimitMiddleware, RequestLoggingMiddleware
-from app.routers import defi, earn, health, market
-
-load_dotenv()
+from app.motor.engine import start_engine, stop_engine
+from app.routers import ai, bots, defi, earn, health, market, trends
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 logging.basicConfig(
@@ -36,7 +42,9 @@ RATE_LIMIT_PER_MINUTE = int(os.getenv("RATE_LIMIT_PER_MINUTE", "60"))
 async def lifespan(app: FastAPI):
     logger.info("PULSO API starting up (log_level=%s)", LOG_LEVEL)
     await init_db()
+    start_engine()  # motor de bots paper trading -- background task, no bloquea el resto de la API
     yield
+    await stop_engine()
     logger.info("PULSO API shutting down")
 
 
@@ -63,6 +71,9 @@ app.include_router(health.router)
 app.include_router(market.router)
 app.include_router(earn.router)
 app.include_router(defi.router)
+app.include_router(ai.router)
+app.include_router(trends.router)
+app.include_router(bots.router)
 
 
 @app.get("/")

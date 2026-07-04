@@ -91,12 +91,18 @@ class TTLCache:
 
 _top100_cache = TTLCache(ttl_seconds=60)
 _global_cache = TTLCache(ttl_seconds=300)
+# Klines es el hot path (cada apertura de CoinDetail + cada cambio de timeframe):
+# sin cache pega directo a Binance y, en fallback, a CoinGecko (free tier ~30
+# req/min) — con pocos usuarios simultáneos eso escala a 429/502 en cascada.
+_klines_cache = TTLCache(ttl_seconds=30)
 _trending_cache = TTLCache(ttl_seconds=300)
 
 
 def _upstream_error(exc: httpx.HTTPError, upstream: str) -> HTTPException:
+    # El detalle interno (URL con query params incluida) va SOLO al log; al
+    # cliente le llega un mensaje genérico — no exponemos infraestructura.
     logger.warning("%s request failed: %s", upstream, exc)
-    return HTTPException(status_code=502, detail=f"{upstream} unavailable: {exc}")
+    return HTTPException(status_code=502, detail=f"{upstream} no disponible, reintentá en unos segundos")
 
 
 # ---------------------------------------------------------------------------
@@ -210,14 +216,7 @@ def _strip_quote_asset(symbol: str) -> str:
     return symbol
 
 
-@router.get("/klines/{symbol}", response_model=KlinesResponse)
-async def get_klines(
-    symbol: str,
-    interval: str = Query("1h", description="Binance-style interval, e.g. 1m,5m,1h,4h,1d"),
-    limit: int = Query(100, ge=1, le=1000),
-) -> dict[str, Any]:
-    symbol_upper = symbol.upper()
-
+async def _fetch_klines_any(symbol_upper: str, interval: str, limit: int) -> dict[str, Any]:
     try:
         klines = await _fetch_binance_klines(symbol_upper, interval, limit)
         return {
@@ -256,6 +255,19 @@ async def get_klines(
         "interval": interval,
         "klines": ohlc[-limit:],
     }
+
+
+@router.get("/klines/{symbol}", response_model=KlinesResponse)
+async def get_klines(
+    symbol: str,
+    interval: str = Query("1h", description="Binance-style interval, e.g. 1m,5m,1h,4h,1d"),
+    limit: int = Query(100, ge=1, le=1000),
+) -> dict[str, Any]:
+    symbol_upper = symbol.upper()
+    cache_key = f"{symbol_upper}:{interval}:{limit}"
+    return await _klines_cache.get_or_fetch(
+        cache_key, lambda: _fetch_klines_any(symbol_upper, interval, limit)
+    )
 
 
 # ---------------------------------------------------------------------------

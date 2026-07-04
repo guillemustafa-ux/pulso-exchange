@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { JSX } from 'react'
-import { useAccount, useReadContract } from 'wagmi'
+import { useAccount, useReadContract, useSwitchChain } from 'wagmi'
 import { formatUnits, maxUint256, parseUnits } from 'viem'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
@@ -9,7 +9,8 @@ import { Spinner } from '../components/ui/Spinner'
 import { WalletButton } from '../components/WalletButton'
 import { IconStaking, IconWallet } from '../components/icons/Icon'
 import { useTxAction } from '../hooks/useTxAction'
-import { CONTRACT_ADDRESSES, etherscanTxUrl } from '../contracts/addresses'
+import { useSetPageContext } from '../context/AIContext'
+import { CHAIN_ID, CONTRACT_ADDRESSES, etherscanTxUrl } from '../contracts/addresses'
 import { PulsoTokenAbi } from '../contracts/abi/PulsoToken'
 import { PulsoStakingAbi } from '../contracts/abi/PulsoStaking'
 
@@ -227,7 +228,10 @@ function StakeSection(): JSX.Element {
     }
   }, [amountInput])
 
-  const needsApproval = parsedAmount !== null && (allowance === undefined || allowance < parsedAmount)
+  // allowance === undefined significa "cargando", no "sin allowance": mostrar el
+  // botón de approve en ese estado invita a firmar un approve innecesario.
+  const allowanceLoading = parsedAmount !== null && allowance === undefined
+  const needsApproval = parsedAmount !== null && allowance !== undefined && allowance < parsedAmount
   const exceedsBalance = parsedAmount !== null && walletBalance !== undefined && parsedAmount > walletBalance
 
   useEffect(() => {
@@ -302,23 +306,29 @@ function StakeSection(): JSX.Element {
         {exceedsBalance && <p className="text-xs text-negative">No tenés suficiente PULSO disponible.</p>}
         <TxStatusLine tx={activeTx} />
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex-col gap-2">
         {needsApproval ? (
-          <Button
-            variant="primary"
-            className="w-full"
-            loading={isBusy}
-            disabled={!address || !parsedAmount || exceedsBalance}
-            onClick={handleApprove}
-          >
-            Aprobar PULSO
-          </Button>
+          <>
+            <Button
+              variant="primary"
+              className="w-full"
+              loading={isBusy}
+              disabled={!address || !parsedAmount || exceedsBalance}
+              onClick={handleApprove}
+            >
+              Aprobar PULSO
+            </Button>
+            <p className="text-center text-[11px] leading-snug text-text-muted">
+              Aprobás el gasto de PULSO una sola vez (allowance ilimitado) — no vas a
+              tener que firmar un approve por cada stake.
+            </p>
+          </>
         ) : (
           <Button
             variant="primary"
             className="w-full"
-            loading={isBusy}
-            disabled={!address || !parsedAmount || exceedsBalance}
+            loading={isBusy || allowanceLoading}
+            disabled={!address || !parsedAmount || exceedsBalance || allowanceLoading}
             onClick={handleStake}
           >
             Stakear
@@ -446,7 +456,43 @@ function ClaimSection(): JSX.Element {
 // ---------------------------------------------------------------------------
 
 export function Staking(): JSX.Element {
-  const { isConnected } = useAccount()
+  const { isConnected, address, chain } = useAccount()
+  const { switchChain, isPending: switchPending } = useSwitchChain()
+
+  // Los reads van por el transport de Sepolia siempre, pero los WRITES firman en
+  // la chain de la wallet: sin este guard, un usuario en otra red ve los botones
+  // habilitados y la transacción falla con un error críptico (o peor, firma en
+  // la red equivocada).
+  const wrongNetwork = isConnected && chain !== undefined && chain.id !== CHAIN_ID
+
+  // Mismas queries de solo-lectura que ClaimSection -- wagmi/react-query las
+  // dedupea por (contrato, función, args), no duplica el request RPC.
+  const { data: stakedBalance } = useReadContract({
+    ...STAKING,
+    functionName: 'balances',
+    args: address ? [address] : undefined,
+    query: { enabled: !!address },
+  })
+  const { data: rewardRate } = useReadContract({ ...STAKING, functionName: 'rewardRate' })
+  const { data: totalSupply } = useReadContract({ ...STAKING, functionName: 'totalSupply' })
+  const { data: periodFinish } = useReadContract({ ...STAKING, functionName: 'periodFinish' })
+
+  const apr = useMemo<number | null>(() => {
+    if (rewardRate === undefined || totalSupply === undefined || periodFinish === undefined) return null
+    if (totalSupply === 0n) return null
+    if (Number(periodFinish) <= Math.floor(Date.now() / 1000)) return 0
+    const rate = Number(formatUnits(rewardRate, 18))
+    const supply = Number(formatUnits(totalSupply, 18))
+    return (rate * SECONDS_PER_YEAR * 100) / supply
+  }, [rewardRate, totalSupply, periodFinish])
+
+  // Snapshot para el AIAssistant: APR estimado + posición del usuario, si hay wallet conectada.
+  useSetPageContext({
+    seccion: 'staking',
+    wallet_conectada: isConnected,
+    apr_estimado_pct: apr,
+    balance_stakeado: stakedBalance !== undefined ? Number(formatUnits(stakedBalance, 18)) : null,
+  })
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-8">
@@ -465,6 +511,25 @@ export function Staking(): JSX.Element {
 
       {!isConnected ? (
         <ConnectPanel />
+      ) : wrongNetwork ? (
+        <Card glow="magenta">
+          <CardContent className="flex flex-col items-center gap-4 py-10 text-center">
+            <p className="text-sm font-medium text-text-primary">
+              Tu wallet está en {chain?.name ?? 'otra red'} — PULSO opera en Sepolia Testnet.
+            </p>
+            <p className="max-w-md text-xs text-text-tertiary">
+              Cambiá de red para reclamar del faucet, stakear y cobrar recompensas. Ninguna
+              acción se habilita en la red equivocada.
+            </p>
+            <Button
+              variant="primary"
+              loading={switchPending}
+              onClick={() => switchChain({ chainId: CHAIN_ID })}
+            >
+              Cambiar a Sepolia
+            </Button>
+          </CardContent>
+        </Card>
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
           <FaucetSection />

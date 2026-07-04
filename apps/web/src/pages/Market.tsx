@@ -12,6 +12,7 @@ import { ApiError, fetchTop100 } from '../services/api'
 import type { CoinMarketItem } from '../services/api'
 import { formatCompactUsd, formatPercent, formatUsd } from '../lib/format'
 import { cn } from '../lib/cn'
+import { useSetPageContext } from '../context/AIContext'
 
 /** Coincide con el TTL del cache del backend (60s) — no tiene sentido pollear más seguido. */
 const REFRESH_INTERVAL_MS = 60_000
@@ -192,6 +193,28 @@ export function Market(): JSX.Element {
   )
 
   const selectedCoin = id ? (coins?.find((c) => c.id === id) ?? null) : null
+
+  // Snapshot para el AIAssistant -- solo datos que están efectivamente en
+  // pantalla, nunca precios/cifras que el modelo no puede ver acá.
+  useSetPageContext({
+    seccion: 'market',
+    moneda_seleccionada: selectedCoin
+      ? {
+          symbol: selectedCoin.symbol,
+          nombre: selectedCoin.name,
+          precio_usd: selectedCoin.current_price,
+          cambio_24h_pct:
+            selectedCoin.price_change_percentage_24h_in_currency ?? selectedCoin.price_change_percentage_24h,
+          market_cap_usd: selectedCoin.market_cap,
+        }
+      : null,
+    top_monedas_visibles: (coins ?? []).slice(0, 8).map((c) => ({
+      symbol: c.symbol,
+      nombre: c.name,
+      precio_usd: c.current_price,
+      cambio_24h_pct: c.price_change_percentage_24h_in_currency ?? c.price_change_percentage_24h,
+    })),
+  })
 
   function handleRowClick(coin: CoinMarketItem): void {
     navigate(`/market/${coin.id}`)

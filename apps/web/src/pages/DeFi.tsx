@@ -10,6 +10,7 @@ import { ApiError, fetchDefiProtocols } from '../services/api'
 import type { DefiProtocolItem } from '../services/api'
 import { formatCompactUsd, formatPercent } from '../lib/format'
 import { cn } from '../lib/cn'
+import { useSetPageContext } from '../context/AIContext'
 
 /** Coincide con el TTL del cache del backend (5min) — no tiene sentido pollear más seguido. */
 const REFRESH_INTERVAL_MS = 5 * 60_000
@@ -250,6 +251,20 @@ export function DeFi(): JSX.Element {
       return true
     })
   }, [protocols, category, chain, query])
+
+  // Snapshot para el AIAssistant: protocolos visibles con el filtro actual (top 10 por TVL).
+  useSetPageContext({
+    seccion: 'defi',
+    filtro_categoria: category === ALL ? null : category,
+    filtro_cadena: chain === ALL ? null : chain,
+    protocolos_visibles: filtered.slice(0, 10).map((p) => ({
+      nombre: p.name,
+      categoria: p.category,
+      tvl_usd: p.tvl,
+      cambio_7d_pct: p.change_7d,
+      cadenas: p.chains,
+    })),
+  })
 
   // Sin datos previos y la carga inicial falló: no hay cards que mostrar, solo el error.
   if (error && !protocols) {

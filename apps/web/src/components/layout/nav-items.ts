@@ -29,8 +29,8 @@ export const NAV_ITEMS: NavItem[] = [
   { id: 'defi', label: 'DeFi', icon: IconDefi, path: '/defi' },
   { id: 'earn', label: 'Earn AR', icon: IconEarn, path: '/earn' },
   { id: 'staking', label: 'Staking', icon: IconStaking, path: '/staking' },
-  { id: 'bots', label: 'Bots', icon: IconBots },
-  { id: 'tendencias', label: 'Tendencias', icon: IconTrending },
+  { id: 'bots', label: 'Bots', icon: IconBots, path: '/bots' },
+  { id: 'tendencias', label: 'Tendencias', icon: IconTrending, path: '/trends' },
   { id: 'educacion', label: 'Educación', icon: IconEducation },
   { id: 'seguridad', label: 'Seguridad', icon: IconShield },
 ]

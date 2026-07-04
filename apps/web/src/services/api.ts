@@ -43,6 +43,60 @@ async function getJson<T>(path: string): Promise<T> {
   return (await res.json()) as T
 }
 
+async function postJson<T>(path: string, body: unknown): Promise<T> {
+  let res: Response
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+  } catch {
+    throw new ApiError('No se pudo conectar con la API de PULSO. ¿Está corriendo en :8000?', 0)
+  }
+
+  if (!res.ok) {
+    let detail = res.statusText || `Error ${res.status}`
+    try {
+      const data = (await res.json()) as { detail?: unknown }
+      if (typeof data?.detail === 'string' && data.detail.trim()) detail = data.detail
+    } catch {
+      // Respuesta sin body JSON parseable: nos quedamos con el statusText.
+    }
+    throw new ApiError(detail, res.status)
+  }
+
+  return (await res.json()) as T
+}
+
+/** PATCH/DELETE genérico -- mismo manejo de error que `postJson`, sin exigir un body. */
+async function sendJson<T>(path: string, method: 'PATCH' | 'DELETE', body?: unknown): Promise<T> {
+  let res: Response
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      method,
+      headers: body !== undefined ? { 'Content-Type': 'application/json' } : undefined,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    })
+  } catch {
+    throw new ApiError('No se pudo conectar con la API de PULSO. ¿Está corriendo en :8000?', 0)
+  }
+
+  if (!res.ok) {
+    let detail = res.statusText || `Error ${res.status}`
+    try {
+      const data = (await res.json()) as { detail?: unknown }
+      if (typeof data?.detail === 'string' && data.detail.trim()) detail = data.detail
+    } catch {
+      // Respuesta sin body JSON parseable (ej. 204 No Content, o statusText solo).
+    }
+    throw new ApiError(detail, res.status)
+  }
+
+  if (res.status === 204) return undefined as T
+  return (await res.json()) as T
+}
+
 // ---------------------------------------------------------------------------
 // GET /api/market/top100
 // ---------------------------------------------------------------------------
@@ -172,4 +226,164 @@ export interface DefiProtocolItem {
 
 export function fetchDefiProtocols(): Promise<DefiProtocolItem[]> {
   return getJson<DefiProtocolItem[]>('/api/defi/protocols')
+}
+
+// ---------------------------------------------------------------------------
+// POST /api/ai/ask
+// ---------------------------------------------------------------------------
+
+export interface AskAIResponse {
+  respuesta: string
+}
+
+/** Asistente educativo contextual (Groq). `contexto` es el único dato "real" que el modelo puede usar. */
+export function askAI(
+  pregunta: string,
+  seccion: string,
+  contexto: Record<string, unknown>,
+): Promise<AskAIResponse> {
+  return postJson<AskAIResponse>('/api/ai/ask', { pregunta, seccion, contexto })
+}
+
+// ---------------------------------------------------------------------------
+// GET /api/trends/fear-greed
+// ---------------------------------------------------------------------------
+
+export interface FearGreedItem {
+  value: number
+  value_classification: string
+  /** Unix timestamp (segundos). */
+  timestamp: number
+}
+
+export interface FearGreedResponse {
+  name: string
+  data: FearGreedItem[]
+}
+
+export function fetchFearGreed(): Promise<FearGreedResponse> {
+  return getJson<FearGreedResponse>('/api/trends/fear-greed')
+}
+
+// ---------------------------------------------------------------------------
+// GET /api/trends/summary
+// ---------------------------------------------------------------------------
+
+export interface FearGreedCurrent {
+  value: number
+  label: string
+}
+
+/** Mismo shape que `TrendingCoin` de CoinGecko `/search/trending` -- `data` queda pass-through (precio/variación por moneda, no vale tipar cada subcampo). */
+export interface TrendingCoinSummary {
+  id: string
+  coin_id: number | null
+  name: string
+  symbol: string
+  market_cap_rank: number | null
+  thumb: string | null
+  slug: string | null
+  price_btc: number | null
+  score: number | null
+  data: Record<string, unknown> | null
+}
+
+export interface MoverItem {
+  id: string
+  symbol: string
+  name: string
+  image: string | null
+  current_price: number | null
+  price_change_percentage_24h: number | null
+  market_cap_rank: number | null
+}
+
+export interface TrendsSummaryResponse {
+  /** `null` si alternative.me no respondió a tiempo. */
+  fear_greed: FearGreedCurrent | null
+  trending: TrendingCoinSummary[]
+  gainers: MoverItem[]
+  losers: MoverItem[]
+  market_cap_usd: number | null
+  market_cap_change_percentage_24h: number | null
+  btc_dominance: number | null
+}
+
+export function fetchTrendsSummary(): Promise<TrendsSummaryResponse> {
+  return getJson<TrendsSummaryResponse>('/api/trends/summary')
+}
+
+// ---------------------------------------------------------------------------
+// /api/bots -- motor de paper trading (100% simulado, ver PROMPT.md módulo Bots)
+// ---------------------------------------------------------------------------
+
+export type BotEstrategia = 'DCA' | 'GRID' | 'SMA'
+export type BotEstado = 'activo' | 'pausado'
+export type TradeTipo = 'compra' | 'venta'
+
+export interface EquityPoint {
+  timestamp: string
+  equity: number
+}
+
+export interface Bot {
+  id: number
+  nombre: string
+  estrategia: BotEstrategia
+  par: string
+  capital_inicial: number
+  capital_actual: number
+  cantidad_total: number
+  capital_invertido: number
+  /** `null` si Binance no respondió al armar la respuesta -- el PnL cae a 0 en ese caso. */
+  precio_actual: number | null
+  pnl_usd: number
+  pnl_pct: number
+  estado: BotEstado
+  creado_at: string
+  params: Record<string, unknown>
+  /** Últimos ~60 puntos de equity -- alcanza para la mini curva de la lista. */
+  equity_curve: EquityPoint[]
+}
+
+export interface Trade {
+  id: number
+  bot_id: number
+  tipo: TradeTipo
+  precio: number
+  cantidad: number
+  timestamp: string
+}
+
+export interface BotCreatePayload {
+  nombre: string
+  estrategia: BotEstrategia
+  par: string
+  capital_inicial: number
+  params: Record<string, unknown>
+}
+
+export function fetchBots(): Promise<Bot[]> {
+  return getJson<Bot[]>('/api/bots/')
+}
+
+export function createBot(payload: BotCreatePayload): Promise<Bot> {
+  return postJson<Bot>('/api/bots/', payload)
+}
+
+export function fetchBotTrades(botId: number): Promise<Trade[]> {
+  return getJson<Trade[]>(`/api/bots/${botId}/trades`)
+}
+
+/** Equity curve completa (todos los snapshots del motor) -- para el detalle del bot. */
+export function fetchBotEquity(botId: number): Promise<EquityPoint[]> {
+  return getJson<EquityPoint[]>(`/api/bots/${botId}/equity`)
+}
+
+export function setBotEstado(botId: number, estado: BotEstado): Promise<Bot> {
+  return sendJson<Bot>(`/api/bots/${botId}/estado`, 'PATCH', { estado })
+}
+
+export function deleteBot(botId: number): Promise<void> {
+  return sendJson<void>(`/api/bots/${botId}`, 'DELETE')
 }

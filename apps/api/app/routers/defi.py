@@ -116,4 +116,4 @@ async def get_protocols() -> list[dict[str, Any]]:
         return await _protocols_cache.get_or_fetch("protocols", _fetch_top_protocols)
     except httpx.HTTPError as exc:
         logger.warning("DefiLlama request failed: %s", exc)
-        raise HTTPException(status_code=502, detail=f"DefiLlama unavailable: {exc}") from exc
+        raise HTTPException(status_code=502, detail="DefiLlama no disponible, reintentá en unos segundos") from exc
