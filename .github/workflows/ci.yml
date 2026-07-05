@@ -37,7 +37,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          # 24 = mismo entorno que genera package-lock.json local (npm 11);
+          # npm 10 (Node 22) materializa distinto los peers opcionales y npm ci falla
+          node-version: 24
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
 
