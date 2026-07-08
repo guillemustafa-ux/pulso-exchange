@@ -49,6 +49,9 @@ jobs:
       - name: Lint (oxlint, incluye no-explicit-any)
         run: npx oxlint src
 
+      - name: i18n — paridad de claves entre locales (es/en/pt)
+        run: npm run check:i18n
+
       - name: Build (tsc -b + vite build)
         run: npm run build
 

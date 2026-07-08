@@ -1,0 +1,442 @@
+{
+  "common": {
+    "retry": "Tentar novamente",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "close": "Fechar",
+    "loading": "Carregando",
+    "updated": "Atualizado {{time}}",
+    "liveData": "Dados ao vivo",
+    "updateError": "Não foi possível atualizar: {{error}}",
+    "connectionError": "Não foi possível conectar com a API da PULSO. Está rodando na :8000?",
+    "visit": "Visitar ↗",
+    "viewOnEtherscan": "Ver no Etherscan ↗"
+  },
+  "nav": {
+    "mercado": "Mercado",
+    "defi": "DeFi",
+    "earn": "Earn AR",
+    "staking": "Staking",
+    "bots": "Bots",
+    "tendencias": "Tendências",
+    "educacion": "Educação",
+    "seguridad": "Segurança"
+  },
+  "langSwitch": {
+    "es": "ES",
+    "en": "EN",
+    "pt": "PT",
+    "switchToEs": "Cambiar a español",
+    "switchToEn": "Switch to English",
+    "switchToPt": "Mudar para português"
+  },
+  "layout": {
+    "sepoliaTestnet": "Sepolia Testnet",
+    "nonCustodialNote": "Non-custodial · você guarda suas chaves. A PULSO nunca as pede.",
+    "more": "Mais",
+    "moreModules": "Mais módulos",
+    "close": "Fechar"
+  },
+  "home": {
+    "title": "O pulso do mercado cripto, na sua wallet.",
+    "subtitle": "Exchange non-custodial de demonstração: preços ao vivo, staking on-chain na Sepolia e bots de paper trading. Nunca custodiamos fundos nem pedimos sua seed.",
+    "badgeLiveData": "Dados ao vivo",
+    "badgeSepolia": "Sepolia Testnet",
+    "badgePaperTrading": "Paper trading",
+    "ctaExplore": "Explorar o mercado",
+    "ctaHowItWorks": "Como funciona",
+    "modules": {
+      "mercado": "Mercado — Top 100",
+      "defi": "DeFi — melhores protocolos",
+      "staking": "Staking on-chain"
+    },
+    "syncingLabel": "Sincronizando {{label}}",
+    "syncing": "sincronizando",
+    "comingSoon": "Em breve",
+    "footerTag": "Design system — Dia 1"
+  },
+  "market": {
+    "title": "Mercado",
+    "subtitle": "Top 100 por capitalização de mercado.",
+    "columns": {
+      "rank": "#",
+      "name": "Nome",
+      "price": "Preço",
+      "change24h": "24h %",
+      "change7d": "7d %",
+      "sparkline": "7d",
+      "marketCap": "Market Cap",
+      "volume": "Volume (24h)"
+    },
+    "searchPlaceholder": "Buscar por nome ou símbolo...",
+    "emptyTitle": "Sem resultados",
+    "emptyDescription": "Tente outro nome ou símbolo.",
+    "loadErrorTitle": "Não foi possível carregar o mercado"
+  },
+  "earn": {
+    "title": "Earn AR",
+    "subtitle": "Comparador de rendimentos: exchanges argentinas, fintechs e DeFi.",
+    "tipoLabel": {
+      "exchange_ar": "Exchange AR",
+      "fintech": "Fintech",
+      "defi": "DeFi"
+    },
+    "cotizaciones": {
+      "mep": "Dólar MEP",
+      "ccl": "Dólar CCL",
+      "usdtArs": "USDT/ARS (méd.)"
+    },
+    "disclaimerLoading": "Carregando disclaimer...",
+    "columns": {
+      "nombre": "Nome",
+      "moneda": "Moeda",
+      "apy": "APY aprox.",
+      "actualizado": "Atualizado",
+      "sitio": "Site"
+    },
+    "emptyTitle": "Sem dados",
+    "emptyDescription": "Ainda não há rendimentos para mostrar.",
+    "loadErrorTitle": "Não foi possível carregar o Earn AR"
+  },
+  "defi": {
+    "title": "DeFi",
+    "subtitle": "Top 50 protocolos por TVL, via DefiLlama.",
+    "searchPlaceholder": "Buscar por nome...",
+    "allCategories": "Todas as categorias",
+    "allChains": "Todas as redes",
+    "risk": {
+      "established": "Estabelecido",
+      "high": "Alto risco",
+      "medium": "Risco médio"
+    },
+    "tvl": "TVL",
+    "change7d": "7d",
+    "emptyTitle": "Sem resultados",
+    "emptyDescription": "Tente outro filtro ou categoria.",
+    "loadErrorTitle": "Não foi possível carregar o DeFi"
+  },
+  "staking": {
+    "title": "Staking",
+    "subtitle": "Faça staking de PULSO de teste na Sepolia e ganhe recompensas do mesmo token. Non-custodial: cada ação é uma transação que você assina, a PULSO nunca toca nos seus fundos.",
+    "sepoliaBadge": "Sepolia",
+    "connect": {
+      "title": "Conecte sua wallet",
+      "desc": "Você precisa de uma wallet conectada à Sepolia Testnet para reclamar PULSO do faucet e fazer staking."
+    },
+    "faucet": {
+      "title": "Faucet",
+      "desc": "PULSO de teste, cooldown de {{hours}}h por wallet.",
+      "claim": "Reclamar 100 PULSO",
+      "nextClaim": "Próximo claim em"
+    },
+    "stake": {
+      "title": "Stake",
+      "desc": "Bloqueie PULSO para começar a ganhar recompensas.",
+      "available": "Disponível:",
+      "staked": "Em staking:",
+      "max": "MAX",
+      "insufficientBalance": "Você não tem PULSO suficiente disponível.",
+      "approve": "Aprovar PULSO",
+      "approveNote": "Você aprova o gasto de PULSO uma única vez (allowance ilimitado) — não vai precisar assinar um approve a cada stake.",
+      "stakeBtn": "Fazer stake"
+    },
+    "rewards": {
+      "title": "Recompensas",
+      "claim": "Reclamar recompensas",
+      "exit": "Exit (unstake + claim)",
+      "pending": "PULSO pendentes",
+      "noActive": "sem recompensas ativas",
+      "aprEst": "{{apr}}% APR est."
+    },
+    "tx": {
+      "signInWallet": "Confirme na sua wallet…",
+      "waitingConfirmation": "Aguardando confirmação na Sepolia…",
+      "confirmed": "Confirmado —",
+      "viewOnEtherscan": "ver no Etherscan",
+      "reverted": "A transação foi revertida on-chain. Revise as condições (cooldown, saldo) e tente de novo.",
+      "unexpectedError": "Ocorreu um erro inesperado. Tente de novo.",
+      "processing": "Processando transação"
+    },
+    "wrongNetwork": {
+      "message": "Sua wallet está na {{network}} — a PULSO opera na Sepolia Testnet.",
+      "detail": "Troque de rede para reclamar do faucet, fazer staking e receber recompensas. Nenhuma ação é habilitada na rede errada.",
+      "switch": "Mudar para Sepolia",
+      "otherNetwork": "outra rede"
+    }
+  },
+  "trends": {
+    "title": "Tendências",
+    "subtitle": "Sentimento de mercado, trending coins, ganhadoras/perdedoras 24h e dominância do BTC.",
+    "bands": {
+      "extremeFear": "Medo extremo",
+      "fear": "Medo",
+      "greed": "Ganância",
+      "extremeGreed": "Ganância extrema",
+      "noData": "Sem dados"
+    },
+    "gaugeAria": "Índice de medo e ganância: {{value}} de 100, {{label}}",
+    "gaugeAriaEmpty": "Índice de medo e ganância sem dados",
+    "historyEmpty": "Sem histórico disponível.",
+    "tooltipIndex": "Índice",
+    "fearGreedTitle": "Fear & Greed Index",
+    "fearGreedDesc": "Sentimento agregado do mercado cripto, via alternative.me.",
+    "last30days": "Últimos 30 dias",
+    "dominanceTitle": "Dominância do BTC",
+    "dominanceDesc": "Participação do Bitcoin sobre o market cap total.",
+    "marketCapTotal": "Market cap total",
+    "change24h": "Variação 24h",
+    "trendingTitle": "Trending",
+    "trendingSubtitle": "Top 7 mais buscadas no CoinGecko",
+    "trendingRank": "#{{rank}} trending",
+    "rank": "Rank #{{rank}}",
+    "trendingEmpty": "Sem dados de trending por enquanto.",
+    "gainersTitle": "Ganhadoras 24h",
+    "losersTitle": "Perdedoras 24h",
+    "columns": {
+      "name": "Nome",
+      "price": "Preço",
+      "change": "24h %"
+    },
+    "gainersEmptyDesc": "Ainda não há ganhadoras para mostrar.",
+    "losersEmptyDesc": "Ainda não há perdedoras para mostrar.",
+    "emptyTitle": "Sem dados",
+    "loadErrorTitle": "Não foi possível carregar as tendências"
+  },
+  "bots": {
+    "title": "Bots",
+    "subtitle": "Motor de paper trading: DCA, Grid e SMA Crossover sobre preços reais da Binance.",
+    "estrategiaLabel": {
+      "DCA": "DCA",
+      "GRID": "Grid",
+      "SMA": "SMA Crossover"
+    },
+    "estado": {
+      "activo": "Ativo",
+      "pausado": "Pausado"
+    },
+    "banner": "PAPER TRADING — Fundos e operações totalmente simulados. Nenhum bot da PULSO se conecta a um exchange real nem executa ordens reais.",
+    "createBot": "+ Criar bot",
+    "loadErrorTitle": "Não foi possível carregar os Bots",
+    "emptyTitle": "Você ainda não criou nenhum bot",
+    "emptyDescription": "Comece com DCA, Grid ou SMA — tudo com fundos simulados.",
+    "createFirst": "Criar o primeiro",
+    "pnl": "PnL",
+    "valorTotal": "Valor total",
+    "noHistory": "Sem histórico ainda",
+    "noEquityHistory": "Ainda não há histórico de equity para este bot.",
+    "wizard": {
+      "title": "Criar bot",
+      "steps": ["Estratégia", "Par e capital", "Parâmetros"],
+      "estrategias": {
+        "DCA": { "label": "DCA", "desc": "Compra um valor fixo em USD de tempos em tempos, independentemente do preço." },
+        "GRID": { "label": "Grid", "desc": "Níveis de compra/venda fixos acima e abaixo do preço atual." },
+        "SMA": { "label": "SMA Crossover", "desc": "Cruzamento de médias móveis: compra no cruzamento de alta, vende no de baixa." }
+      },
+      "nombreLabel": "Nome do bot",
+      "nombrePlaceholder": "Ex. DCA BTC semanal",
+      "parLabel": "Par",
+      "parPlaceholder": "BTCUSDT",
+      "capitalLabel": "Capital inicial (USD, simulado)",
+      "dca": {
+        "frecuencia": "Frequência de compra",
+        "opcion1m": "A cada 1 minuto",
+        "opcion5m": "A cada 5 minutos",
+        "opcion1h": "A cada 1 hora",
+        "opcion4h": "A cada 4 horas",
+        "opcion1d": "A cada 1 dia",
+        "monto": "Valor por ordem (USD)"
+      },
+      "grid": {
+        "niveles": "Níveis por lado",
+        "spread": "Spread entre níveis (%)",
+        "capitalPorNivel": "Capital por nível (USD, opcional)",
+        "capitalPorNivelPlaceholder": "Auto: capital / (níveis x 2)",
+        "note": "Os níveis são calculados sobre o preço atual do par no momento de criar o bot."
+      },
+      "sma": {
+        "corta": "SMA curta (candles)",
+        "larga": "SMA longa (candles)",
+        "invalid": "A SMA curta deve ser menor que a SMA longa.",
+        "timeframe": "Timeframe dos candles",
+        "tf1h": "1 hora",
+        "tf4h": "4 horas",
+        "tf1d": "1 dia",
+        "monto": "Valor por ordem (USD)"
+      },
+      "cancel": "Cancelar",
+      "back": "Voltar",
+      "continue": "Continuar",
+      "submit": "Criar bot",
+      "genericError": "Não foi possível criar o bot."
+    },
+    "detail": {
+      "createdAt": "criado {{date}}",
+      "capitalInicial": "Capital inicial",
+      "cashDisponible": "Cash disponível",
+      "holding": "Holding",
+      "equityCurve": "Equity curve",
+      "tradesHistory": "Histórico de trades",
+      "noTrades": "Sem trades ainda",
+      "noTradesDesc": "O motor ainda não executou nenhuma ordem simulada para este bot.",
+      "pausar": "Pausar",
+      "reanudar": "Retomar",
+      "eliminar": "Excluir",
+      "confirmDelete": "Excluir este bot e seu histórico?",
+      "deleteError": "Não foi possível excluir o bot.",
+      "toggleError": "Não foi possível mudar o estado do bot.",
+      "loadError": "Não foi possível carregar o detalhe do bot.",
+      "columns": {
+        "fecha": "Data",
+        "tipo": "Tipo",
+        "precio": "Preço",
+        "cantidad": "Quantidade"
+      },
+      "tipo": {
+        "compra": "Compra",
+        "venta": "Venda"
+      }
+    }
+  },
+  "security": {
+    "title": "Segurança",
+    "intro": "A PULSO é <strong>non-custodial</strong>: em nenhum momento temos acesso aos seus fundos nem às suas chaves. Cada ação on-chain é assinada por você, a partir da sua própria wallet. Esta página explica em detalhe o que isso significa na prática.",
+    "badgeSepolia": "Sepolia Testnet",
+    "badgeNonCustodial": "Non-custodial",
+    "badgePaperTrading": "Paper trading",
+    "custodialModel": {
+      "heading": "Como funciona o modelo non-custodial",
+      "desc": "Sua wallet (MetaMask, Rainbow, etc.) guarda suas chaves sempre no seu próprio dispositivo. A PULSO nunca as vê, nunca as pede e nunca poderia movê-las, ainda que quisesse.",
+      "p1": "Quando você conecta sua wallet, o app apenas lê seu endereço público e seus saldos — informação que qualquer um pode ver em um explorador de blocos. Nenhuma operação (faucet, stake, claim, etc.) se executa sozinha: cada uma abre um popup da sua wallet onde você vê exatamente qual contrato, qual função e qual valor está prestes a assinar, e você decide confirmar ou rejeitar.",
+      "p2": "Se a PULSO desaparecesse amanhã, seus PULSO em staking e suas recompensas continuariam sendo seus: eles vivem nos contratos na Sepolia, não em um servidor nosso. O backend da PULSO nunca tem uma chave privada nem a possibilidade de mover um único token."
+    },
+    "signedActions": {
+      "heading": "O que você assina, ação por ação",
+      "desc": "Tudo o que acontece no módulo de Staking se resume a estas cinco transações. Nada mais move seus fundos.",
+      "faucet": { "action": "Faucet", "what": "Você pede 100 PULSO de teste. Só move tokens de testnet para a sua wallet — nunca ao contrário." },
+      "approve": { "action": "Approve", "what": "Você autoriza o contrato de Staking a mover uma quantidade de PULSO em seu nome. Não move nada ainda: só dá permissão." },
+      "stake": { "action": "Stake", "what": "Você transfere PULSO da sua wallet para o contrato de Staking. Fica registrado em seu nome e você pode retirá-lo quando quiser com Unstake." },
+      "claim": { "action": "Claim", "what": "Você retira para a sua wallet as recompensas que já ganhou. Não toca no seu principal em staking." },
+      "unstake": { "action": "Unstake / Exit", "what": "Devolve seu PULSO em staking (e as recompensas pendentes, no caso do Exit) para a sua wallet. Nunca fica bloqueado por uma pausa do contrato." }
+    },
+    "neverAsks": {
+      "heading": "A PULSO nunca pede a você:",
+      "item1": "Sua frase-semente (seed phrase) ou palavras de recuperação.",
+      "item2": "Sua chave privada, em nenhum formato nem por nenhum canal.",
+      "item3": "Que você \"conecte sua wallet aqui\" fora do app oficial da PULSO.",
+      "item4": "Que você transfira fundos para um endereço \"de suporte\" ou \"de verificação\".",
+      "item5": "Senhas, códigos 2FA ou acesso ao seu exchange centralizado.",
+      "footer": "Se alguém pedir isso dizendo ser \"da PULSO\" (por Telegram, Discord, DM ou qualquer outro canal), é uma tentativa de golpe — ignore e não responda."
+    },
+    "verifyContracts": {
+      "heading": "Como verificar os contratos você mesmo",
+      "desc": "Não confie, verifique: os dois contratos da PULSO estão verificados publicamente no Etherscan. Qualquer um pode ler o código-fonte exato que roda on-chain, sem depender do que diz esta página.",
+      "cardTitle": "Contratos na Sepolia",
+      "cardDesc": "Endereços verificados — o código-fonte coincide byte a byte com o deployado.",
+      "stepsTitle": "Passos para checar você mesmo:",
+      "step1": "Abra o link \"Ver no Etherscan\" de qualquer um dos dois contratos acima.",
+      "step2a": "Repare no ícone verde de check ao lado de \"Contract\" — significa que o código-fonte está verificado (aba",
+      "step2b": "Contract → Code",
+      "step2c": ").",
+      "step3": "Leia o código diretamente ali, ou compare com o repositório público do projeto (pasta contracts/src).",
+      "step4a": "Na aba",
+      "step4b": "Read Contract",
+      "step4c": "você pode consultar seu saldo em staking, recompensas pendentes, etc. direto do Etherscan, sem passar pelo app da PULSO.",
+      "explorerUsed": "Explorador usado:"
+    },
+    "disclaimers": {
+      "heading": "Disclaimers",
+      "desc": "A PULSO é um projeto de demonstração. Nada do que segue é negociável nem depende da seção onde você está dentro do app.",
+      "testnetTitle": "Testnet — sem valor real.",
+      "testnetBody": "Tudo roda na Sepolia. O PULSO que você recebe do faucet e o que coloca em staking não tem nenhum valor econômico, e o faucet é intencionalmente abusável (detalhe no DESIGN.md): é uma demo educativa, não um produto financeiro.",
+      "paperTitle": "Paper trading — fundos simulados.",
+      "paperBody": "Os bots de trading (módulo Bots) não executam nenhuma ordem real contra nenhum exchange. Todo o PnL, posições e histórico são simulados sobre preços reais apenas para fins ilustrativos.",
+      "aiTitle": "Assistente de IA — apenas educativo.",
+      "aiBody": "O assistente (Groq) responde unicamente com os dados que vê na tela, nunca inventa preços nem números, e é proibido de dar conselho financeiro. Nenhuma resposta dele é uma recomendação de investimento.",
+      "footer": "Nada na PULSO —nem esta página, nem o resto do app, nem o assistente de IA— constitui aconselhamento financeiro, jurídico ou fiscal. Use para aprender e para testar o fluxo completo de um exchange non-custodial, não para tomar decisões de investimento reais."
+    }
+  },
+  "education": {
+    "moduleLabel": "Módulo",
+    "title": "Educação",
+    "subtitle": "8 lições curtas para operar cripto com critério próprio: wallets e seeds, staking, riscos DeFi, stablecoins e o dólar na Argentina, como ler gráficos, smart contracts, custodial vs. non-custodial e como detectar golpes.",
+    "progressLabel": "Progresso do curso",
+    "lessonsApproved": "{{done}}/{{total}} lições aprovadas",
+    "lessonN": "Lição {{order}}",
+    "review": "Revisar",
+    "start": "Começar",
+    "status": {
+      "completed": "Concluída",
+      "inProgress": "Em progresso",
+      "notStarted": "Não iniciada"
+    },
+    "quiz": {
+      "title": "Quiz",
+      "answered": "{{answered}}/{{total}} respondidas",
+      "correct": "Correto. ",
+      "incorrect": "Não está correto. ",
+      "result": "Resultado: {{score}}/{{total}}",
+      "passed": "Aprovado -- você já pode passar para a próxima lição.",
+      "failed": "Você não chegou aos 75% -- revise a lição e tente de novo.",
+      "retry": "Refazer quiz"
+    },
+    "backLink": "Educação",
+    "lessonCounter": "Lição {{order}}/{{total}}",
+    "notFoundTitle": "Lição não encontrada",
+    "notFoundDesc": "Pode ser que o link esteja quebrado ou incompleto.",
+    "backToIndex": "Voltar ao índice",
+    "prev": "Anterior",
+    "next": "Próxima"
+  },
+  "coinDetail": {
+    "detailAria": "Detalhe de {{name}}",
+    "close": "Fechar",
+    "sourceBinance": "Binance · candles",
+    "sourceCoingecko": "CoinGecko · linha",
+    "loadingChart": "Carregando gráfico",
+    "errorNoData": "Não há dados de gráfico para este par, nem na Binance nem no CoinGecko.",
+    "errorGeneric": "Não foi possível carregar o gráfico."
+  },
+  "walletButton": {
+    "connect": "Conectar wallet",
+    "connectShort": "Conectar",
+    "wrongNetwork": "Rede incorreta"
+  },
+  "aiAssistant": {
+    "sectionLabel": {
+      "market": "Mercado",
+      "staking": "Staking",
+      "defi": "DeFi",
+      "bots": "Bots",
+      "trends": "Tendências",
+      "earn": "Earn AR",
+      "general": "PULSO"
+    },
+    "quickQuestions": {
+      "market": ["O que significa market cap?", "Como ler o gráfico de candles?"],
+      "staking": ["O que é o APR?", "Que risco tem o staking?"],
+      "defi": ["O que é TVL?", "O que é um rug pull?"],
+      "bots": ["Que risco tem esta config?", "O que é DCA?"],
+      "trends": ["O que significa Fear & Greed?"]
+    },
+    "openAria": "Abrir assistente de IA",
+    "panelAria": "Assistente de IA da PULSO",
+    "closeAria": "Fechar assistente",
+    "headerTitle": "Assistente PULSO",
+    "headerSubtitle": "Educativo · seção {{section}}",
+    "emptyMessage": "Pergunte o que quiser sobre esta seção. Só uso os dados que você vê na tela, nunca invento preços nem números.",
+    "thinking": "Pensando",
+    "thinkingDots": "Pensando…",
+    "inputPlaceholder": "Escreva sua pergunta...",
+    "submit": "Perguntar",
+    "footerDisclaimer": "IA educativa. Não é conselho financeiro.",
+    "connectionError": "Não foi possível conectar com o assistente de IA."
+  },
+  "table": {
+    "searchPlaceholder": "Buscar...",
+    "emptyTitle": "Sem dados",
+    "emptyDescription": "Ainda não há nada para mostrar aqui.",
+    "pageInfo": "Página {{page}} de {{total}} · {{count}} resultados",
+    "prevPage": "Página anterior",
+    "nextPage": "Próxima página"
+  }
+}
