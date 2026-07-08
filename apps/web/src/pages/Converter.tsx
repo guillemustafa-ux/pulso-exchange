@@ -8,29 +8,11 @@ import { ApiError, fetchEarnAr, fetchTop100 } from '../services/api'
 import type { CoinMarketItem, EarnCotizaciones } from '../services/api'
 import { formatArs, formatUsd } from '../lib/format'
 import { cn } from '../lib/cn'
+import { computeArsRates, type ArsRateKey } from '../lib/rates'
 import { useSetPageContext } from '../context/AIContext'
 
 /** Coincide con el TTL del cache del backend de Earn (10 min). */
 const REFRESH_INTERVAL_MS = 10 * 60_000
-
-type ArsRateKey = 'mep' | 'ccl' | 'usdt'
-
-/** Dólar MEP/CCL de referencia: precio CI del AL30 (el más líquido en CriptoYa). */
-function extractDolarPrice(dolar: Record<string, unknown> | undefined, key: 'mep' | 'ccl'): number | null {
-  const node = dolar?.[key] as { al30?: { ci?: { price?: number } } } | undefined
-  const price = node?.al30?.ci?.price
-  return typeof price === 'number' ? price : null
-}
-
-/** Promedio del ask de USDT/ARS entre casas — descarta ceros/no numéricos (fuentes caídas). */
-function averageUsdtArsAsk(usdtArs: Record<string, unknown> | undefined): number | null {
-  if (!usdtArs) return null
-  const asks = Object.values(usdtArs)
-    .map((entry) => (entry as { ask?: number } | undefined)?.ask)
-    .filter((ask): ask is number => typeof ask === 'number' && ask > 0)
-  if (asks.length === 0) return null
-  return asks.reduce((sum, ask) => sum + ask, 0) / asks.length
-}
 
 export function Converter(): JSX.Element {
   const { t } = useTranslation()
@@ -72,11 +54,7 @@ export function Converter(): JSX.Element {
   }, [load])
 
   const rates: Record<ArsRateKey, number | null> = useMemo(
-    () => ({
-      mep: extractDolarPrice(cotizaciones?.dolar, 'mep'),
-      ccl: extractDolarPrice(cotizaciones?.dolar, 'ccl'),
-      usdt: averageUsdtArsAsk(cotizaciones?.usdt_ars),
-    }),
+    () => computeArsRates(cotizaciones),
     [cotizaciones],
   )
 

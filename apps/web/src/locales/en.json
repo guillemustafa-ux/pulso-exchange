@@ -15,6 +15,7 @@
   "nav": {
     "mercado": "Market",
     "conversor": "Converter",
+    "portfolio": "Portfolio",
     "defi": "DeFi",
     "earn": "Earn AR",
     "staking": "Staking",
@@ -86,6 +87,37 @@
     "priceRef": "Reference price: 1 {{symbol}} = {{price}}",
     "disclaimer": "Market prices (CoinGecko/Binance) and dollar rates (CriptoYa) with cache delay. Reference only — not an exchange offer.",
     "loadErrorTitle": "Couldn't load the converter"
+  },
+  "portfolio": {
+    "title": "Portfolio",
+    "subtitle": "Your holdings in the connected wallet (Sepolia), valued in dollars and pesos with live market prices.",
+    "connect": {
+      "title": "Connect your wallet to see your portfolio",
+      "desc": "We read your on-chain balances on Sepolia — non-custodial, we never ask for your seed or move funds."
+    },
+    "wrongNetwork": "Switch your wallet to the Sepolia network to see your balances.",
+    "switchNetwork": "Switch to Sepolia",
+    "rateLabel": "Dollar rate",
+    "rates": { "mep": "MEP", "ccl": "CCL", "usdt": "USDT" },
+    "totalLabel": "Market value (ETH)",
+    "totalHint": "Only ETH is valued (it has a market price). The PULSO token is testnet and has no quote.",
+    "holdingsTitle": "Your assets",
+    "cols": {
+      "asset": "Asset",
+      "amount": "Amount",
+      "priceUsd": "Price (USD)",
+      "valueUsd": "Value (USD)",
+      "valueArs": "Value (ARS)"
+    },
+    "assets": {
+      "eth": "ETH (Sepolia)",
+      "pulsoWallet": "PULSO (in wallet)",
+      "pulsoStaked": "PULSO (staked)",
+      "pulsoRewards": "PULSO rewards"
+    },
+    "noMarketPrice": "testnet · no market price",
+    "viewOnExplorer": "View wallet on Etherscan",
+    "disclaimer": "On-chain Sepolia data + market prices (CoinGecko/CriptoYa) with cache delay. Reference only."
   },
   "earn": {
     "title": "Earn AR",
@@ -424,6 +456,7 @@
       "trends": "Trends",
       "earn": "Earn AR",
       "converter": "Converter",
+      "portfolio": "Portfolio",
       "general": "PULSO"
     },
     "quickQuestions": {

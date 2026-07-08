@@ -13,6 +13,7 @@ import { Home } from './pages/Home'
 // recharts de páginas que el usuario nunca visita infle el chunk inicial.
 const Market = lazy(() => import('./pages/Market'))
 const Converter = lazy(() => import('./pages/Converter'))
+const Portfolio = lazy(() => import('./pages/Portfolio'))
 const Earn = lazy(() => import('./pages/Earn'))
 const DeFi = lazy(() => import('./pages/DeFi'))
 const Staking = lazy(() => import('./pages/Staking'))
@@ -60,6 +61,7 @@ function App(): JSX.Element {
             <Route path="/" element={<Home />} />
             <Route path="/market/:id?" element={<Market />} />
             <Route path="/converter" element={<Converter />} />
+            <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/earn" element={<Earn />} />
             <Route path="/defi" element={<DeFi />} />
             <Route path="/staking" element={<Staking />} />

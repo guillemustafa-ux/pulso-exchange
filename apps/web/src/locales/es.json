@@ -15,6 +15,7 @@
   "nav": {
     "mercado": "Mercado",
     "conversor": "Conversor",
+    "portfolio": "Portfolio",
     "defi": "DeFi",
     "earn": "Earn AR",
     "staking": "Staking",
@@ -86,6 +87,37 @@
     "priceRef": "Precio de referencia: 1 {{symbol}} = {{price}}",
     "disclaimer": "Precios de mercado (CoinGecko/Binance) y cotizaciones del dólar (CriptoYa) con demora de caché. Solo referencia — no es una oferta de cambio.",
     "loadErrorTitle": "No se pudo cargar el conversor"
+  },
+  "portfolio": {
+    "title": "Portfolio",
+    "subtitle": "Tus holdings en la wallet conectada (Sepolia), valuados en dólares y pesos con precios de mercado en vivo.",
+    "connect": {
+      "title": "Conectá tu wallet para ver tu portfolio",
+      "desc": "Leemos tus balances on-chain en Sepolia — non-custodial, nunca pedimos tu seed ni movemos fondos."
+    },
+    "wrongNetwork": "Cambiá tu wallet a la red Sepolia para ver tus balances.",
+    "switchNetwork": "Cambiar a Sepolia",
+    "rateLabel": "Cotización del dólar",
+    "rates": { "mep": "MEP", "ccl": "CCL", "usdt": "USDT" },
+    "totalLabel": "Valor de mercado (ETH)",
+    "totalHint": "Solo se valúa el ETH (tiene precio de mercado). El token PULSO es de testnet y no tiene cotización.",
+    "holdingsTitle": "Tus activos",
+    "cols": {
+      "asset": "Activo",
+      "amount": "Cantidad",
+      "priceUsd": "Precio (USD)",
+      "valueUsd": "Valor (USD)",
+      "valueArs": "Valor (ARS)"
+    },
+    "assets": {
+      "eth": "ETH (Sepolia)",
+      "pulsoWallet": "PULSO (en wallet)",
+      "pulsoStaked": "PULSO (en staking)",
+      "pulsoRewards": "Recompensas PULSO"
+    },
+    "noMarketPrice": "testnet · sin precio de mercado",
+    "viewOnExplorer": "Ver wallet en Etherscan",
+    "disclaimer": "Datos on-chain de Sepolia + precios de mercado (CoinGecko/CriptoYa) con demora de caché. Solo referencia."
   },
   "earn": {
     "title": "Earn AR",
@@ -424,6 +456,7 @@
       "trends": "Tendencias",
       "earn": "Earn AR",
       "converter": "Conversor",
+      "portfolio": "Portfolio",
       "general": "PULSO"
     },
     "quickQuestions": {
