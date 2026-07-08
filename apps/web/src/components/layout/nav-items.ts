@@ -22,11 +22,12 @@ export interface NavItem {
 }
 
 /**
- * Los 8 módulos de PULSO (PROMPT.md). El asistente de IA no está acá: es un
+ * Los 9 módulos de PULSO (PROMPT.md). El asistente de IA no está acá: es un
  * widget flotante presente en toda la app, no una sección de nav.
  */
 export const NAV_ITEMS: NavItem[] = [
   { id: 'mercado', labelKey: 'nav.mercado', icon: IconMarket, path: '/market' },
+  { id: 'conversor', labelKey: 'nav.conversor', icon: IconEarn, path: '/converter' },
   { id: 'defi', labelKey: 'nav.defi', icon: IconDefi, path: '/defi' },
   { id: 'earn', labelKey: 'nav.earn', icon: IconEarn, path: '/earn' },
   { id: 'staking', labelKey: 'nav.staking', icon: IconStaking, path: '/staking' },

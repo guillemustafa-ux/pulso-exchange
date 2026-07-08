@@ -14,6 +14,7 @@
   },
   "nav": {
     "mercado": "Market",
+    "conversor": "Converter",
     "defi": "DeFi",
     "earn": "Earn AR",
     "staking": "Staking",
@@ -72,6 +73,19 @@
     "emptyTitle": "No results",
     "emptyDescription": "Try another name or symbol.",
     "loadErrorTitle": "Couldn't load the market"
+  },
+  "converter": {
+    "title": "Converter",
+    "subtitle": "Convert any crypto to US dollars and Argentine pesos, using the dollar rate you choose.",
+    "amountLabel": "Amount",
+    "rateLabel": "Dollar rate",
+    "invalidAmount": "Enter a number greater than zero.",
+    "rates": { "mep": "MEP", "ccl": "CCL", "usdt": "USDT" },
+    "inUsd": "In dollars (USD)",
+    "inArs": "In pesos ({{rate}})",
+    "priceRef": "Reference price: 1 {{symbol}} = {{price}}",
+    "disclaimer": "Market prices (CoinGecko/Binance) and dollar rates (CriptoYa) with cache delay. Reference only — not an exchange offer.",
+    "loadErrorTitle": "Couldn't load the converter"
   },
   "earn": {
     "title": "Earn AR",
@@ -409,6 +423,7 @@
       "bots": "Bots",
       "trends": "Trends",
       "earn": "Earn AR",
+      "converter": "Converter",
       "general": "PULSO"
     },
     "quickQuestions": {

@@ -14,6 +14,7 @@
   },
   "nav": {
     "mercado": "Mercado",
+    "conversor": "Conversor",
     "defi": "DeFi",
     "earn": "Earn AR",
     "staking": "Staking",
@@ -72,6 +73,19 @@
     "emptyTitle": "Sin resultados",
     "emptyDescription": "Probá con otro nombre o símbolo.",
     "loadErrorTitle": "No se pudo cargar el mercado"
+  },
+  "converter": {
+    "title": "Conversor",
+    "subtitle": "Convertí cualquier cripto a dólares y a pesos, con la cotización del dólar que elijas.",
+    "amountLabel": "Monto",
+    "rateLabel": "Cotización del dólar",
+    "invalidAmount": "Ingresá un número mayor que cero.",
+    "rates": { "mep": "MEP", "ccl": "CCL", "usdt": "USDT" },
+    "inUsd": "En dólares (USD)",
+    "inArs": "En pesos ({{rate}})",
+    "priceRef": "Precio de referencia: 1 {{symbol}} = {{price}}",
+    "disclaimer": "Precios de mercado (CoinGecko/Binance) y cotizaciones del dólar (CriptoYa) con demora de caché. Solo referencia — no es una oferta de cambio.",
+    "loadErrorTitle": "No se pudo cargar el conversor"
   },
   "earn": {
     "title": "Earn AR",
@@ -409,6 +423,7 @@
       "bots": "Bots",
       "trends": "Tendencias",
       "earn": "Earn AR",
+      "converter": "Conversor",
       "general": "PULSO"
     },
     "quickQuestions": {
