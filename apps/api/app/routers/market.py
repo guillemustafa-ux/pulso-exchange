@@ -1,9 +1,12 @@
 """Market data endpoints: CoinGecko + Binance proxies with in-memory TTL caching.
 
-- /top100   -> CoinGecko /coins/markets (cache 60s)
+- /top100   -> CoinGecko /coins/markets, CoinPaprika fallback (cache 60s)
 - /klines   -> Binance data-api (proxy) with CoinGecko /coins/{id}/ohlc fallback
-- /global   -> CoinGecko /global (cache 5min)
+- /global   -> CoinGecko /global, CoinPaprika fallback (cache 5min)
 - /trending -> CoinGecko /search/trending (cache 5min)
+
+CoinGecko's free tier is rejected from datacenter IPs (429/451), so /top100 and
+/global fall back to the keyless CoinPaprika API, which answers from the cloud.
 """
 
 from __future__ import annotations
@@ -30,6 +33,10 @@ router = APIRouter(prefix="/api/market", tags=["market"])
 
 COINGECKO_BASE = "https://api.coingecko.com/api/v3"
 BINANCE_BASE = "https://data-api.binance.vision/api/v3"
+# CoinPaprika is a keyless fallback that (unlike CoinGecko's free tier) still
+# answers from datacenter IPs. Used for /top100 and /global when CoinGecko
+# rejects the request (typically 429/451 from cloud hosts like Render).
+COINPAPRIKA_BASE = "https://api.coinpaprika.com/v1"
 COINGECKO_API_KEY = os.getenv("COINGECKO_API_KEY", "").strip()
 
 _HTTP_TIMEOUT = httpx.Timeout(10.0, connect=5.0)
@@ -64,7 +71,7 @@ def _upstream_error(exc: httpx.HTTPError, upstream: str) -> HTTPException:
 # ---------------------------------------------------------------------------
 
 
-async def _fetch_top100() -> list[dict[str, Any]]:
+async def _fetch_top100_coingecko() -> list[dict[str, Any]]:
     params = {
         "vs_currency": "usd",
         "order": "market_cap_desc",
@@ -81,12 +88,58 @@ async def _fetch_top100() -> list[dict[str, Any]]:
         return resp.json()
 
 
+def _map_paprika_ticker(t: dict[str, Any]) -> dict[str, Any]:
+    """Map a CoinPaprika ticker to the CoinGecko-shaped CoinMarketItem dict.
+    Fields CoinPaprika doesn't provide (image, sparkline) are left null — the
+    frontend already guards both (`coin.image ? ... : fallback`,
+    `sparkline_in_7d?.price ?? []`)."""
+    usd = t.get("quotes", {}).get("USD", {})
+    change_24h = usd.get("percent_change_24h")
+    return {
+        "id": t.get("id"),
+        # CoinGecko symbols are lowercase; the frontend upper-cases for display.
+        "symbol": str(t.get("symbol", "")).lower(),
+        "name": t.get("name"),
+        "image": None,
+        "current_price": usd.get("price"),
+        "market_cap": usd.get("market_cap"),
+        "market_cap_rank": t.get("rank"),
+        "total_volume": usd.get("volume_24h"),
+        "price_change_percentage_24h": change_24h,
+        "price_change_percentage_24h_in_currency": change_24h,
+        "price_change_percentage_7d_in_currency": usd.get("percent_change_7d"),
+        "market_cap_change_percentage_24h": usd.get("market_cap_change_24h"),
+        "circulating_supply": t.get("circulating_supply"),
+        "total_supply": t.get("total_supply"),
+        "max_supply": t.get("max_supply"),
+        "last_updated": t.get("last_updated"),
+        "sparkline_in_7d": None,
+    }
+
+
+async def _fetch_top100_paprika() -> list[dict[str, Any]]:
+    async with httpx.AsyncClient(timeout=_HTTP_TIMEOUT) as client:
+        resp = await client.get(f"{COINPAPRIKA_BASE}/tickers", params={"limit": 100})
+        resp.raise_for_status()
+        raw = resp.json()
+    return [_map_paprika_ticker(t) for t in raw]
+
+
+async def _fetch_top100() -> list[dict[str, Any]]:
+    """CoinGecko first; on any HTTP error fall back to the keyless CoinPaprika."""
+    try:
+        return await _fetch_top100_coingecko()
+    except httpx.HTTPError as exc:
+        logger.info("CoinGecko top100 unavailable (%s); falling back to CoinPaprika", exc)
+        return await _fetch_top100_paprika()
+
+
 @router.get("/top100", response_model=list[CoinMarketItem])
 async def get_top100() -> list[dict[str, Any]]:
     try:
         return await _top100_cache.get_or_fetch("top100", _fetch_top100)
     except httpx.HTTPError as exc:
-        raise _upstream_error(exc, "CoinGecko") from exc
+        raise _upstream_error(exc, "Market data") from exc
 
 
 # ---------------------------------------------------------------------------
@@ -229,11 +282,36 @@ async def get_klines(
 # ---------------------------------------------------------------------------
 
 
-async def _fetch_global() -> dict[str, Any]:
+async def _fetch_global_coingecko() -> dict[str, Any]:
     async with httpx.AsyncClient(timeout=_HTTP_TIMEOUT) as client:
         resp = await client.get(f"{COINGECKO_BASE}/global", headers=_coingecko_headers())
         resp.raise_for_status()
         return resp.json()["data"]
+
+
+async def _fetch_global_paprika() -> dict[str, Any]:
+    async with httpx.AsyncClient(timeout=_HTTP_TIMEOUT) as client:
+        resp = await client.get(f"{COINPAPRIKA_BASE}/global")
+        resp.raise_for_status()
+        g = resp.json()
+    # Map to the GlobalMarketResponse shape (btc_dominance is a computed field
+    # derived from market_cap_percentage.btc).
+    return {
+        "active_cryptocurrencies": g.get("cryptocurrencies_number"),
+        "total_market_cap": {"usd": g.get("market_cap_usd")},
+        "total_volume": {"usd": g.get("volume_24h_usd")},
+        "market_cap_percentage": {"btc": g.get("bitcoin_dominance_percentage")},
+        "market_cap_change_percentage_24h_usd": g.get("market_cap_change_24h"),
+        "updated_at": g.get("last_updated"),
+    }
+
+
+async def _fetch_global() -> dict[str, Any]:
+    try:
+        return await _fetch_global_coingecko()
+    except httpx.HTTPError as exc:
+        logger.info("CoinGecko global unavailable (%s); falling back to CoinPaprika", exc)
+        return await _fetch_global_paprika()
 
 
 @router.get("/global", response_model=GlobalMarketResponse)
@@ -241,7 +319,7 @@ async def get_global() -> dict[str, Any]:
     try:
         return await _global_cache.get_or_fetch("global", _fetch_global)
     except httpx.HTTPError as exc:
-        raise _upstream_error(exc, "CoinGecko") from exc
+        raise _upstream_error(exc, "Market data") from exc
 
 
 # ---------------------------------------------------------------------------
