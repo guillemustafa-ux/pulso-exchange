@@ -14,6 +14,7 @@ import logging
 import os
 import time
 from collections import defaultdict, deque
+from typing import Any
 
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -88,6 +89,20 @@ def _build_user_message(payload: AskRequest) -> str:
     )
 
 
+async def _call_groq(body: dict[str, Any]) -> dict[str, Any]:
+    async with httpx.AsyncClient(timeout=_HTTP_TIMEOUT) as client:
+        resp = await client.post(
+            GROQ_URL,
+            headers={
+                "Authorization": f"Bearer {GROQ_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json=body,
+        )
+        resp.raise_for_status()
+        return resp.json()
+
+
 @router.post("/ask", response_model=AskResponse, dependencies=[Depends(ai_rate_limiter)])
 async def ask(payload: AskRequest) -> AskResponse:
     if not GROQ_API_KEY:
@@ -107,17 +122,7 @@ async def ask(payload: AskRequest) -> AskResponse:
     }
 
     try:
-        async with httpx.AsyncClient(timeout=_HTTP_TIMEOUT) as client:
-            resp = await client.post(
-                GROQ_URL,
-                headers={
-                    "Authorization": f"Bearer {GROQ_API_KEY}",
-                    "Content-Type": "application/json",
-                },
-                json=body,
-            )
-            resp.raise_for_status()
-            data = resp.json()
+        data = await _call_groq(body)
     except httpx.HTTPStatusError as exc:
         logger.warning(
             "Groq request failed: status=%s body=%s", exc.response.status_code, exc.response.text[:300]

@@ -64,3 +64,16 @@ async def fetch_capital(db: aiosqlite.Connection, bot_id: int) -> float:
     cur = await db.execute("SELECT capital_actual FROM bots WHERE id = ?", (bot_id,))
     row = await cur.fetchone()
     return float(row["capital_actual"])
+
+
+def clear_cache(cache: Any) -> None:
+    """Limpia una TTLCache entera (data+timestamp+locks) entre tests.
+
+    Los _locks también hay que limpiarlos: son asyncio.Lock creados en el
+    event loop de un test y reusados si no se limpian -- pytest-asyncio le da
+    un loop nuevo a cada test, así que un Lock viejo puede quedar atado a un
+    loop ya cerrado.
+    """
+    cache._data.clear()
+    cache._timestamp.clear()
+    cache._locks.clear()
