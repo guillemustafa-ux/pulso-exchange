@@ -10,7 +10,8 @@
     "check:i18n": "node scripts/check-i18n-parity.mjs",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "check:lessons": "node scripts/check-lessons-parity.mjs"
   },
   "dependencies": {
     "@rainbow-me/rainbowkit": "^2.2.11",

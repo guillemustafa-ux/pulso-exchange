@@ -157,14 +157,21 @@ para que el deploy real sea un paso de ~10 minutos.
 
 ## Internacionalización (i18n)
 
-El frontend soporta **español (default) e inglés** con `react-i18next` — selector ES | EN
-en el header, persistido en `localStorage` (`pulso-lang`). Todo el chrome de la UI (nav,
-títulos, botones, disclaimers, errores, wizard de bots) está traducido vía `t('...')`
-(`apps/web/src/locales/{es,en}.json`). **Decisión deliberada:** el contenido de las 8
-lecciones del módulo Educación queda **solo en español** (son piezas largas de prosa +
-quiz, no chrome de interfaz — traducirlas es trabajo editorial, no i18n de UI) y las
-respuestas del asistente de IA no se traducen porque el modelo ya responde en el idioma
-en que se le pregunta.
+El frontend soporta **español (default), inglés y portugués (pt-BR)** con `react-i18next`
+— selector ES | EN | PT en el header, persistido en `localStorage` (`pulso-lang`). Todo el
+chrome de la UI (nav, títulos, botones, disclaimers, errores, wizard de bots) está
+traducido vía `t('...')` (`apps/web/src/locales/{es,en,pt}.json`), con un guard de CI
+(`npm run check:i18n`) que falla si las claves se desincronizan entre locales.
+
+El **contenido del módulo Educación** (8 lecciones + 32 preguntas de quiz) también está
+traducido a los tres idiomas: los `.md` viven en `apps/web/src/content/lessons/{es,en,pt}/`
+(mismos slugs → las URLs `/education/:id` y el progreso en `localStorage` sobreviven el
+cambio de idioma), el loader elige el set por el idioma activo de i18next con fallback a
+español, y un segundo guard de CI (`npm run check:lessons`) verifica que las tres
+traducciones estén estructuralmente alineadas (mismos slugs, misma cantidad de preguntas y
+opciones, mismo `correctIndex` — traducir no debe reordenar las opciones). Las respuestas
+del asistente de IA no se traducen porque el modelo ya responde en el idioma en que se le
+pregunta.
 
 ## Diseño
 

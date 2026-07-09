@@ -12,11 +12,19 @@ import { cn } from '../lib/cn'
 import { useSetPageContext } from '../context/AIContext'
 import { useEducationProgress } from '../hooks/useEducationProgress'
 import type { ProgressState } from '../hooks/useEducationProgress'
-import { LESSONS, getAdjacentLessons, getLessonById } from '../content/lessons'
+import { getAdjacentLessons, getLessonById, getLessons } from '../content/lessons'
 import type { Lesson, QuizQuestion } from '../content/lessons'
+import { SUPPORTED_LANGUAGES, type Language } from '../i18n'
 
 /** Aprueba con 75% o más (3 de 4 preguntas) -- debe coincidir con useEducationProgress. */
 const PASS_THRESHOLD = 0.75
+
+/** Idioma activo de i18next, acotado a los soportados (default español). */
+function resolveLang(resolved: string | undefined): Language {
+  return (SUPPORTED_LANGUAGES as readonly string[]).includes(resolved ?? '')
+    ? (resolved as Language)
+    : 'es'
+}
 
 /**
  * No hay plugin de tipografía (@tailwindcss/typography) instalado, así que
@@ -55,10 +63,10 @@ const markdownComponents: Components = {
   ),
 }
 
-function overallPercent(progress: ProgressState): number {
-  if (LESSONS.length === 0) return 0
-  const done = LESSONS.filter((lesson) => progress[lesson.id]?.quizPassed).length
-  return Math.round((done / LESSONS.length) * 100)
+function overallPercent(progress: ProgressState, lessons: Lesson[]): number {
+  if (lessons.length === 0) return 0
+  const done = lessons.filter((lesson) => progress[lesson.id]?.quizPassed).length
+  return Math.round((done / lessons.length) * 100)
 }
 
 function ProgressBar({ percent }: { percent: number }): JSX.Element {
@@ -84,14 +92,16 @@ function lessonStatus(
 
 function EducationIndex({
   progress,
+  lessons,
   onOpenLesson,
 }: {
   progress: ProgressState
+  lessons: Lesson[]
   onOpenLesson: (id: string) => void
 }): JSX.Element {
   const { t } = useTranslation()
-  const percent = overallPercent(progress)
-  const completedCount = LESSONS.filter((lesson) => progress[lesson.id]?.quizPassed).length
+  const percent = overallPercent(progress, lessons)
+  const completedCount = lessons.filter((lesson) => progress[lesson.id]?.quizPassed).length
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-6">
@@ -108,7 +118,7 @@ function EducationIndex({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <span className="text-sm font-medium text-text-primary">{t('education.progressLabel')}</span>
           <span className="font-display text-sm font-semibold tabular-nums text-text-primary">
-            {t('education.lessonsApproved', { done: completedCount, total: LESSONS.length })}
+            {t('education.lessonsApproved', { done: completedCount, total: lessons.length })}
           </span>
         </div>
         <div className="mt-3">
@@ -117,7 +127,7 @@ function EducationIndex({
       </Card>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        {LESSONS.map((lesson) => {
+        {lessons.map((lesson) => {
           const status = lessonStatus(lesson, progress)
           return (
             <Card
@@ -326,12 +336,16 @@ function LessonQuiz({
 
 function LessonView({
   lesson,
+  lang,
+  total,
   progress,
   onRead,
   onQuizResult,
   onNavigate,
 }: {
   lesson: Lesson
+  lang: Language
+  total: number
   progress: ProgressState
   onRead: (id: string) => void
   onQuizResult: (id: string, score: number, total: number) => void
@@ -344,7 +358,7 @@ function LessonView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lesson.id])
 
-  const { prev, next } = getAdjacentLessons(lesson.id)
+  const { prev, next } = getAdjacentLessons(lang, lesson.id)
   const status = lessonStatus(lesson, progress)
 
   return (
@@ -359,7 +373,7 @@ function LessonView({
         </button>
         <div className="flex items-center gap-2">
           <span className="text-xs text-text-muted">
-            {t('education.lessonCounter', { order: lesson.order, total: LESSONS.length })}
+            {t('education.lessonCounter', { order: lesson.order, total })}
           </span>
           <Badge variant={status.variant} size="sm">
             {t(status.labelKey)}
@@ -385,17 +399,19 @@ function LessonView({
 }
 
 export function Education(): JSX.Element {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const lang = resolveLang(i18n.resolvedLanguage)
+  const lessons = useMemo(() => getLessons(lang), [lang])
   const { lessonId } = useParams<{ lessonId?: string }>()
   const navigate = useNavigate()
   const { progress, markRead, recordQuizResult } = useEducationProgress()
 
-  const completedCount = LESSONS.filter((lesson) => progress[lesson.id]?.quizPassed).length
-  const lesson = lessonId ? getLessonById(lessonId) : undefined
+  const completedCount = lessons.filter((lesson) => progress[lesson.id]?.quizPassed).length
+  const lesson = lessonId ? getLessonById(lang, lessonId) : undefined
 
   useSetPageContext({
     seccion: 'educacion',
-    lecciones_totales: LESSONS.length,
+    lecciones_totales: lessons.length,
     lecciones_completadas: completedCount,
     leccion_actual: lesson?.title ?? null,
   })
@@ -423,6 +439,8 @@ export function Education(): JSX.Element {
     return (
       <LessonView
         lesson={lesson}
+        lang={lang}
+        total={lessons.length}
         progress={progress}
         onRead={markRead}
         onQuizResult={recordQuizResult}
@@ -431,7 +449,7 @@ export function Education(): JSX.Element {
     )
   }
 
-  return <EducationIndex progress={progress} onOpenLesson={(id) => goToLesson(id)} />
+  return <EducationIndex progress={progress} lessons={lessons} onOpenLesson={(id) => goToLesson(id)} />
 }
 
 export default Education

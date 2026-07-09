@@ -101,6 +101,15 @@ test('alertas: una lejos del precio queda activa y persiste al recargar', async 
   await expect(page.getByText('Activas (1)')).toBeVisible() // localStorage
 })
 
+test('educación: las lecciones se traducen con el switch de idioma', async ({ page }) => {
+  await page.goto('/education')
+  // Título de la lección 1 en español.
+  await expect(page.getByText('Wallets y seeds: la base de la custodia')).toBeVisible()
+  await page.locator('button', { hasText: /^EN$/ }).first().click()
+  // Mismo curso, título ahora en inglés (contenido, no solo chrome).
+  await expect(page.getByText('Wallets and seeds: the foundation of custody')).toBeVisible()
+})
+
 test('i18n: el switch cambia es -> en', async ({ page }) => {
   await page.goto('/market')
   // Nav en español por defecto; tras el switch, las labels pasan a inglés.

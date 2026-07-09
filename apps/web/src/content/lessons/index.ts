@@ -1,11 +1,4 @@
-import lesson01 from './01-wallets-y-seeds.md?raw'
-import lesson02 from './02-que-es-staking.md?raw'
-import lesson03 from './03-riesgos-defi.md?raw'
-import lesson04 from './04-stablecoins-y-dolar-ar.md?raw'
-import lesson05 from './05-como-leer-graficos.md?raw'
-import lesson06 from './06-smart-contracts.md?raw'
-import lesson07 from './07-custodial-vs-noncustodial.md?raw'
-import lesson08 from './08-como-detectar-scams.md?raw'
+import { SUPPORTED_LANGUAGES, type Language } from '../../i18n'
 
 /** Marcador que separa el contenido markdown del bloque de quiz al final del `.md`. */
 const QUIZ_MARKER = '<!-- quiz -->'
@@ -62,26 +55,67 @@ function parseLesson(id: string, order: number, raw: string): Lesson {
   return { id, order, title, summary, markdown, quiz }
 }
 
-const RAW_LESSONS: ReadonlyArray<{ id: string; raw: string }> = [
-  { id: 'wallets-y-seeds', raw: lesson01 },
-  { id: 'que-es-staking', raw: lesson02 },
-  { id: 'riesgos-defi', raw: lesson03 },
-  { id: 'stablecoins-y-dolar-ar', raw: lesson04 },
-  { id: 'como-leer-graficos', raw: lesson05 },
-  { id: 'smart-contracts', raw: lesson06 },
-  { id: 'custodial-vs-noncustodial', raw: lesson07 },
-  { id: 'como-detectar-scams', raw: lesson08 },
-]
-
-/** Las 8 lecciones del módulo Educación, en orden de curso. */
-export const LESSONS: Lesson[] = RAW_LESSONS.map((entry, i) => parseLesson(entry.id, i + 1, entry.raw))
-
-export function getLessonById(id: string): Lesson | undefined {
-  return LESSONS.find((lesson) => lesson.id === id)
+/**
+ * Orden e IDs del curso, derivados del NOMBRE de archivo (`NN-slug.md`). Los
+ * slugs son idénticos en los tres idiomas (los `.md` traducidos conservan el
+ * nombre del original) — por eso el `id` sale del filename, no del contenido:
+ * así las URLs `/education/:id` y el progreso en localStorage sobreviven el
+ * cambio de idioma sin migración.
+ */
+function slugFromPath(path: string): string {
+  const file = path.split('/').pop() ?? path
+  return file.replace(/^\d+-/, '').replace(/\.md$/, '')
 }
 
-export function getAdjacentLessons(id: string): { prev: Lesson | undefined; next: Lesson | undefined } {
-  const index = LESSONS.findIndex((lesson) => lesson.id === id)
+// Los tres sets de lecciones, importados en build-time. `eager` = sin lazy:
+// son ~5KB de texto por lección, no justifican un chunk aparte.
+const RAW_BY_LANG = import.meta.glob<string>('./{es,en,pt}/*.md', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+})
+
+function buildLessonsFor(lang: Language): Lesson[] {
+  const prefix = `./${lang}/`
+  return Object.entries(RAW_BY_LANG)
+    .filter(([path]) => path.startsWith(prefix))
+    .sort(([a], [b]) => a.localeCompare(b)) // por nombre de archivo => orden de curso
+    .map(([path, raw], i) => parseLesson(slugFromPath(path), i + 1, raw))
+}
+
+const LESSONS_BY_LANG: Record<Language, Lesson[]> = SUPPORTED_LANGUAGES.reduce(
+  (acc, lang) => {
+    acc[lang] = buildLessonsFor(lang)
+    return acc
+  },
+  {} as Record<Language, Lesson[]>,
+)
+
+/** Idioma de fallback: espeja `fallbackLng: 'es'` de i18n. */
+const FALLBACK_LANG: Language = 'es'
+
+/** Las lecciones del curso en `lang`, con fallback a español si el set está vacío. */
+export function getLessons(lang: Language): Lesson[] {
+  const lessons = LESSONS_BY_LANG[lang]
+  return lessons && lessons.length > 0 ? lessons : LESSONS_BY_LANG[FALLBACK_LANG]
+}
+
+export function getLessonById(lang: Language, id: string): Lesson | undefined {
+  const inLang = getLessons(lang).find((lesson) => lesson.id === id)
+  if (inLang) return inLang
+  // Fallback por-lección: si una traducción puntual faltara, cae al español.
+  return LESSONS_BY_LANG[FALLBACK_LANG].find((lesson) => lesson.id === id)
+}
+
+export function getAdjacentLessons(
+  lang: Language,
+  id: string,
+): { prev: Lesson | undefined; next: Lesson | undefined } {
+  const lessons = getLessons(lang)
+  const index = lessons.findIndex((lesson) => lesson.id === id)
   if (index === -1) return { prev: undefined, next: undefined }
-  return { prev: LESSONS[index - 1], next: LESSONS[index + 1] }
+  return { prev: lessons[index - 1], next: lessons[index + 1] }
 }
+
+/** Set en español, para compatibilidad con consumidores que no pasan idioma. */
+export const LESSONS: Lesson[] = LESSONS_BY_LANG[FALLBACK_LANG]

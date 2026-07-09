@@ -52,7 +52,10 @@ jobs:
       - name: i18n — paridad de claves entre locales (es/en/pt)
         run: npm run check:i18n
 
-      - name: Unit tests (vitest — lib/rates, lib/format)
+      - name: Educación — paridad de lecciones entre idiomas (es/en/pt)
+        run: npm run check:lessons
+
+      - name: Unit tests (vitest — lib/rates, lib/format, lessons)
         run: npm run test
 
       - name: Build (tsc -b + vite build)
