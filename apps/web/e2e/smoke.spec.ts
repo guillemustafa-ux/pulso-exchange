@@ -81,6 +81,26 @@ test('conversor: cambiar la cantidad recalcula', async ({ page }) => {
   await expect(page.getByText('$100,000.00').first()).toBeVisible()
 })
 
+test('alertas: crear una que ya cumple el objetivo la dispara al toque', async ({ page }) => {
+  await page.goto('/alerts')
+  // BTC stub = 50.000: "baja a 60.000" ya se cumple -> dispara en la evaluación inmediata.
+  await page.getByRole('button', { name: 'Baja a' }).click()
+  await page.locator('#alert-target').fill('60000')
+  await page.getByRole('button', { name: 'Crear alerta' }).click()
+  await expect(page.getByText('Disparada', { exact: true })).toBeVisible()
+  await expect(page.getByText('Disparadas (1)')).toBeVisible()
+})
+
+test('alertas: una lejos del precio queda activa y persiste al recargar', async ({ page }) => {
+  await page.goto('/alerts')
+  await page.getByRole('button', { name: 'Sube a' }).click()
+  await page.locator('#alert-target').fill('100000')
+  await page.getByRole('button', { name: 'Crear alerta' }).click()
+  await expect(page.getByText('Activas (1)')).toBeVisible()
+  await page.reload()
+  await expect(page.getByText('Activas (1)')).toBeVisible() // localStorage
+})
+
 test('i18n: el switch cambia es -> en', async ({ page }) => {
   await page.goto('/market')
   // Nav en español por defecto; tras el switch, las labels pasan a inglés.

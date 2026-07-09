@@ -9,6 +9,7 @@ import {
   IconEducation,
   IconShield,
   IconWallet,
+  IconBell,
 } from '../icons/Icon'
 
 export type IconType = ComponentType<SVGProps<SVGSVGElement>>
@@ -23,13 +24,14 @@ export interface NavItem {
 }
 
 /**
- * Los 10 módulos de PULSO (PROMPT.md). El asistente de IA no está acá: es un
+ * Los 11 módulos de PULSO (PROMPT.md). El asistente de IA no está acá: es un
  * widget flotante presente en toda la app, no una sección de nav.
  */
 export const NAV_ITEMS: NavItem[] = [
   { id: 'mercado', labelKey: 'nav.mercado', icon: IconMarket, path: '/market' },
   { id: 'conversor', labelKey: 'nav.conversor', icon: IconEarn, path: '/converter' },
   { id: 'portfolio', labelKey: 'nav.portfolio', icon: IconWallet, path: '/portfolio' },
+  { id: 'alertas', labelKey: 'nav.alertas', icon: IconBell, path: '/alerts' },
   { id: 'defi', labelKey: 'nav.defi', icon: IconDefi, path: '/defi' },
   { id: 'earn', labelKey: 'nav.earn', icon: IconEarn, path: '/earn' },
   { id: 'staking', labelKey: 'nav.staking', icon: IconStaking, path: '/staking' },

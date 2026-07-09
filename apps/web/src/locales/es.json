@@ -22,7 +22,8 @@
     "bots": "Bots",
     "tendencias": "Tendencias",
     "educacion": "Educación",
-    "seguridad": "Seguridad"
+    "seguridad": "Seguridad",
+    "alertas": "Alertas"
   },
   "langSwitch": {
     "es": "ES",
@@ -81,7 +82,11 @@
     "amountLabel": "Monto",
     "rateLabel": "Cotización del dólar",
     "invalidAmount": "Ingresá un número mayor que cero.",
-    "rates": { "mep": "MEP", "ccl": "CCL", "usdt": "USDT" },
+    "rates": {
+      "mep": "MEP",
+      "ccl": "CCL",
+      "usdt": "USDT"
+    },
     "inUsd": "En dólares (USD)",
     "inArs": "En pesos ({{rate}})",
     "priceRef": "Precio de referencia: 1 {{symbol}} = {{price}}",
@@ -98,7 +103,11 @@
     "wrongNetwork": "Cambiá tu wallet a la red Sepolia para ver tus balances.",
     "switchNetwork": "Cambiar a Sepolia",
     "rateLabel": "Cotización del dólar",
-    "rates": { "mep": "MEP", "ccl": "CCL", "usdt": "USDT" },
+    "rates": {
+      "mep": "MEP",
+      "ccl": "CCL",
+      "usdt": "USDT"
+    },
     "totalLabel": "Valor de mercado (ETH)",
     "totalHint": "Solo se valúa el ETH (tiene precio de mercado). El token PULSO es de testnet y no tiene cotización.",
     "holdingsTitle": "Tus activos",
@@ -272,11 +281,24 @@
     "noEquityHistory": "Todavía no hay historial de equity para este bot.",
     "wizard": {
       "title": "Crear bot",
-      "steps": ["Estrategia", "Par y capital", "Parámetros"],
+      "steps": [
+        "Estrategia",
+        "Par y capital",
+        "Parámetros"
+      ],
       "estrategias": {
-        "DCA": { "label": "DCA", "desc": "Compra un monto fijo en USD cada cierto tiempo, sin importar el precio." },
-        "GRID": { "label": "Grid", "desc": "Niveles de compra/venta fijos por encima y por debajo del precio actual." },
-        "SMA": { "label": "SMA Crossover", "desc": "Cruce de medias móviles: compra en el cruce alcista, vende en el bajista." }
+        "DCA": {
+          "label": "DCA",
+          "desc": "Compra un monto fijo en USD cada cierto tiempo, sin importar el precio."
+        },
+        "GRID": {
+          "label": "Grid",
+          "desc": "Niveles de compra/venta fijos por encima y por debajo del precio actual."
+        },
+        "SMA": {
+          "label": "SMA Crossover",
+          "desc": "Cruce de medias móviles: compra en el cruce alcista, vende en el bajista."
+        }
       },
       "nombreLabel": "Nombre del bot",
       "nombrePlaceholder": "Ej. DCA BTC semanal",
@@ -358,11 +380,26 @@
     "signedActions": {
       "heading": "Qué firmás vos, acción por acción",
       "desc": "Todo lo que pasa en el módulo de Staking se reduce a estas cinco transacciones. Ninguna otra cosa mueve tus fondos.",
-      "faucet": { "action": "Faucet", "what": "Pedís 100 PULSO de prueba. Solo mueve tokens de testnet hacia tu wallet — nunca al revés." },
-      "approve": { "action": "Approve", "what": "Autorizás al contrato de Staking a mover una cantidad de PULSO en tu nombre. No mueve nada todavía: solo da permiso." },
-      "stake": { "action": "Stake", "what": "Transferís PULSO desde tu wallet al contrato de Staking. Queda registrado a tu nombre y podés retirarlo cuando quieras con Unstake." },
-      "claim": { "action": "Claim", "what": "Retirás a tu wallet las recompensas que ya ganaste. No toca tu principal stakeado." },
-      "unstake": { "action": "Unstake / Exit", "what": "Devuelve tu PULSO stakeado (y las recompensas pendientes, en el caso de Exit) a tu wallet. Nunca está bloqueado por una pausa del contrato." }
+      "faucet": {
+        "action": "Faucet",
+        "what": "Pedís 100 PULSO de prueba. Solo mueve tokens de testnet hacia tu wallet — nunca al revés."
+      },
+      "approve": {
+        "action": "Approve",
+        "what": "Autorizás al contrato de Staking a mover una cantidad de PULSO en tu nombre. No mueve nada todavía: solo da permiso."
+      },
+      "stake": {
+        "action": "Stake",
+        "what": "Transferís PULSO desde tu wallet al contrato de Staking. Queda registrado a tu nombre y podés retirarlo cuando quieras con Unstake."
+      },
+      "claim": {
+        "action": "Claim",
+        "what": "Retirás a tu wallet las recompensas que ya ganaste. No toca tu principal stakeado."
+      },
+      "unstake": {
+        "action": "Unstake / Exit",
+        "what": "Devuelve tu PULSO stakeado (y las recompensas pendientes, en el caso de Exit) a tu wallet. Nunca está bloqueado por una pausa del contrato."
+      }
     },
     "neverAsks": {
       "heading": "PULSO nunca te pide:",
@@ -457,14 +494,29 @@
       "earn": "Earn AR",
       "converter": "Conversor",
       "portfolio": "Portfolio",
-      "general": "PULSO"
+      "general": "PULSO",
+      "alerts": "Alertas"
     },
     "quickQuestions": {
-      "market": ["¿Qué significa market cap?", "¿Cómo leer el gráfico de velas?"],
-      "staking": ["¿Qué es el APR?", "¿Qué riesgo tiene el staking?"],
-      "defi": ["¿Qué es TVL?", "¿Qué es un rug pull?"],
-      "bots": ["¿Qué riesgo tiene esta config?", "¿Qué es DCA?"],
-      "trends": ["¿Qué significa Fear & Greed?"]
+      "market": [
+        "¿Qué significa market cap?",
+        "¿Cómo leer el gráfico de velas?"
+      ],
+      "staking": [
+        "¿Qué es el APR?",
+        "¿Qué riesgo tiene el staking?"
+      ],
+      "defi": [
+        "¿Qué es TVL?",
+        "¿Qué es un rug pull?"
+      ],
+      "bots": [
+        "¿Qué riesgo tiene esta config?",
+        "¿Qué es DCA?"
+      ],
+      "trends": [
+        "¿Qué significa Fear & Greed?"
+      ]
     },
     "openAria": "Abrir asistente de IA",
     "panelAria": "Asistente de IA de PULSO",
@@ -486,5 +538,30 @@
     "pageInfo": "Página {{page}} de {{total}} · {{count}} resultados",
     "prevPage": "Página anterior",
     "nextPage": "Página siguiente"
+  },
+  "alerts": {
+    "title": "Alertas de precio",
+    "subtitle": "Avisos cuando una cripto del top 100 cruza el precio que definas. Se guardan en este navegador.",
+    "coinLabel": "Criptomoneda",
+    "conditionLabel": "Condición",
+    "above": "Sube a",
+    "below": "Baja a",
+    "targetLabel": "Precio objetivo (USD)",
+    "create": "Crear alerta",
+    "invalidTarget": "Ingresá un precio válido mayor a cero.",
+    "currentPrice": "{{symbol}} ahora: {{price}}",
+    "priceUnknown": "Precio no disponible en este momento.",
+    "activeTitle": "Activas",
+    "triggeredTitle": "Disparadas",
+    "emptyActive": "No tenés alertas activas. Creá la primera arriba.",
+    "emptyTriggered": "Ninguna alerta se disparó todavía.",
+    "firedBadge": "Disparada",
+    "firedDetail": "Se disparó a {{price}} el {{when}}.",
+    "delete": "Eliminar",
+    "rearm": "Reactivar",
+    "notifTitle": "PULSO — alerta de {{symbol}}",
+    "notifBody": "{{symbol}} tocó {{price}} (objetivo: {{target}}).",
+    "loadErrorTitle": "No pudimos cargar los precios",
+    "disclaimer": "Las alertas viven solo en este navegador (localStorage) y se chequean cada 60 segundos mientras PULSO está abierto. No constituyen asesoramiento financiero."
   }
 }

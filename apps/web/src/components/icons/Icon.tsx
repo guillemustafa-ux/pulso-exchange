@@ -174,6 +174,15 @@ export function IconClose(props: IconProps): JSX.Element {
   )
 }
 
+export function IconBell(props: IconProps): JSX.Element {
+  return (
+    <svg {...base(props)}>
+      <path d="M12 4C8.96243 4 6.5 6.46243 6.5 9.5V13.5L5 16.5H19L17.5 13.5V9.5C17.5 6.46243 15.0376 4 12 4Z" />
+      <path d="M10 19.5C10.35 20.4 11.1 21 12 21C12.9 21 13.65 20.4 14 19.5" />
+    </svg>
+  )
+}
+
 export interface SortIconProps extends IconProps {
   state: 'asc' | 'desc' | 'none'
 }
