@@ -52,8 +52,17 @@ jobs:
       - name: i18n — paridad de claves entre locales (es/en/pt)
         run: npm run check:i18n
 
+      - name: Unit tests (vitest — lib/rates, lib/format)
+        run: npm run test
+
       - name: Build (tsc -b + vite build)
         run: npm run build
+
+      - name: Instalar Chromium para E2E
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E (Playwright sobre el build, API stubbeada)
+        run: npx playwright test
 
   api:
     name: Backend (FastAPI)
@@ -69,7 +78,10 @@ jobs:
           python-version: '3.12'
 
       - name: Instalar dependencias
-        run: pip install -r requirements.txt
+        run: pip install -r requirements.txt -r requirements-dev.txt
 
       - name: La app importa y arranca (smoke)
         run: python -c "from app.main import app; print('OK:', app.title)"
+
+      - name: Tests (pytest — motor de bots + fallback de market)
+        run: pytest -q
