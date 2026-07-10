@@ -183,6 +183,20 @@ export function IconBell(props: IconProps): JSX.Element {
   )
 }
 
+interface StarProps extends IconProps {
+  /** Relleno cuando la moneda está en la watchlist; contorno cuando no. */
+  filled?: boolean
+}
+
+/** Estrella de favorito — misma silueta llena o vacía según `filled`. */
+export function IconStar({ filled = false, ...props }: StarProps): JSX.Element {
+  return (
+    <svg {...base(props)} fill={filled ? 'currentColor' : 'none'}>
+      <path d="M12 3.5L14.6 8.77L20.4 9.61L16.2 13.7L17.19 19.48L12 16.75L6.81 19.48L7.8 13.7L3.6 9.61L9.4 8.77L12 3.5Z" />
+    </svg>
+  )
+}
+
 export interface SortIconProps extends IconProps {
   state: 'asc' | 'desc' | 'none'
 }

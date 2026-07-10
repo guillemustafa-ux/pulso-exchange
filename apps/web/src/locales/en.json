@@ -23,7 +23,8 @@
     "tendencias": "Trends",
     "educacion": "Education",
     "seguridad": "Security",
-    "alertas": "Alerts"
+    "alertas": "Alerts",
+    "watchlist": "Watchlist"
   },
   "langSwitch": {
     "es": "ES",
@@ -495,7 +496,8 @@
       "converter": "Converter",
       "portfolio": "Portfolio",
       "general": "PULSO",
-      "alerts": "Alerts"
+      "alerts": "Alerts",
+      "watchlist": "Watchlist"
     },
     "quickQuestions": {
       "market": [
@@ -563,5 +565,17 @@
     "notifBody": "{{symbol}} hit {{price}} (target: {{target}}).",
     "loadErrorTitle": "Could not load prices",
     "disclaimer": "Alerts live only in this browser (localStorage) and are checked every 60 seconds while PULSO is open. Not financial advice."
+  },
+  "watchlist": {
+    "title": "Watchlist",
+    "subtitle": "The cryptos you starred in Market, with their live price.",
+    "empty": "You're not following any crypto yet. Tap the star in the Market table to add one.",
+    "goToMarket": "Go to Market",
+    "marketCap": "Market cap",
+    "alertCount": "Alerts: {{count}}",
+    "addAria": "Add {{symbol}} to watchlist",
+    "removeAria": "Remove {{symbol}} from watchlist",
+    "loadErrorTitle": "Could not load prices",
+    "disclaimer": "Your watchlist lives only in this browser (localStorage). Not financial advice."
   }
 }

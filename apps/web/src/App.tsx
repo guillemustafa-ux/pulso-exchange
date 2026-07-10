@@ -15,6 +15,7 @@ const Market = lazy(() => import('./pages/Market'))
 const Converter = lazy(() => import('./pages/Converter'))
 const Portfolio = lazy(() => import('./pages/Portfolio'))
 const Alerts = lazy(() => import('./pages/Alerts'))
+const Watchlist = lazy(() => import('./pages/Watchlist'))
 const Earn = lazy(() => import('./pages/Earn'))
 const DeFi = lazy(() => import('./pages/DeFi'))
 const Staking = lazy(() => import('./pages/Staking'))
@@ -64,6 +65,7 @@ function App(): JSX.Element {
             <Route path="/converter" element={<Converter />} />
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/alerts" element={<Alerts />} />
+            <Route path="/watchlist" element={<Watchlist />} />
             <Route path="/earn" element={<Earn />} />
             <Route path="/defi" element={<DeFi />} />
             <Route path="/staking" element={<Staking />} />

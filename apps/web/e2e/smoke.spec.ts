@@ -110,6 +110,24 @@ test('educación: las lecciones se traducen con el switch de idioma', async ({ p
   await expect(page.getByText('Wallets and seeds: the foundation of custody')).toBeVisible()
 })
 
+test('watchlist: marcar en Mercado aparece en Favoritos y persiste', async ({ page }) => {
+  await page.goto('/market')
+  await expect(page.getByText('Bitcoin').first()).toBeVisible()
+  // La estrella de la fila de BTC (aria-label "Agregar BTC a favoritos").
+  await page.getByRole('button', { name: /Agregar BTC a favoritos/i }).click()
+  await page.goto('/watchlist')
+  await expect(page.getByText('Bitcoin').first()).toBeVisible()
+  await expect(page.getByText('$50,000.00').first()).toBeVisible()
+  // Persiste al recargar (localStorage).
+  await page.reload()
+  await expect(page.getByText('Bitcoin').first()).toBeVisible()
+})
+
+test('watchlist: vacía muestra el estado inicial', async ({ page }) => {
+  await page.goto('/watchlist')
+  await expect(page.getByRole('button', { name: 'Ir a Mercado' })).toBeVisible()
+})
+
 test('i18n: el switch cambia es -> en', async ({ page }) => {
   await page.goto('/market')
   // Nav en español por defecto; tras el switch, las labels pasan a inglés.

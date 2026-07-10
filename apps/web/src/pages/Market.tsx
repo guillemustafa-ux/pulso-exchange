@@ -8,11 +8,13 @@ import type { Column } from '../components/ui/Table'
 import { Button } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
 import { PulseIcon } from '../components/icons/PulseIcon'
+import { IconStar } from '../components/icons/Icon'
 import { CoinDetail } from './CoinDetail'
 import { ApiError, fetchTop100 } from '../services/api'
 import type { CoinMarketItem } from '../services/api'
 import { formatCompactUsd, formatPercent, formatUsd } from '../lib/format'
 import { cn } from '../lib/cn'
+import { loadWatchlist, saveWatchlist, toggleWatch } from '../lib/watchlist'
 import { useSetPageContext } from '../context/AIContext'
 
 /** Coincide con el TTL del cache del backend (60s) — no tiene sentido pollear más seguido. */
@@ -97,9 +99,18 @@ export function Market(): JSX.Element {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [lastUpdated, setLastUpdated] = useState<number | null>(null)
+  const [watchlist, setWatchlist] = useState<string[]>(() => loadWatchlist())
 
   const navigate = useNavigate()
   const { id } = useParams<{ id?: string }>()
+
+  const handleToggleWatch = useCallback((coinId: string) => {
+    setWatchlist((prev) => {
+      const next = toggleWatch(prev, coinId)
+      saveWatchlist(next)
+      return next
+    })
+  }, [])
 
   const load = useCallback(async (opts: { silent?: boolean } = {}) => {
     if (!opts.silent) setLoading(true)
@@ -127,6 +138,34 @@ export function Market(): JSX.Element {
 
   const columns = useMemo<Column<CoinMarketItem>[]>(
     () => [
+      {
+        key: 'watch',
+        header: '',
+        width: '40px',
+        cell: (row) => {
+          const watched = watchlist.includes(row.id)
+          return (
+            <button
+              type="button"
+              // stopPropagation: la fila navega al detalle; la estrella no debe hacerlo.
+              onClick={(e) => {
+                e.stopPropagation()
+                handleToggleWatch(row.id)
+              }}
+              aria-pressed={watched}
+              aria-label={t(watched ? 'watchlist.removeAria' : 'watchlist.addAria', {
+                symbol: row.symbol.toUpperCase(),
+              })}
+              className={cn(
+                'transition-colors',
+                watched ? 'text-amber-400' : 'text-text-muted hover:text-text-secondary',
+              )}
+            >
+              <IconStar filled={watched} className="h-4 w-4" />
+            </button>
+          )
+        },
+      },
       {
         key: 'rank',
         header: t('market.columns.rank'),
@@ -191,7 +230,7 @@ export function Market(): JSX.Element {
         cell: (row) => <span>{formatCompactUsd(row.total_volume)}</span>,
       },
     ],
-    [t],
+    [t, watchlist, handleToggleWatch],
   )
 
   const selectedCoin = id ? (coins?.find((c) => c.id === id) ?? null) : null

@@ -23,7 +23,8 @@
     "tendencias": "Tendencias",
     "educacion": "Educación",
     "seguridad": "Seguridad",
-    "alertas": "Alertas"
+    "alertas": "Alertas",
+    "watchlist": "Favoritos"
   },
   "langSwitch": {
     "es": "ES",
@@ -495,7 +496,8 @@
       "converter": "Conversor",
       "portfolio": "Portfolio",
       "general": "PULSO",
-      "alerts": "Alertas"
+      "alerts": "Alertas",
+      "watchlist": "Favoritos"
     },
     "quickQuestions": {
       "market": [
@@ -563,5 +565,17 @@
     "notifBody": "{{symbol}} tocó {{price}} (objetivo: {{target}}).",
     "loadErrorTitle": "No pudimos cargar los precios",
     "disclaimer": "Las alertas viven solo en este navegador (localStorage) y se chequean cada 60 segundos mientras PULSO está abierto. No constituyen asesoramiento financiero."
+  },
+  "watchlist": {
+    "title": "Favoritos",
+    "subtitle": "Las criptos que marcaste con la estrella en Mercado, con su precio en vivo.",
+    "empty": "Todavía no seguís ninguna cripto. Tocá la estrella en la tabla de Mercado para agregarla.",
+    "goToMarket": "Ir a Mercado",
+    "marketCap": "Cap. de mercado",
+    "alertCount": "Alertas: {{count}}",
+    "addAria": "Agregar {{symbol}} a favoritos",
+    "removeAria": "Quitar {{symbol}} de favoritos",
+    "loadErrorTitle": "No pudimos cargar los precios",
+    "disclaimer": "Tus favoritos viven solo en este navegador (localStorage). No constituyen asesoramiento financiero."
   }
 }
