@@ -10,7 +10,8 @@
     "updateError": "Não foi possível atualizar: {{error}}",
     "connectionError": "Não foi possível conectar com a API da PULSO. Está rodando na :8000?",
     "visit": "Visitar ↗",
-    "viewOnEtherscan": "Ver no Etherscan ↗"
+    "viewOnEtherscan": "Ver no Etherscan ↗",
+    "liveStream": "Preços em tempo real"
   },
   "nav": {
     "mercado": "Mercado",

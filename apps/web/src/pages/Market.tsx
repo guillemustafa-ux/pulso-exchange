@@ -15,6 +15,8 @@ import type { CoinMarketItem } from '../services/api'
 import { formatCompactUsd, formatPercent, formatUsd } from '../lib/format'
 import { cn } from '../lib/cn'
 import { loadWatchlist, saveWatchlist, toggleWatch } from '../lib/watchlist'
+import { mergeLivePrices } from '../lib/livePrices'
+import { useLivePrices } from '../hooks/useLivePrices'
 import { useSetPageContext } from '../context/AIContext'
 
 /** Coincide con el TTL del cache del backend (60s) — no tiene sentido pollear más seguido. */
@@ -103,6 +105,14 @@ export function Market(): JSX.Element {
 
   const navigate = useNavigate()
   const { id } = useParams<{ id?: string }>()
+
+  // Overlay de precios en vivo (SSE): pisa current_price sobre el top100 de
+  // CoinGecko; si el stream no está, `liveCoins === coins` y queda el polling.
+  const { prices: livePrices, live: streamLive } = useLivePrices()
+  const liveCoins = useMemo(
+    () => (coins ? mergeLivePrices(coins, livePrices) : coins),
+    [coins, livePrices],
+  )
 
   const handleToggleWatch = useCallback((coinId: string) => {
     setWatchlist((prev) => {
@@ -233,7 +243,7 @@ export function Market(): JSX.Element {
     [t, watchlist, handleToggleWatch],
   )
 
-  const selectedCoin = id ? (coins?.find((c) => c.id === id) ?? null) : null
+  const selectedCoin = id ? (liveCoins?.find((c) => c.id === id) ?? null) : null
 
   // Snapshot para el AIAssistant -- solo datos que están efectivamente en
   // pantalla, nunca precios/cifras que el modelo no puede ver acá.
@@ -249,7 +259,7 @@ export function Market(): JSX.Element {
           market_cap_usd: selectedCoin.market_cap,
         }
       : null,
-    top_monedas_visibles: (coins ?? []).slice(0, 8).map((c) => ({
+    top_monedas_visibles: (liveCoins ?? []).slice(0, 8).map((c) => ({
       symbol: c.symbol,
       nombre: c.name,
       precio_usd: c.current_price,
@@ -289,8 +299,10 @@ export function Market(): JSX.Element {
           <p className="mt-1 text-sm text-text-tertiary">{t('market.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="info" size="md" live>
-            {t('common.liveData')}
+          {/* El punto pulsa solo con el stream SSE conectado; sin stream el
+              badge dice "Datos en vivo" (polling 60s), sin prometer de más. */}
+          <Badge variant="info" size="md" live={streamLive}>
+            {t(streamLive ? 'common.liveStream' : 'common.liveData')}
           </Badge>
           {lastUpdated && (
             <span className="hidden text-xs text-text-muted sm:inline">
@@ -310,7 +322,7 @@ export function Market(): JSX.Element {
       )}
 
       <Table
-        data={coins ?? []}
+        data={liveCoins ?? []}
         columns={columns}
         rowKey={(row) => row.id}
         onRowClick={handleRowClick}

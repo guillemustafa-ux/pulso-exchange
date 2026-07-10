@@ -7,7 +7,8 @@ import i18n from '../i18n'
 
 const DEFAULT_API_URL = 'http://localhost:8000'
 
-const API_URL = (
+/** Origin de la API — exportado para consumidores no-fetch (ej. EventSource del stream SSE). */
+export const API_URL = (
   (import.meta.env.VITE_API_URL as string | undefined)?.trim() || DEFAULT_API_URL
 ).replace(/\/+$/, '')
 

@@ -12,6 +12,8 @@ import { formatCompactUsd, formatPercent, formatUsd } from '../lib/format'
 import { cn } from '../lib/cn'
 import { loadWatchlist, saveWatchlist, toggleWatch } from '../lib/watchlist'
 import { loadAlerts } from '../lib/alerts'
+import { mergeLivePrices } from '../lib/livePrices'
+import { useLivePrices } from '../hooks/useLivePrices'
 import { useSetPageContext } from '../context/AIContext'
 
 const REFRESH_INTERVAL_MS = 60_000
@@ -57,13 +59,19 @@ export function Watchlist(): JSX.Element {
     return map
   }, [])
 
+  // Overlay de precios en vivo (SSE) sobre el top100; sin stream queda el polling.
+  const { prices: livePrices } = useLivePrices()
+
   // Las monedas seguidas, en el orden de la watchlist, resueltas contra el top100.
   const watchedCoins = useMemo(
     () =>
-      watchlist
-        .map((id) => coins.find((c) => c.id === id))
-        .filter((c): c is CoinMarketItem => c !== undefined),
-    [watchlist, coins],
+      mergeLivePrices(
+        watchlist
+          .map((id) => coins.find((c) => c.id === id))
+          .filter((c): c is CoinMarketItem => c !== undefined),
+        livePrices,
+      ),
+    [watchlist, coins, livePrices],
   )
 
   useSetPageContext({

@@ -16,7 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.db import init_db
 from app.middleware import RateLimitMiddleware, RequestLoggingMiddleware
 from app.motor.engine import start_engine, stop_engine
-from app.routers import ai, bots, defi, earn, health, market, trends
+from app.routers import ai, bots, defi, earn, health, market, stream, trends
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 logging.basicConfig(
@@ -74,6 +74,7 @@ app.include_router(defi.router)
 app.include_router(ai.router)
 app.include_router(trends.router)
 app.include_router(bots.router)
+app.include_router(stream.router)
 
 
 @app.get("/")

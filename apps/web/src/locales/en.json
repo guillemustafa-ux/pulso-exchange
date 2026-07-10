@@ -10,7 +10,8 @@
     "updateError": "Couldn't refresh: {{error}}",
     "connectionError": "Couldn't connect to the PULSO API. Is it running on :8000?",
     "visit": "Visit ↗",
-    "viewOnEtherscan": "View on Etherscan ↗"
+    "viewOnEtherscan": "View on Etherscan ↗",
+    "liveStream": "Real-time prices"
   },
   "nav": {
     "mercado": "Market",

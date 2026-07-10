@@ -128,6 +128,31 @@ test('watchlist: vacía muestra el estado inicial', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Ir a Mercado' })).toBeVisible()
 })
 
+test('stream SSE: el precio vivo pisa al de CoinGecko y el badge pasa a tiempo real', async ({ page }) => {
+  // Registrada DESPUÉS del stubApi del beforeEach -> tiene precedencia sobre
+  // el catch-all para esta URL. Un frame snapshot y la conexión cierra
+  // (EventSource reintenta solo; alcanza para el assert).
+  await page.route('**/api/stream/prices', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'text/event-stream',
+      body: 'data: {"type":"snapshot","prices":{"BTCUSDT":51234}}\n\n',
+    }),
+  )
+  await page.goto('/market')
+  // El top100 stub dice 50.000, pero el stream manda 51.234 -> gana el vivo.
+  await expect(page.getByText('$51,234.00').first()).toBeVisible()
+  await expect(page.getByText('Precios en tiempo real')).toBeVisible()
+})
+
+test('stream SSE: sin stream la página degrada al polling sin romper', async ({ page }) => {
+  // El catch-all del stubApi responde JSON al stream -> EventSource falla el
+  // MIME check y se cierra; la tabla sigue con los datos del polling.
+  await page.goto('/market')
+  await expect(page.getByText('$50,000.00').first()).toBeVisible()
+  await expect(page.getByText('Datos en vivo')).toBeVisible() // badge de polling, no promete stream
+})
+
 test('i18n: el switch cambia es -> en', async ({ page }) => {
   await page.goto('/market')
   // Nav en español por defecto; tras el switch, las labels pasan a inglés.
