@@ -46,8 +46,9 @@ def test_map_paprika_ticker_produce_shape_coingecko():
     assert item.market_cap_rank == 1
     assert item.price_change_percentage_24h == pytest.approx(2.5)
     assert item.price_change_percentage_7d_in_currency == pytest.approx(-1.2)
+    # El logo se arma desde el CDN estático de Paprika (keyed por coin id).
+    assert item.image == "https://static.coinpaprika.com/coin/btc-bitcoin/logo.png"
     # Lo que Paprika no tiene queda null y el frontend ya lo guardea.
-    assert item.image is None
     assert item.sparkline_in_7d is None
 
 
@@ -56,6 +57,11 @@ def test_map_paprika_ticker_sin_quotes_no_explota():
     item = CoinMarketItem(**mapped)
     assert item.current_price is None
     assert item.market_cap is None
+
+
+def test_map_paprika_ticker_sin_id_no_inventa_logo():
+    mapped = market._map_paprika_ticker({"symbol": "X", "name": "X"})
+    assert mapped["image"] is None  # sin id no hay URL que armar
 
 
 async def test_fetch_top100_usa_coingecko_si_responde(monkeypatch):

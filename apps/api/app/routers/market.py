@@ -90,17 +90,18 @@ async def _fetch_top100_coingecko() -> list[dict[str, Any]]:
 
 def _map_paprika_ticker(t: dict[str, Any]) -> dict[str, Any]:
     """Map a CoinPaprika ticker to the CoinGecko-shaped CoinMarketItem dict.
-    Fields CoinPaprika doesn't provide (image, sparkline) are left null — the
-    frontend already guards both (`coin.image ? ... : fallback`,
-    `sparkline_in_7d?.price ?? []`)."""
+    Fields CoinPaprika doesn't provide in the ticker (sparkline) are left
+    null — the frontend already guards (`sparkline_in_7d?.price ?? []`).
+    The logo does exist on CoinPaprika's static CDN, keyed by coin id."""
     usd = t.get("quotes", {}).get("USD", {})
     change_24h = usd.get("percent_change_24h")
+    coin_id = t.get("id")
     return {
-        "id": t.get("id"),
+        "id": coin_id,
         # CoinGecko symbols are lowercase; the frontend upper-cases for display.
         "symbol": str(t.get("symbol", "")).lower(),
         "name": t.get("name"),
-        "image": None,
+        "image": f"https://static.coinpaprika.com/coin/{coin_id}/logo.png" if coin_id else None,
         "current_price": usd.get("price"),
         "market_cap": usd.get("market_cap"),
         "market_cap_rank": t.get("rank"),
