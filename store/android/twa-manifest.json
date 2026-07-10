@@ -1,0 +1,52 @@
+{
+  "packageId": "com.guillemustafa.pulso",
+  "host": "pulso-exchange.vercel.app",
+  "name": "PULSO — Exchange non-custodial",
+  "launcherName": "PULSO",
+  "display": "standalone",
+  "themeColor": "#0a0118",
+  "themeColorDark": "#0a0118",
+  "navigationColor": "#0a0118",
+  "navigationColorDark": "#0a0118",
+  "navigationDividerColor": "#0a0118",
+  "navigationDividerColorDark": "#0a0118",
+  "backgroundColor": "#0a0118",
+  "startUrl": "/",
+  "iconUrl": "https://pulso-exchange.vercel.app/pwa-512x512.png",
+  "maskableIconUrl": "https://pulso-exchange.vercel.app/pwa-maskable-512x512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "C:\\Users\\Cript\\.keys\\pulso-android\\upload.keystore",
+    "alias": "pulso-upload"
+  },
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [
+    {
+      "name": "Mercado",
+      "shortName": "Mercado",
+      "url": "/market",
+      "chosenIconUrl": "https://pulso-exchange.vercel.app/pwa-192x192.png"
+    },
+    {
+      "name": "Favoritos",
+      "shortName": "Favoritos",
+      "url": "/watchlist",
+      "chosenIconUrl": "https://pulso-exchange.vercel.app/pwa-192x192.png"
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://pulso-exchange.vercel.app/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "enableNotifications": false,
+  "features": {},
+  "orientation": "portrait",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "minSdkVersion": 21,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://pulso-exchange.vercel.app/",
+  "enableSiteSettingsShortcut": true
+}

@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.guillemustafa.pulso",
+      "sha256_cert_fingerprints": [
+        "D2:79:9A:74:D1:72:E4:66:FE:49:58:F7:EF:AD:3E:0A:15:24:F2:D1:F6:02:6D:1E:E9:A2:00:B3:D9:27:62:2A"
+      ]
+    }
+  }
+]

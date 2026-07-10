@@ -1,0 +1,15 @@
+# Proyecto Android generado por Bubblewrap — regenerable con `bubblewrap update`
+app/
+gradle/
+build.gradle
+settings.gradle
+gradle.properties
+gradlew
+gradlew.bat
+manifest-checksum.txt
+store_icon.png
+
+# Artefactos firmados — se regeneran; el keystore vive FUERA del repo
+*.aab
+*.apk
+*.idsig
