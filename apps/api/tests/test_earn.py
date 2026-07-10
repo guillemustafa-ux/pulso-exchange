@@ -68,6 +68,20 @@ async def test_earn_ar_cachea_las_cotizaciones(monkeypatch):
     assert calls["n"] == 1  # el segundo request sale de la cache (TTL 10 min)
 
 
+async def test_earn_ar_500_si_el_archivo_estatico_falla(monkeypatch):
+    _reset()
+
+    def boom():
+        raise OSError("earn_ar.json ilegible")
+
+    monkeypatch.setattr(earn, "_load_opciones", boom)
+    try:
+        await earn.get_earn_ar()
+        raise AssertionError("debería haber levantado 500")
+    except earn.HTTPException as exc:
+        assert exc.status_code == 500
+
+
 def test_tabla_curada_real_valida_contra_schema():
     # La tabla estática de disco no debe romper el modelo (guardia de datos).
     opciones = earn._load_opciones()

@@ -80,6 +80,30 @@ async def test_protocols_upstream_caido_devuelve_502(monkeypatch):
         assert exc.status_code == 502
 
 
+async def test_protocols_upstream_vacio_devuelve_lista_vacia(monkeypatch):
+    _reset()
+
+    async def fake_fetch():
+        return []
+
+    monkeypatch.setattr(defi, "_fetch_protocols_raw", fake_fetch)
+    assert await defi.get_protocols() == []
+
+
+async def test_protocols_cachea_sin_refetch(monkeypatch):
+    _reset()
+    calls = {"n": 0}
+
+    async def fake_fetch():
+        calls["n"] += 1
+        return [_raw("Aave", 1000)]
+
+    monkeypatch.setattr(defi, "_fetch_protocols_raw", fake_fetch)
+    await defi.get_protocols()
+    await defi.get_protocols()
+    assert calls["n"] == 1  # el segundo request sale de la cache (TTL 5 min)
+
+
 def test_map_protocol_fallbacks_de_id():
     # id sale de slug; si falta, de id; si falta, de name.
     assert defi._map_protocol({"slug": "aave", "name": "Aave"})["id"] == "aave"

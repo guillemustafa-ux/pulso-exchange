@@ -59,6 +59,13 @@ def test_top_movers_ordena_y_filtra_sin_pct():
     assert all(m["id"] != "ddd" for m in gainers + losers)
 
 
+def test_pct_24h_usa_in_currency_y_cae_al_generico():
+    # Prioriza el campo _in_currency; si falta, usa el genérico; si faltan ambos, None.
+    assert trends._pct_24h({"price_change_percentage_24h_in_currency": 5.0}) == 5.0
+    assert trends._pct_24h({"price_change_percentage_24h": -3.0}) == -3.0
+    assert trends._pct_24h({}) is None
+
+
 # ---------------------------------------------------------------------------
 # /fear-greed
 # ---------------------------------------------------------------------------
@@ -88,6 +95,20 @@ async def test_fear_greed_upstream_caido_502(monkeypatch):
         raise AssertionError("debería haber levantado 502")
     except trends.HTTPException as exc:
         assert exc.status_code == 502
+
+
+async def test_fear_greed_cachea_sin_refetch(monkeypatch):
+    _reset_all()
+    calls = {"n": 0}
+
+    async def fake(limit=30):
+        calls["n"] += 1
+        return FNG_RAW
+
+    monkeypatch.setattr(trends, "_fetch_fear_greed", fake)
+    await trends.get_fear_greed()
+    await trends.get_fear_greed()
+    assert calls["n"] == 1  # el segundo request sale de la cache (TTL 1h)
 
 
 # ---------------------------------------------------------------------------
@@ -150,3 +171,50 @@ async def test_summary_degrada_si_una_fuente_cae(monkeypatch):
     assert model.fear_greed is None  # la fuente caída degrada a None
     assert model.market_cap_usd == 2_500_000_000_000  # el resto se sirve igual
     assert len(model.gainers) == 1
+
+
+async def test_summary_las_cuatro_caen_devuelve_200_vacio(monkeypatch):
+    _reset_all()
+
+    async def down(*a, **k):
+        raise httpx.ConnectError("todo caído")
+
+    monkeypatch.setattr(trends, "_fetch_fear_greed", down)
+    monkeypatch.setattr(trends, "_fetch_trending_raw", down)
+    monkeypatch.setattr(trends, "_fetch_top100", down)
+    monkeypatch.setattr(trends, "_fetch_global_raw", down)
+
+    # asyncio.gather(return_exceptions=True) -> no propaga, degrada todo a vacío.
+    result = await trends.get_summary()
+    model = TrendsSummaryResponse(**result)
+    assert model.fear_greed is None
+    assert model.trending == []
+    assert model.gainers == [] and model.losers == []
+    assert model.market_cap_usd is None
+    assert model.btc_dominance is None
+
+
+async def test_summary_trunca_trending_a_siete(monkeypatch):
+    _reset_all()
+
+    async def fng(limit=30):
+        return FNG_RAW
+
+    async def trending():
+        # 10 trending crudos; el summary debe recortar a 7.
+        return [{"id": f"c{i}", "name": f"Coin {i}", "symbol": f"c{i}"} for i in range(10)]
+
+    async def top100():
+        return []
+
+    async def glob():
+        return GLOBAL_RAW
+
+    monkeypatch.setattr(trends, "_fetch_fear_greed", fng)
+    monkeypatch.setattr(trends, "_fetch_trending_raw", trending)
+    monkeypatch.setattr(trends, "_fetch_top100", top100)
+    monkeypatch.setattr(trends, "_fetch_global_raw", glob)
+
+    result = await trends.get_summary()
+    model = TrendsSummaryResponse(**result)
+    assert len(model.trending) == 7
