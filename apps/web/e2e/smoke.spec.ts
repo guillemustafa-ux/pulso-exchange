@@ -11,7 +11,10 @@
 import { expect, test, type Page } from '@playwright/test'
 
 const BTC = {
-  id: 'bitcoin',
+  // Id estilo CoinPaprika A PROPÓSITO: producción suele servir el fallback
+  // (CoinGecko ratelimitea datacenters) y los defaults hardcodeados tipo
+  // 'bitcoin' no existen en ese esquema — la suite cubre esa realidad.
+  id: 'btc-bitcoin',
   symbol: 'btc',
   name: 'Bitcoin',
   image: null,

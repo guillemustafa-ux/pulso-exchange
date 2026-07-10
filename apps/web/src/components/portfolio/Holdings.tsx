@@ -48,7 +48,13 @@ export function Holdings({ coins }: HoldingsProps): JSX.Element {
   const [amount, setAmount] = useState('')
   const [buyPrice, setBuyPrice] = useState('')
 
-  const selectedCoin = useMemo(() => coins.find((c) => c.id === coinId), [coins, coinId])
+  // Fallback a la primera del top100: el id default ('bitcoin') es el esquema
+  // de CoinGecko, pero con el fallback CoinPaprika los ids son otros
+  // ('btc-bitcoin') y un default hardcodeado no matchearía nunca.
+  const selectedCoin = useMemo(
+    () => coins.find((c) => c.id === coinId) ?? coins[0],
+    [coins, coinId],
+  )
   const currentOfSelected =
     (selectedCoin ? liveUsdtPrice(livePrices, selectedCoin.symbol) : null) ??
     selectedCoin?.current_price ??
@@ -123,7 +129,7 @@ export function Holdings({ coins }: HoldingsProps): JSX.Element {
       <Card className="flex flex-col gap-3">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto_auto_auto]">
           <select
-            value={coinId}
+            value={selectedCoin?.id ?? coinId}
             onChange={(e) => setCoinId(e.target.value)}
             aria-label={t('holdings.coinAria')}
             className={inputClass}

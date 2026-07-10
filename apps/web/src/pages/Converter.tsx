@@ -58,7 +58,13 @@ export function Converter(): JSX.Element {
     [cotizaciones],
   )
 
-  const selectedCoin = useMemo(() => coins.find((c) => c.id === coinId), [coins, coinId])
+  // Fallback a la primera del top100: el id default ('bitcoin') es el esquema
+  // de CoinGecko, pero con el fallback CoinPaprika los ids son otros
+  // ('btc-bitcoin') y un default hardcodeado no matchearía nunca.
+  const selectedCoin = useMemo(
+    () => coins.find((c) => c.id === coinId) ?? coins[0],
+    [coins, coinId],
+  )
   const parsedAmount = Number(amount.replace(',', '.'))
   const amountValid = Number.isFinite(parsedAmount) && parsedAmount > 0
 
@@ -118,7 +124,7 @@ export function Converter(): JSX.Element {
               className="w-full rounded-lg border border-border-default bg-surface-1 px-3 py-2 font-display text-lg tabular-nums text-text-primary outline-none focus:border-border-emphasis"
             />
             <select
-              value={coinId}
+              value={selectedCoin?.id ?? coinId}
               onChange={(e) => setCoinId(e.target.value)}
               disabled={loading && coins.length === 0}
               className="w-full rounded-lg border border-border-default bg-surface-1 px-3 py-2 text-sm text-text-primary outline-none focus:border-border-emphasis sm:w-48"
