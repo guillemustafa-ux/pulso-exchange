@@ -14,6 +14,9 @@ export default defineConfig({
     baseURL: 'http://localhost:4174',
     ...devices['Desktop Chrome'],
     channel: process.env.CI ? undefined : 'chrome',
+    // El service worker de la PWA NO debe interceptar los requests de los
+    // tests: los stubs de route interception tienen que ver todo el tráfico.
+    serviceWorkers: 'block',
   },
   webServer: {
     command: 'npm run preview -- --port 4174 --strictPort',
