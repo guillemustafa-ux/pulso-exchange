@@ -182,6 +182,23 @@ test('trading: el terminal renderiza velas stubbeadas con OHLC y stats', async (
   await expect(page.getByRole('button', { name: 'SMA 9/21' })).toBeVisible()
 })
 
+test('portfolio: alta de posición manual calcula PnL y persiste', async ({ page }) => {
+  await page.goto('/portfolio')
+  // 0.5 BTC comprados a 40.000; el stub cotiza BTC a 50.000 -> vale 25.000, +5.000 (+25%).
+  await page.getByLabel('Cantidad comprada').fill('0.5')
+  await page.getByLabel('Precio de compra en USD').fill('40000')
+  await page.getByRole('button', { name: 'Agregar' }).click()
+  await expect(page.getByText('Valor total')).toBeVisible()
+  await expect(page.getByText('$25,000.00').first()).toBeVisible()
+  await expect(page.getByText('+$5,000.00').first()).toBeVisible()
+  // Persiste al recargar (localStorage).
+  await page.reload()
+  await expect(page.getByText('$25,000.00').first()).toBeVisible()
+  // Eliminar la posición vuelve al estado vacío.
+  await page.getByRole('button', { name: 'Eliminar posición de BTC' }).click()
+  await expect(page.getByText(/Todavía no cargaste posiciones/)).toBeVisible()
+})
+
 test('i18n: el switch cambia es -> en', async ({ page }) => {
   await page.goto('/market')
   // Nav en español por defecto; tras el switch, las labels pasan a inglés.

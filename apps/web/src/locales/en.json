@@ -592,5 +592,24 @@
     "high24h": "24h high",
     "low24h": "24h low",
     "disclaimer": "Informational chart built on public Binance data. PULSO never executes real orders and none of this is financial advice."
+  },
+  "holdings": {
+    "title": "My positions",
+    "subtitle": "Log your buys and track the result with live prices. Everything stays on your device.",
+    "totalValue": "Total value",
+    "totalCost": "Invested",
+    "totalPnl": "P&L",
+    "coinAria": "Choose coin",
+    "amountPlaceholder": "Amount",
+    "amountAria": "Amount bought",
+    "buyPricePlaceholder": "Buy price (now: {{price}})",
+    "buyPriceEmpty": "Buy price USD",
+    "buyPriceAria": "Buy price in USD",
+    "add": "Add",
+    "invalidAmount": "Enter an amount greater than zero.",
+    "bought": "Bought at {{price}}",
+    "empty": "No positions yet. Add your first buy above.",
+    "removeAria": "Remove {{symbol}} position",
+    "disclaimer": "Manual log for informational purposes: PULSO does not custody these funds nor verify the buys. None of this is financial advice."
   }
 }

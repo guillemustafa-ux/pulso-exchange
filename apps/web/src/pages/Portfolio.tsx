@@ -7,6 +7,7 @@ import { Card, CardContent } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
 import { WalletButton } from '../components/WalletButton'
+import { Holdings } from '../components/portfolio/Holdings'
 import { IconWallet } from '../components/icons/Icon'
 import { cn } from '../lib/cn'
 import { formatArs, formatUsd } from '../lib/format'
@@ -125,6 +126,9 @@ export function Portfolio(): JSX.Element {
         </div>
         <p className="max-w-2xl text-sm text-text-secondary">{t('portfolio.subtitle')}</p>
       </header>
+
+      {/* Posiciones manuales: viven en localStorage, disponibles CON o SIN wallet. */}
+      <Holdings coins={coins} />
 
       {!isConnected ? (
         <Card glow="violet">

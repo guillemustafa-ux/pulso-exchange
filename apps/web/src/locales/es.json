@@ -592,5 +592,24 @@
     "high24h": "Máx 24h",
     "low24h": "Mín 24h",
     "disclaimer": "Gráfico informativo con datos públicos de Binance. PULSO no ejecuta órdenes reales y nada de esto es asesoramiento financiero."
+  },
+  "holdings": {
+    "title": "Mis posiciones",
+    "subtitle": "Cargá tus compras y seguí el resultado con precios en vivo. Todo queda en tu dispositivo.",
+    "totalValue": "Valor total",
+    "totalCost": "Invertido",
+    "totalPnl": "Resultado",
+    "coinAria": "Elegir moneda",
+    "amountPlaceholder": "Cantidad",
+    "amountAria": "Cantidad comprada",
+    "buyPricePlaceholder": "Precio de compra (hoy: {{price}})",
+    "buyPriceEmpty": "Precio de compra USD",
+    "buyPriceAria": "Precio de compra en USD",
+    "add": "Agregar",
+    "invalidAmount": "Ingresá una cantidad mayor a cero.",
+    "bought": "Comprada a {{price}}",
+    "empty": "Todavía no cargaste posiciones. Agregá tu primera compra arriba.",
+    "removeAria": "Eliminar posición de {{symbol}}",
+    "disclaimer": "Registro manual con fines informativos: PULSO no custodia estos fondos ni verifica las compras. Nada de esto es asesoramiento financiero."
   }
 }
