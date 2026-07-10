@@ -13,3 +13,5 @@ store_icon.png
 *.aab
 *.apk
 *.idsig
+.gradle/
+build/
