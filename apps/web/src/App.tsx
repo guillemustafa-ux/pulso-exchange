@@ -12,6 +12,7 @@ import { Home } from './pages/Home'
 // resto se carga on-demand -- evita que RainbowKit/wagmi/lightweight-charts/
 // recharts de páginas que el usuario nunca visita infle el chunk inicial.
 const Market = lazy(() => import('./pages/Market'))
+const Trading = lazy(() => import('./pages/Trading'))
 const Converter = lazy(() => import('./pages/Converter'))
 const Portfolio = lazy(() => import('./pages/Portfolio'))
 const Alerts = lazy(() => import('./pages/Alerts'))
@@ -62,6 +63,7 @@ function App(): JSX.Element {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/market/:id?" element={<Market />} />
+            <Route path="/trading" element={<Trading />} />
             <Route path="/converter" element={<Converter />} />
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/alerts" element={<Alerts />} />

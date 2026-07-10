@@ -174,6 +174,19 @@ export function IconClose(props: IconProps): JSX.Element {
   )
 }
 
+export function IconCandles(props: IconProps): JSX.Element {
+  return (
+    <svg {...base(props)}>
+      <path d="M7 6V9" />
+      <rect x="5" y="9" width="4" height="7" rx="0.5" />
+      <path d="M7 16V19" />
+      <path d="M17 4V7" />
+      <rect x="15" y="7" width="4" height="8" rx="0.5" />
+      <path d="M17 15V18" />
+    </svg>
+  )
+}
+
 export function IconBell(props: IconProps): JSX.Element {
   return (
     <svg {...base(props)}>

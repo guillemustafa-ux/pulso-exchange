@@ -153,6 +153,35 @@ test('stream SSE: sin stream la página degrada al polling sin romper', async ({
   await expect(page.getByText('Datos en vivo')).toBeVisible() // badge de polling, no promete stream
 })
 
+test('trading: el terminal renderiza velas stubbeadas con OHLC y stats', async ({ page }) => {
+  // 30 velas horarias sintéticas — suficientes para que la SMA 21 exista.
+  const klines = Array.from({ length: 30 }, (_, i) => ({
+    open_time: (1_700_000_000 + i * 3600) * 1000,
+    open: 50000 + i * 10,
+    high: 50100 + i * 10,
+    low: 49900 + i * 10,
+    close: 50050 + i * 10,
+    volume: 1000 + i,
+    close_time: null,
+    quote_volume: null,
+    trades: null,
+  }))
+  await page.route('**/api/market/klines/**', (route) =>
+    route.fulfill({
+      json: { source: 'binance', symbol: 'BTCUSDT', interval: '1h', coingecko_id: null, klines },
+    }),
+  )
+  await page.goto('/trading')
+  // Leyenda OHLC de la última vela (close = 50050 + 29*10 = 50340).
+  await expect(page.getByText('$50,340.00').first()).toBeVisible()
+  // Chart montado (canvas de lightweight-charts adentro).
+  await expect(page.getByTestId('trading-chart').locator('canvas').first()).toBeAttached()
+  // Stats del par desde el stub del top100 (market cap compacto de BTC).
+  await expect(page.getByText('Máx 24h')).toBeVisible()
+  // Toggle SMA presente y activo.
+  await expect(page.getByRole('button', { name: 'SMA 9/21' })).toBeVisible()
+})
+
 test('i18n: el switch cambia es -> en', async ({ page }) => {
   await page.goto('/market')
   // Nav en español por defecto; tras el switch, las labels pasan a inglés.

@@ -25,7 +25,8 @@
     "educacion": "Education",
     "seguridad": "Security",
     "alertas": "Alerts",
-    "watchlist": "Watchlist"
+    "watchlist": "Watchlist",
+    "trading": "Trading"
   },
   "langSwitch": {
     "es": "ES",
@@ -498,7 +499,8 @@
       "portfolio": "Portfolio",
       "general": "PULSO",
       "alerts": "Alerts",
-      "watchlist": "Watchlist"
+      "watchlist": "Watchlist",
+      "trading": "Trading"
     },
     "quickQuestions": {
       "market": [
@@ -578,5 +580,17 @@
     "removeAria": "Remove {{symbol}} from watchlist",
     "loadErrorTitle": "Could not load prices",
     "disclaimer": "Your watchlist lives only in this browser (localStorage). Not financial advice."
+  },
+  "trading": {
+    "title": "Trading terminal",
+    "subtitle": "Binance candles with volume and moving averages — read-only, no orders here.",
+    "pairAria": "Choose trading pair",
+    "loadingChart": "Loading candles…",
+    "errorNoPair": "Binance has no {{symbol}}/USDT pair.",
+    "marketCap": "Market cap",
+    "volume24h": "24h volume",
+    "high24h": "24h high",
+    "low24h": "24h low",
+    "disclaimer": "Informational chart built on public Binance data. PULSO never executes real orders and none of this is financial advice."
   }
 }

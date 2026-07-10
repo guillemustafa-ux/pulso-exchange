@@ -25,7 +25,8 @@
     "educacion": "Educação",
     "seguridad": "Segurança",
     "alertas": "Alertas",
-    "watchlist": "Favoritos"
+    "watchlist": "Favoritos",
+    "trading": "Trading"
   },
   "langSwitch": {
     "es": "ES",
@@ -498,7 +499,8 @@
       "portfolio": "Portfólio",
       "general": "PULSO",
       "alerts": "Alertas",
-      "watchlist": "Favoritos"
+      "watchlist": "Favoritos",
+      "trading": "Trading"
     },
     "quickQuestions": {
       "market": [
@@ -578,5 +580,17 @@
     "removeAria": "Remover {{symbol}} dos favoritos",
     "loadErrorTitle": "Não foi possível carregar os preços",
     "disclaimer": "Seus favoritos ficam apenas neste navegador (localStorage). Não é aconselhamento financeiro."
+  },
+  "trading": {
+    "title": "Terminal de trading",
+    "subtitle": "Velas da Binance com volume e médias móveis — somente leitura, aqui não se opera.",
+    "pairAria": "Escolher par de trading",
+    "loadingChart": "Carregando velas…",
+    "errorNoPair": "A Binance não tem o par {{symbol}}/USDT.",
+    "marketCap": "Market cap",
+    "volume24h": "Volume 24h",
+    "high24h": "Máx 24h",
+    "low24h": "Mín 24h",
+    "disclaimer": "Gráfico informativo com dados públicos da Binance. O PULSO nunca executa ordens reais e nada disto é aconselhamento financeiro."
   }
 }
