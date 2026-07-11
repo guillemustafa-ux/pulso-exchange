@@ -64,6 +64,17 @@ test.beforeEach(async ({ page }) => {
   await stubApi(page)
 })
 
+test('home: el preview de Mercado muestra el top 3 con precio real', async ({ page }) => {
+  await page.goto('/')
+  // La card de Mercado deja el skeleton y muestra filas con datos del top100
+  // (el símbolo se ve BTC pero el DOM guarda 'btc'; el uppercase es CSS).
+  await expect(page.getByText(/^btc$/i).first()).toBeVisible()
+  await expect(page.getByText('$50,000.00').first()).toBeVisible()
+  // DeFi y Staking ya no dicen "Próximamente": son accesos con descripción.
+  await expect(page.getByText(/DefiLlama/).first()).toBeVisible()
+  await expect(page.getByText(/sin dinero real/).first()).toBeVisible()
+})
+
 test('mercado: la tabla renderiza el top100 con formato USD', async ({ page }) => {
   await page.goto('/market')
   await expect(page.getByText('Bitcoin').first()).toBeVisible()

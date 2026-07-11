@@ -51,8 +51,7 @@ function App(): JSX.Element {
 
   function handleNavigate(id: string): void {
     const item = NAV_ITEMS.find((i) => i.id === id)
-    // Módulos sin página propia todavía (DeFi, Earn, etc.) vuelven a Home, donde
-    // aparecen como cards "Próximamente".
+    // Ítems de nav sin página propia caen en Home.
     navigate(item?.path ?? '/')
   }
 

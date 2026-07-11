@@ -53,12 +53,12 @@
     "ctaHowItWorks": "Cómo funciona",
     "modules": {
       "mercado": "Mercado — Top 100",
+      "mercadoDesc": "Top 100 por capitalización con precios en tiempo real, favoritos y detalle por moneda.",
       "defi": "DeFi — mejores protocolos",
-      "staking": "Staking on-chain"
+      "defiDesc": "Los protocolos líderes de DeFi rankeados por TVL, con datos de DefiLlama.",
+      "staking": "Staking on-chain",
+      "stakingDesc": "Staking de demostración en la testnet Sepolia — conectá tu wallet, sin dinero real."
     },
-    "syncingLabel": "Sincronizando {{label}}",
-    "syncing": "sincronizando",
-    "comingSoon": "Próximamente",
     "footerTag": "Design system — Día 1"
   },
   "market": {

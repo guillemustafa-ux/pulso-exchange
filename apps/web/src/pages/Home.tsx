@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import type { JSX } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
@@ -7,18 +8,60 @@ import { Card, CardHeader, CardTitle } from '../components/ui/Card'
 import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
 import { Skeleton } from '../components/ui/Skeleton'
-import { Spinner } from '../components/ui/Spinner'
 import { PulseIcon } from '../components/icons/PulseIcon'
+import { fetchTop100 } from '../services/api'
+import type { CoinMarketItem } from '../services/api'
+import { formatPercent, formatUsd } from '../lib/format'
+import { cn } from '../lib/cn'
 
-const PREVIEW_MODULES: { id: string; labelKey: string; sync: boolean; path?: string }[] = [
-  { id: 'mercado', labelKey: 'home.modules.mercado', sync: true, path: '/market' },
-  { id: 'defi', labelKey: 'home.modules.defi', sync: false },
-  { id: 'staking', labelKey: 'home.modules.staking', sync: false },
+const PREVIEW_MODULES: { id: string; labelKey: string; descKey: string; path: string }[] = [
+  { id: 'mercado', labelKey: 'home.modules.mercado', descKey: 'home.modules.mercadoDesc', path: '/market' },
+  { id: 'defi', labelKey: 'home.modules.defi', descKey: 'home.modules.defiDesc', path: '/defi' },
+  { id: 'staking', labelKey: 'home.modules.staking', descKey: 'home.modules.stakingDesc', path: '/staking' },
 ]
+
+/** Mini-fila del preview de Mercado: logo, símbolo, precio y 24h% coloreado. */
+function PreviewRow({ coin }: { coin: CoinMarketItem }): JSX.Element {
+  const pct = coin.price_change_percentage_24h_in_currency ?? coin.price_change_percentage_24h
+  const positive = (pct ?? 0) >= 0
+  return (
+    <li className="flex items-center gap-2 text-sm">
+      {coin.image ? <img src={coin.image} alt="" className="h-5 w-5 rounded-full" loading="lazy" /> : null}
+      <span className="font-medium uppercase text-text-primary">{coin.symbol}</span>
+      <span className="ml-auto tabular-nums text-text-secondary">{formatUsd(coin.current_price)}</span>
+      {pct === null || pct === undefined || Number.isNaN(pct) ? (
+        <span className="text-text-muted">—</span>
+      ) : (
+        <span className={cn('inline-flex items-center gap-1 tabular-nums', positive ? 'text-positive' : 'text-negative')}>
+          <span aria-hidden="true">{positive ? '▲' : '▼'}</span>
+          {formatPercent(pct)}
+        </span>
+      )}
+    </li>
+  )
+}
 
 export function Home(): JSX.Element {
   const navigate = useNavigate()
   const { t } = useTranslation()
+  // Preview one-shot del top 3 (sin polling: la landing es un teaser, el dato
+  // vivo está en /market). Si falla, la card degrada al texto descriptivo.
+  const [top3, setTop3] = useState<CoinMarketItem[] | null>(null)
+  const [previewFailed, setPreviewFailed] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    fetchTop100()
+      .then((coins) => {
+        if (!cancelled) setTop3(coins.slice(0, 3))
+      })
+      .catch(() => {
+        if (!cancelled) setPreviewFailed(true)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-16">
@@ -60,6 +103,7 @@ export function Home(): JSX.Element {
       <section className="grid gap-4 pb-16 sm:grid-cols-2 lg:grid-cols-3">
         {PREVIEW_MODULES.map((module, i) => {
           const label = t(module.labelKey)
+          const isMarketPreview = module.id === 'mercado'
           return (
             <motion.div
               key={module.id}
@@ -67,25 +111,21 @@ export function Home(): JSX.Element {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.15 + i * 0.08, ease: [0.16, 1, 0.3, 1] }}
             >
-              <Card
-                glow="violet"
-                onClick={module.path ? () => navigate(module.path!) : undefined}
-                className={module.path ? 'cursor-pointer' : undefined}
-              >
+              <Card glow="violet" onClick={() => navigate(module.path)} className="cursor-pointer">
                 <CardHeader>
                   <CardTitle>{label}</CardTitle>
-                  {module.sync ? (
-                    <span className="flex items-center gap-1.5 text-xs text-text-tertiary">
-                      <Spinner size="sm" color="violet" label={t('home.syncingLabel', { label })} />
-                      {t('home.syncing')}
-                    </span>
-                  ) : (
-                    <Badge variant="neutral" size="sm">
-                      {t('home.comingSoon')}
-                    </Badge>
-                  )}
                 </CardHeader>
-                <Skeleton lines={3} />
+                {isMarketPreview && top3 ? (
+                  <ul className="flex flex-col gap-2.5">
+                    {top3.map((coin) => (
+                      <PreviewRow key={coin.id} coin={coin} />
+                    ))}
+                  </ul>
+                ) : isMarketPreview && !previewFailed ? (
+                  <Skeleton lines={3} />
+                ) : (
+                  <p className="text-sm text-text-secondary">{t(module.descKey)}</p>
+                )}
               </Card>
             </motion.div>
           )
