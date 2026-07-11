@@ -1,9 +1,9 @@
 # Ficha de Google Play — textos listos para pegar
 
-## Título (máx 30 caracteres — este tiene 29)
+## Título (máx 30 caracteres — este tiene 20)
 
 ```
-PULSO — Mercado cripto en vivo
+PULSO: Mercado Cripto
 ```
 
 ## Descripción corta (máx 80 caracteres — esta tiene 78)
@@ -58,12 +58,7 @@ PULSO es una plataforma educativa y de seguimiento de mercado. No es un exchange
 | Tags sugeridos | criptomonedas, bitcoin, precios, educación |
 | Email de contacto | guille.mustafa@gmail.com |
 | Sitio web | https://pulso-exchange.vercel.app |
-| Política de privacidad | https://pulso-exchange.vercel.app (ver nota abajo) |
-
-> **Nota política de privacidad**: Play exige una URL de privacy policy. PULSO no
-> tiene cuentas ni recolecta datos personales (todo vive en localStorage del
-> dispositivo) — hace falta publicar una página simple que diga exactamente eso.
-> Pedirla como próxima tarea antes de subir la ficha.
+| Política de privacidad | https://pulso-exchange.vercel.app/privacidad.html |
 
 ## Assets en esta carpeta
 
