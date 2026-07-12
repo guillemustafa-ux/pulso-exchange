@@ -467,7 +467,7 @@ export function Trends(): JSX.Element {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="info" size="md" live>
+          <Badge variant="realtime" size="md" live>
             {t('common.liveData')}
           </Badge>
           {lastUpdated && (

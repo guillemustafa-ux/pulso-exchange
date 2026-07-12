@@ -293,7 +293,7 @@ export function DeFi(): JSX.Element {
           <p className="mt-1 text-sm text-text-tertiary">{t('defi.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="info" size="md" live>
+          <Badge variant="realtime" size="md" live>
             {t('common.liveData')}
           </Badge>
           {lastUpdated && (

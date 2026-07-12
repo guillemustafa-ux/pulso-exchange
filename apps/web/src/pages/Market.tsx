@@ -301,7 +301,7 @@ export function Market(): JSX.Element {
         <div className="flex items-center gap-2">
           {/* El punto pulsa solo con el stream SSE conectado; sin stream el
               badge dice "Datos en vivo" (polling 60s), sin prometer de más. */}
-          <Badge variant="info" size="md" live={streamLive}>
+          <Badge variant="realtime" size="md" live={streamLive}>
             {t(streamLive ? 'common.liveStream' : 'common.liveData')}
           </Badge>
           {lastUpdated && (

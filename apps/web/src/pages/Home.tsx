@@ -81,7 +81,7 @@ export function Home(): JSX.Element {
         <p className="max-w-xl text-balance text-sm text-text-secondary md:text-base">{t('home.subtitle')}</p>
 
         <div className="flex flex-wrap items-center justify-center gap-2">
-          <Badge variant="info" size="md" live>
+          <Badge variant="realtime" size="md" live>
             {t('home.badgeLiveData')}
           </Badge>
           <Badge variant="neutral" size="md">
@@ -113,7 +113,7 @@ export function Home(): JSX.Element {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.15 + i * 0.08, ease: [0.16, 1, 0.3, 1] }}
             >
-              <Card glow="violet" onClick={() => navigate(module.path)} className="cursor-pointer">
+              <Card glow={isMarketPreview ? 'cyan' : 'violet'} onClick={() => navigate(module.path)} className="cursor-pointer">
                 <CardHeader>
                   <CardTitle>{label}</CardTitle>
                 </CardHeader>

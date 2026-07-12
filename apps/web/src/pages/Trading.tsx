@@ -238,7 +238,7 @@ export function Trading(): JSX.Element {
           <h1 className="font-display text-2xl font-semibold text-text-primary">{t('trading.title')}</h1>
           <p className="mt-1 text-sm text-text-tertiary">{t('trading.subtitle')}</p>
         </div>
-        <Badge variant="info" size="md" live={streamLive}>
+        <Badge variant="realtime" size="md" live={streamLive}>
           {t(streamLive ? 'common.liveStream' : 'common.liveData')}
         </Badge>
       </div>
