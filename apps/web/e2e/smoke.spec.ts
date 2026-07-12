@@ -8,57 +8,8 @@
  *    (la misma matemática que valida rates.test.ts, acá punta a punta en UI).
  *  - i18n: el switch de idioma cambia los textos (es -> en).
  */
-import { expect, test, type Page } from '@playwright/test'
-
-const BTC = {
-  // Id estilo CoinPaprika A PROPÓSITO: producción suele servir el fallback
-  // (CoinGecko ratelimitea datacenters) y los defaults hardcodeados tipo
-  // 'bitcoin' no existen en ese esquema — la suite cubre esa realidad.
-  id: 'btc-bitcoin',
-  symbol: 'btc',
-  name: 'Bitcoin',
-  image: null,
-  current_price: 50000,
-  market_cap: 985_000_000_000,
-  market_cap_rank: 1,
-  total_volume: 30_000_000_000,
-  price_change_percentage_24h: 2.5,
-  price_change_percentage_24h_in_currency: 2.5,
-  price_change_percentage_7d_in_currency: -1.2,
-  market_cap_change_percentage_24h: 2.4,
-  circulating_supply: 19_700_000,
-  total_supply: 19_700_000,
-  max_supply: 21_000_000,
-  last_updated: '2026-07-08T00:00:00Z',
-  sparkline_in_7d: null,
-}
-
-const EARN_AR = {
-  disclaimer: 'stub',
-  updated_at: '2026-07-08T00:00:00Z',
-  opciones: [],
-  cotizaciones: {
-    dolar: {
-      mep: { al30: { ci: { price: 1200 } } },
-      ccl: { al30: { ci: { price: 1250 } } },
-    },
-    usdt_ars: { binance: { ask: 1300 }, otra: { ask: 1310 } },
-  },
-  cotizaciones_error: null,
-}
-
-async function stubApi(page: Page): Promise<void> {
-  await page.route('**/api/market/top100', (route) =>
-    route.fulfill({ json: [BTC] }),
-  )
-  await page.route('**/api/earn/ar', (route) => route.fulfill({ json: EARN_AR }))
-  // Cualquier otro endpoint: vacío pero 200, para que ninguna página rompa.
-  await page.route('**/api/**', (route) => {
-    if (route.request().url().includes('/api/market/top100')) return route.fallback()
-    if (route.request().url().includes('/api/earn/ar')) return route.fallback()
-    return route.fulfill({ json: {} })
-  })
-}
+import { expect, test } from '@playwright/test'
+import { BTC, stubApi } from './stubs'
 
 test.beforeEach(async ({ page }) => {
   await stubApi(page)
@@ -73,6 +24,16 @@ test('home: el preview de Mercado muestra el top 3 con precio real', async ({ pa
   // DeFi y Staking ya no dicen "Próximamente": son accesos con descripción.
   await expect(page.getByText(/DefiLlama/).first()).toBeVisible()
   await expect(page.getByText(/sin dinero real/).first()).toBeVisible()
+})
+
+test('home: "Cómo funciona" abre el onboarding y el CTA lleva a Mercado', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Cómo funciona' }).click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+  await expect(page.getByText('Lo que PULSO no es')).toBeVisible()
+  // El CTA del modal cierra y navega al mercado real.
+  await page.getByRole('dialog').getByRole('button', { name: 'Explorar el mercado' }).click()
+  await expect(page.getByText('Bitcoin').first()).toBeVisible()
 })
 
 test('mercado: la tabla renderiza el top100 con formato USD', async ({ page }) => {
@@ -165,6 +126,20 @@ test('stream SSE: sin stream la página degrada al polling sin romper', async ({
   await page.goto('/market')
   await expect(page.getByText('$50,000.00').first()).toBeVisible()
   await expect(page.getByText('Datos en vivo')).toBeVisible() // badge de polling, no promete stream
+})
+
+test('cold start: si la API tarda aparece el banner honesto y desaparece al responder', async ({ page }) => {
+  // Pisa el stub del beforeEach: top100 responde recién a los 5.5s, por encima
+  // del umbral de 4s del banner (simula el free tier despertando).
+  await page.route('**/api/market/top100', async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 5500))
+    await route.fulfill({ json: [BTC] })
+  })
+  await page.goto('/market')
+  await expect(page.getByText(/servidor gratuito/).first()).toBeVisible({ timeout: 6000 })
+  // Cuando la API responde, el banner se va y los datos aparecen.
+  await expect(page.getByText('$50,000.00').first()).toBeVisible({ timeout: 10000 })
+  await expect(page.getByText(/servidor gratuito/)).toHaveCount(0)
 })
 
 test('trading: el terminal renderiza velas stubbeadas con OHLC y stats', async ({ page }) => {

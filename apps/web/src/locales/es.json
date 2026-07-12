@@ -9,6 +9,7 @@
     "liveData": "Datos en vivo",
     "updateError": "No se pudo actualizar: {{error}}",
     "connectionError": "No se pudo conectar con la API de PULSO. ¿Está corriendo en :8000?",
+    "apiWaking": "El servidor gratuito se está despertando — la primera carga puede tardar hasta un minuto.",
     "visit": "Visitar ↗",
     "viewOnEtherscan": "Ver en Etherscan ↗",
     "liveStream": "Precios en tiempo real"
@@ -60,6 +61,18 @@
       "stakingDesc": "Staking de demostración en la testnet Sepolia — conectá tu wallet, sin dinero real."
     },
     "footerTag": "Design system — Día 1"
+  },
+  "howItWorks": {
+    "title": "Cómo funciona PULSO",
+    "intro": "PULSO es tu ventana al mercado cripto: datos reales, herramientas para seguir tu cartera y un espacio para aprender — sin custodiar fondos ni pedirte registro.",
+    "realTimeTitle": "Mercado en tiempo real",
+    "realTimeBody": "Top 100 con streaming de precios en vivo, terminal con velas, conversor a pesos argentinos (MEP/CCL/USDT), DeFi y tendencias.",
+    "yourDataTitle": "Tu cartera, en tu dispositivo",
+    "yourDataBody": "Portfolio, favoritos y alertas de precio viven en tu navegador. No hay cuentas: nadie más ve tus datos.",
+    "learnTitle": "Aprender sin arriesgar",
+    "learnBody": "8 lecciones con quiz, bots de trading con capital 100% simulado y staking de demostración en la testnet Sepolia.",
+    "notTitle": "Lo que PULSO no es",
+    "notBody": "No es un exchange real: no ejecuta compras ni ventas con dinero real, no custodia fondos, nunca pide tu seed phrase y nada de lo que muestra es asesoramiento financiero."
   },
   "market": {
     "title": "Mercado",

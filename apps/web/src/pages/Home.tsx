@@ -9,6 +9,7 @@ import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
 import { Skeleton } from '../components/ui/Skeleton'
 import { PulseIcon } from '../components/icons/PulseIcon'
+import { HowItWorksModal } from '../components/HowItWorksModal'
 import { fetchTop100 } from '../services/api'
 import type { CoinMarketItem } from '../services/api'
 import { formatPercent, formatUsd } from '../lib/format'
@@ -48,6 +49,7 @@ export function Home(): JSX.Element {
   // vivo está en /market). Si falla, la card degrada al texto descriptivo.
   const [top3, setTop3] = useState<CoinMarketItem[] | null>(null)
   const [previewFailed, setPreviewFailed] = useState(false)
+  const [howOpen, setHowOpen] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -94,7 +96,7 @@ export function Home(): JSX.Element {
           <Button variant="primary" size="lg" onClick={() => navigate('/market')}>
             {t('home.ctaExplore')}
           </Button>
-          <Button variant="secondary" size="lg">
+          <Button variant="secondary" size="lg" onClick={() => setHowOpen(true)}>
             {t('home.ctaHowItWorks')}
           </Button>
         </div>
@@ -136,6 +138,15 @@ export function Home(): JSX.Element {
         <PulseIcon variant="flat" className="h-4 w-10" />
         <span className="text-xs">{t('home.footerTag')}</span>
       </footer>
+
+      <HowItWorksModal
+        open={howOpen}
+        onClose={() => setHowOpen(false)}
+        onExplore={() => {
+          setHowOpen(false)
+          navigate('/market')
+        }}
+      />
     </div>
   )
 }

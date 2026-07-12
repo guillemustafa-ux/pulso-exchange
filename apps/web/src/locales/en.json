@@ -9,6 +9,7 @@
     "liveData": "Live data",
     "updateError": "Couldn't refresh: {{error}}",
     "connectionError": "Couldn't connect to the PULSO API. Is it running on :8000?",
+    "apiWaking": "The free-tier server is waking up — the first load can take up to a minute.",
     "visit": "Visit ↗",
     "viewOnEtherscan": "View on Etherscan ↗",
     "liveStream": "Real-time prices"
@@ -60,6 +61,18 @@
       "stakingDesc": "Demo staking on the Sepolia testnet — connect your wallet, no real money involved."
     },
     "footerTag": "Design system — Day 1"
+  },
+  "howItWorks": {
+    "title": "How PULSO works",
+    "intro": "PULSO is your window into the crypto market: real data, tools to track your holdings and a place to learn — without holding your funds or asking you to sign up.",
+    "realTimeTitle": "Real-time market",
+    "realTimeBody": "Top 100 with live price streaming, a candlestick terminal, an Argentine peso converter (MEP/CCL/USDT), DeFi and trends.",
+    "yourDataTitle": "Your holdings, on your device",
+    "yourDataBody": "Portfolio, favorites and price alerts live in your browser. There are no accounts: nobody else sees your data.",
+    "learnTitle": "Learn without risking",
+    "learnBody": "8 lessons with quizzes, trading bots with 100% simulated capital and demo staking on the Sepolia testnet.",
+    "notTitle": "What PULSO is not",
+    "notBody": "It is not a real exchange: it doesn't execute buys or sells with real money, doesn't hold funds, never asks for your seed phrase, and nothing it shows is financial advice."
   },
   "market": {
     "title": "Market",

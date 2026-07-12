@@ -8,6 +8,7 @@ import { PulseIcon } from '../icons/PulseIcon'
 import { IconMore, IconClose } from '../icons/Icon'
 import { WalletButton } from '../WalletButton'
 import { AIAssistant } from '../AIAssistant'
+import { ApiWakeBanner } from '../ApiWakeBanner'
 import { LanguageSwitch } from '../LanguageSwitch'
 import { NAV_ITEMS, MOBILE_PRIMARY_IDS } from './nav-items'
 import type { NavItem } from './nav-items'
@@ -240,6 +241,7 @@ export function Layout({ children, activeId = 'mercado', onNavigate, className }
       <Sidebar activeId={currentActive} onNavigate={handleNavigate} />
       <div className="flex min-w-0 flex-1 flex-col">
         <Header activeLabel={activeLabel} />
+        <ApiWakeBanner />
         <main className="flex-1 px-4 pb-24 pt-6 md:px-8 md:pb-10">{children}</main>
       </div>
       <BottomNav activeId={currentActive} onNavigate={handleNavigate} />

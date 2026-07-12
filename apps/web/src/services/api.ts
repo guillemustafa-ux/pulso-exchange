@@ -23,12 +23,29 @@ export class ApiError extends Error {
   }
 }
 
+// --- Señal de cold start ---------------------------------------------------
+// La API vive en un free tier que se duerme sin tráfico y tarda ~30-60s en
+// despertar. Si un GET supera el umbral emitimos `pulso:api-slow`; con la
+// primera respuesta del servidor (aunque sea un error HTTP: significa que ya
+// despertó) emitimos `pulso:api-awake`. El banner del Layout escucha ambos.
+export const API_SLOW_EVENT = 'pulso:api-slow'
+export const API_AWAKE_EVENT = 'pulso:api-awake'
+const SLOW_THRESHOLD_MS = 4000
+
+function emitApiEvent(name: string): void {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event(name))
+}
+
 async function getJson<T>(path: string): Promise<T> {
+  const slowTimer = setTimeout(() => emitApiEvent(API_SLOW_EVENT), SLOW_THRESHOLD_MS)
   let res: Response
   try {
     res = await fetch(`${API_URL}${path}`)
+    emitApiEvent(API_AWAKE_EVENT)
   } catch {
     throw new ApiError(i18n.t('common.connectionError'), 0)
+  } finally {
+    clearTimeout(slowTimer)
   }
 
   if (!res.ok) {

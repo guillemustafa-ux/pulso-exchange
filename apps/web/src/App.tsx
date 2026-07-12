@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react'
+import { Suspense, lazy, useEffect } from 'react'
 import type { JSX } from 'react'
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -7,6 +7,7 @@ import { NAV_ITEMS } from './components/layout/nav-items'
 import { AIContextProvider } from './context/AIContext'
 import { Spinner } from './components/ui/Spinner'
 import { Home } from './pages/Home'
+import { API_URL } from './services/api'
 
 // Code-splitting por página: Home (landing) va en el bundle principal, el
 // resto se carga on-demand -- evita que RainbowKit/wagmi/lightweight-charts/
@@ -48,6 +49,13 @@ function App(): JSX.Element {
   const location = useLocation()
   const navigate = useNavigate()
   const activeId = resolveActiveId(location.pathname)
+
+  // Precalentamiento: la API free-tier se duerme sin tráfico; un ping temprano
+  // a /health (exento de rate limit) arranca el boot del servidor apenas el
+  // usuario entra, antes del primer fetch real de la página que visite.
+  useEffect(() => {
+    fetch(`${API_URL}/health`).catch(() => {})
+  }, [])
 
   function handleNavigate(id: string): void {
     const item = NAV_ITEMS.find((i) => i.id === id)
