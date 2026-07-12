@@ -56,7 +56,7 @@ PULSO es una plataforma educativa y de seguimiento de mercado. No es un exchange
 |---|---|
 | Categoría | Finanzas |
 | Tags sugeridos | criptomonedas, bitcoin, precios, educación |
-| Email de contacto | pulso.crypto@gmail.com |
+| Email de contacto | pulso.crypto.exc@gmail.com |
 | Sitio web | https://pulso-exchange.vercel.app |
 | Política de privacidad | https://pulso-exchange.vercel.app/privacidad.html |
 
